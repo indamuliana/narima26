@@ -35,4 +35,24 @@ class TagihanDetail extends Model
     {
         return $this->belongsTo(Tagihan::class, 'tagihan_id');
     }
+
+    public function getKodeBiayaAttribute(): ?string
+    {
+        return $this->kode_biaya_snapshot;
+    }
+
+    public function getNamaBiayaAttribute(): ?string
+    {
+        return $this->nama_biaya_snapshot;
+    }
+
+    public function getKategoriAttribute(): ?string
+    {
+        return $this->kategori_snapshot;
+    }
+
+    public function getNominalAttribute(): float
+    {
+        return (float) $this->nominal_snapshot;
+    }
 }

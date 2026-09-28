@@ -47,12 +47,22 @@ Route::middleware(['auth', 'role:admin'])
     });
 
 // Bendahara Area
-Route::middleware(['auth', 'role:bendahara'])
+// Bendahara Area (Fase 7 & Fase 11)
+Route::middleware(['auth', 'role:bendahara,admin'])
     ->prefix('bendahara')
     ->name('bendahara.')
     ->group(function () {
         Route::get('/dashboard', function () {
-            return view('bendahara.dashboard');
+            $stats = [
+                'seleksi_masuk' => (float) \App\Models\PembayaranSeleksi::where('status', 'DIVERIFIKASI')->sum('nominal_dibayar'),
+                'seleksi_pending' => \App\Models\PembayaranSeleksi::where('status', 'PENDING')->count(),
+                'daftar_ulang_masuk' => (float) \App\Models\PembayaranDaftarUlang::where('status', 'DIVERIFIKASI')->sum('nominal_dibayar'),
+                'daftar_ulang_pending' => \App\Models\PembayaranDaftarUlang::where('status', 'PENDING')->count(),
+                'total_tagihan' => \App\Models\Tagihan::count(),
+            ];
+            $recentSeleksi = \App\Models\PembayaranSeleksi::with('calonSiswa')->latest('id')->take(5)->get();
+            $recentDaftarUlang = \App\Models\PembayaranDaftarUlang::with(['calonSiswa', 'tagihan'])->latest('id')->take(5)->get();
+            return view('bendahara.dashboard', compact('stats', 'recentSeleksi', 'recentDaftarUlang'));
         })->name('dashboard');
 
         // Pembayaran Seleksi (Fase 7)
@@ -65,6 +75,50 @@ Route::middleware(['auth', 'role:bendahara'])
                 Route::post('/{pembayaranSeleksi}/verify', 'verify')->name('verify');
                 Route::post('/{pembayaranSeleksi}/reject', 'reject')->name('reject');
                 Route::get('/{pembayaranSeleksi}/cetak', 'cetakKwitansi')->name('cetak');
+            });
+
+        // Tagihan Daftar Ulang (Fase 11)
+        Route::controller(\App\Http\Controllers\Bendahara\TagihanController::class)
+            ->prefix('tagihan')
+            ->name('tagihan.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/create', 'create')->name('create');
+                Route::post('/', 'store')->name('store');
+                Route::get('/{tagihan}', 'show')->name('show');
+                Route::get('/{tagihan}/cetak', 'cetakPdf')->name('cetak');
+            });
+
+        // Kelola Diskon (Fase 11)
+        Route::controller(\App\Http\Controllers\Bendahara\DiskonController::class)
+            ->prefix('diskon')
+            ->name('diskon.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::post('/tagihan/{tagihan}', 'store')->name('store');
+            });
+
+        // Pembayaran Daftar Ulang (Fase 11)
+        Route::controller(\App\Http\Controllers\Bendahara\PembayaranDaftarUlangController::class)
+            ->prefix('pembayaran-daftar-ulang')
+            ->name('pembayaran-daftar-ulang.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/{pembayaranDaftarUlang}', 'show')->name('show');
+                Route::post('/{pembayaranDaftarUlang}/verify', 'verify')->name('verify');
+                Route::post('/{pembayaranDaftarUlang}/reject', 'reject')->name('reject');
+                Route::get('/{pembayaranDaftarUlang}/cetak', 'cetakKwitansi')->name('cetak-kwitansi');
+            });
+
+        // Master Biaya (Fase 11)
+        Route::controller(\App\Http\Controllers\Bendahara\MasterBiayaController::class)
+            ->prefix('master-biaya')
+            ->name('master-biaya.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::post('/', 'store')->name('store');
+                Route::put('/{masterBiaya}', 'update')->name('update');
+                Route::patch('/{masterBiaya}/toggle', 'toggle')->name('toggle');
             });
     });
 
@@ -148,6 +202,18 @@ Route::middleware(['auth', 'role:calon_siswa'])
                 Route::get('/kartu', 'cetakKartu')->name('kartu');
                 Route::get('/kesepahaman', 'cetakKesepahaman')->name('kesepahaman');
                 Route::get('/akun', 'cetakAkun')->name('akun');
+            });
+
+        // Daftar Ulang & Tagihan (Fase 11)
+        Route::controller(\App\Http\Controllers\CalonSiswa\DaftarUlangController::class)
+            ->prefix('daftar-ulang')
+            ->name('daftar-ulang.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/bayar', 'bayar')->name('bayar');
+                Route::post('/bayar', 'storeBayar')->name('store-bayar');
+                Route::get('/cetak-tagihan', 'cetakTagihan')->name('cetak-tagihan');
+                Route::get('/cetak-kwitansi/{pembayaranDaftarUlang}', 'cetakKwitansi')->name('cetak-kwitansi');
             });
     });
 

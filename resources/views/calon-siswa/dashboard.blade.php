@@ -32,8 +32,8 @@
             </svg>
             <span>Dokumen & Cetak PDF</span>
         </a>
-        <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <a href="{{ route('calon-siswa.daftar-ulang.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium {{ request()->routeIs('calon-siswa.daftar-ulang.*') ? 'bg-nampi-orange text-white shadow-xs font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }} transition-colors">
+            <svg class="w-5 h-5 {{ request()->routeIs('calon-siswa.daftar-ulang.*') ? 'text-white' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
             <span>Tagihan Daftar Ulang</span>
@@ -158,6 +158,44 @@
                     <span class="inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
                         Menunggu Penetapan Kelulusan
                     </span>
+                </div>
+            </div>
+        @elseif($statusVal === 'MENUNGGU_DAFTAR_ULANG' || $statusVal === 'DITERIMA')
+            <div class="p-6 rounded-3xl bg-amber-50 border border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <div class="flex items-center text-amber-900 font-black text-base gap-2">
+                        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        <span>Tahap Daftar Ulang: Tagihan Biaya Pendidikan Siap Dibayar</span>
+                    </div>
+                    <p class="text-xs text-amber-800">
+                        Tagihan biaya daftar ulang telah diterbitkan oleh panitia/bendahara. Silakan periksa rincian biaya dan lakukan transfer konfirmasi (lunas atau cicilan bertahap).
+                    </p>
+                </div>
+                <div>
+                    <a href="{{ route('calon-siswa.daftar-ulang.index') }}"
+                        class="inline-flex items-center px-5 py-2.5 rounded-xl font-black text-xs bg-nampi-orange text-white hover:bg-orange-600 shadow-md transition transform active:scale-95 whitespace-nowrap">
+                        <span>Buka Tagihan & Bayar</span>
+                        <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </a>
+                </div>
+            </div>
+        @elseif(in_array($statusVal, ['DAFTAR_ULANG_DIVERIFIKASI', 'RESMI_TERDAFTAR']))
+            <div class="p-6 rounded-3xl bg-emerald-50 border border-emerald-300 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <div class="flex items-center text-emerald-900 font-black text-base gap-2">
+                        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span>Daftar Ulang Telah Berhasil Diverifikasi Bendahara</span>
+                    </div>
+                    <p class="text-xs text-emerald-800">
+                        Pembayaran daftar ulang Anda telah divalidasi sah oleh Bendahara Sekolah. Silakan unduh kwitansi resmi tanda terima pembayaran.
+                    </p>
+                </div>
+                <div>
+                    <a href="{{ route('calon-siswa.daftar-ulang.index') }}"
+                        class="inline-flex items-center px-5 py-2.5 rounded-xl font-black text-xs bg-emerald-600 text-white hover:bg-emerald-700 shadow-md transition transform active:scale-95 whitespace-nowrap">
+                        <span>Lihat Tagihan & Unduh Kwitansi</span>
+                        <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </a>
                 </div>
             </div>
         @endif

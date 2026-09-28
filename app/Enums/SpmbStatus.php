@@ -107,6 +107,7 @@ enum SpmbStatus: string
             self::SUDAH_DIWAWANCARA => [
                 self::MENUNGGU_KEPUTUSAN,
                 self::DITERIMA,
+                self::MENUNGGU_DAFTAR_ULANG,
                 self::DITOLAK,
                 self::MENGUNDURKAN_DIRI,
             ],
