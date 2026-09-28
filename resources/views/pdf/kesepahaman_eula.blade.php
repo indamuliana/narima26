@@ -53,9 +53,17 @@
         <li>Menyetujui penggunaan data pribadi untuk keperluan integrasi Data Pokok Pendidikan (Dapodik) Kementerian Pendidikan Dasar dan Menengah RI.</li>
     </ol>
 
-    <p style="font-size: 9.5pt; margin-bottom: 20px;">
+    <p style="font-size: 9.5pt; margin-bottom: 12px;">
         Demikian surat pernyataan dan kesepahaman ini dibuat tanpa ada paksaan dari pihak manapun untuk dipergunakan sebagaimana mestinya.
     </p>
+
+    @if(!empty($eula) && $eula->setuju)
+        <div style="border: 1px solid #16a34a; background-color: #f0fdf4; border-radius: 4px; padding: 8px 12px; margin-bottom: 14px; font-size: 8pt; color: #166534; line-height: 1.4;">
+            <strong style="text-transform: uppercase;">Persetujuan Digital Terverifikasi (EULA SPMB):</strong><br>
+            Disetujui secara elektronik pada: <strong>{{ \Carbon\Carbon::parse($eula->agreed_at)->translatedFormat('d F Y H:i:s') }} WIB</strong><br>
+            Versi Dokumen: <strong>{{ $eula->versi_dokumen }}</strong> &bull; IP Address: <strong>{{ $eula->ip_address ?? '-' }}</strong> &bull; Signature Token: <code>{{ strtoupper(substr(hash('sha256', $calonSiswa->nomor_pendaftaran . $eula->agreed_at), 0, 16)) }}</code>
+        </div>
+    @endif
 
     <div class="signature-box">
         <table>

@@ -128,6 +128,21 @@ class PdfService
     }
 
     /**
+     * Generate Dokumen Informasi Akun Pendaftaran.
+     *
+     * @param CalonSiswa $calonSiswa
+     * @return DomPdfWrapper
+     */
+    public function generateInformasiAkun(CalonSiswa $calonSiswa): DomPdfWrapper
+    {
+        $calonSiswa->loadMissing(['program', 'jurusan', 'gelombang', 'sekolahAsal', 'user']);
+
+        return $this->renderPdf('pdf.informasi_akun', [
+            'calonSiswa' => $calonSiswa,
+        ]);
+    }
+
+    /**
      * Generate Surat Pernyataan dan Kesepahaman (EULA).
      *
      * @param CalonSiswa $calonSiswa
@@ -135,10 +150,13 @@ class PdfService
      */
     public function generateEula(CalonSiswa $calonSiswa): DomPdfWrapper
     {
-        $calonSiswa->loadMissing(['program', 'jurusan', 'orangTua', 'sekolahAsal']);
+        $calonSiswa->loadMissing(['program', 'jurusan', 'orangTua', 'sekolahAsal', 'kesepahaman']);
+
+        $eula = $calonSiswa->kesepahaman()->where('setuju', true)->latest()->first();
 
         return $this->renderPdf('pdf.kesepahaman_eula', [
             'calonSiswa' => $calonSiswa,
+            'eula' => $eula,
         ]);
     }
 

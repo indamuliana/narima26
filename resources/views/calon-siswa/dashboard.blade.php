@@ -20,6 +20,18 @@
             </svg>
             <span>Lengkapi Data & Berkas</span>
         </a>
+        <a href="{{ route('calon-siswa.kesepahaman.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+            <span>Kesepahaman SPMB</span>
+        </a>
+        <a href="{{ route('calon-siswa.dokumen.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+            </svg>
+            <span>Dokumen & Cetak PDF</span>
+        </a>
         <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
             <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -68,7 +80,7 @@
             $isDataActive = in_array($statusVal, ['PEMBAYARAN_SELEKSI_DIVERIFIKASI', 'MELENGKAPI_DATA']);
         @endphp
 
-        <!-- Quick CTA Banner: Jika sudah verifikasi bayar tapi belum lengkap data -->
+        <!-- Quick CTA Banners based on status -->
         @if($isDataActive)
             <div class="p-6 rounded-3xl bg-orange-50 border border-orange-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div class="space-y-1">
@@ -85,6 +97,49 @@
                         class="inline-flex items-center px-5 py-2.5 rounded-xl font-black text-xs bg-orange-500 text-white hover:bg-orange-600 shadow-md transition transform active:scale-95 whitespace-nowrap">
                         <span>Lengkapi Data Sekarang</span>
                         <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </a>
+                </div>
+            </div>
+        @elseif($statusVal === 'DATA_LENGKAP')
+            <div class="p-6 rounded-3xl bg-purple-50 border border-purple-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <div class="flex items-center text-purple-900 font-black text-base gap-2">
+                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        <span>Langkah Selanjutnya: Persetujuan Lembar Kesepahaman (EULA)</span>
+                    </div>
+                    <p class="text-xs text-purple-800">
+                        Data dan berkas Anda telah lengkap 100%! Silakan baca dan setujui lembar kesepahaman bersama orang tua untuk membuka pencetakan Kartu Peserta Ujian/Wawancara.
+                    </p>
+                </div>
+                <div>
+                    <a href="{{ route('calon-siswa.kesepahaman.index') }}"
+                        class="inline-flex items-center px-5 py-2.5 rounded-xl font-black text-xs bg-purple-600 text-white hover:bg-purple-700 shadow-md transition transform active:scale-95 whitespace-nowrap">
+                        <span>Buka Lembar Kesepahaman</span>
+                        <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </a>
+                </div>
+            </div>
+        @elseif($statusVal === 'MENUNGGU_WAWANCARA')
+            <div class="p-6 rounded-3xl bg-blue-50 border border-blue-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <div class="flex items-center text-blue-900 font-black text-base gap-2">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        <span>Tahap Wawancara: Kartu Peserta Anda Siap Dicetak</span>
+                    </div>
+                    <p class="text-xs text-blue-800">
+                        Anda telah menyetujui Lembar Kesepahaman. Silakan cetak Kartu Tanda Peserta SPMB dan Surat Kesepahaman untuk dibawa saat pelaksanaan wawancara di sekolah.
+                    </p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <a href="{{ route('calon-siswa.dokumen.kartu') }}"
+                        class="inline-flex items-center px-4 py-2.5 rounded-xl font-bold text-xs bg-blue-600 text-white hover:bg-blue-700 shadow-sm transition transform active:scale-95 whitespace-nowrap">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        <span>Kartu Peserta (PDF)</span>
+                    </a>
+                    <a href="{{ route('calon-siswa.dokumen.kesepahaman') }}"
+                        class="inline-flex items-center px-4 py-2.5 rounded-xl font-bold text-xs bg-white text-purple-700 hover:bg-purple-50 border border-purple-200 transition transform active:scale-95 whitespace-nowrap">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        <span>Surat Kesepahaman (PDF)</span>
                     </a>
                 </div>
             </div>
@@ -123,19 +178,19 @@
                     </div>
                 @endif
 
-                <!-- Step 3: Lengkapi Data -->
+                <!-- Step 3: Lengkapi Data & Kesepahaman -->
                 @if($isDataComplete)
                     <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800">
                         <div class="flex items-center justify-between text-xs font-bold mb-1">
-                            <span>3. Lengkapi Data</span>
+                            <span>3. Lengkapi Data & EULA</span>
                             <span class="text-emerald-600">✓ Lengkap</span>
                         </div>
-                        <p class="text-[11px] text-emerald-700">Biodata, orang tua, akademik, seragam, & berkas selesai.</p>
+                        <p class="text-[11px] text-emerald-700">Data, berkas, & kesepahaman telah disetujui.</p>
                     </div>
                 @elseif($isDataActive)
                     <div class="p-4 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 ring-2 ring-amber-400/30">
                         <div class="flex items-center justify-between text-xs font-bold mb-1">
-                            <span>3. Lengkapi Data</span>
+                            <span>3. Lengkapi Data & EULA</span>
                             <span class="text-amber-600">Tahap Aktif</span>
                         </div>
                         <p class="text-[11px] text-amber-800">Lengkapi formulir biodata & upload berkas.</p>
@@ -143,29 +198,37 @@
                 @else
                     <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-400">
                         <div class="flex items-center justify-between text-xs font-bold mb-1">
-                            <span>3. Lengkapi Data</span>
+                            <span>3. Lengkapi Data & EULA</span>
                             <span>Terkunci</span>
                         </div>
                         <p class="text-[11px] text-slate-400">Terbuka setelah pembayaran diverifikasi.</p>
                     </div>
                 @endif
 
-                <!-- Step 4: Daftar Ulang -->
-                @if($isDataComplete)
-                    <div class="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900">
+                <!-- Step 4: Wawancara & Daftar Ulang -->
+                @if($statusVal === 'MENUNGGU_WAWANCARA' || $statusVal === 'SUDAH_DIWAWANCARA')
+                    <div class="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 ring-2 ring-blue-400/30">
                         <div class="flex items-center justify-between text-xs font-bold mb-1">
-                            <span>4. Wawancara & Hasil</span>
-                            <span class="text-blue-600">Menunggu Jadwal</span>
+                            <span>4. Tes Wawancara</span>
+                            <span class="text-blue-600">Tahap Aktif</span>
                         </div>
-                        <p class="text-[11px] text-blue-700">Menunggu jadwal wawancara dari panitia.</p>
+                        <p class="text-[11px] text-blue-700">Cetak kartu ujian & ikuti wawancara di kampus.</p>
+                    </div>
+                @elseif(in_array($statusVal, ['DITERIMA', 'MENUNGGU_DAFTAR_ULANG', 'DAFTAR_ULANG_DIVERIFIKASI', 'RESMI_TERDAFTAR']))
+                    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800">
+                        <div class="flex items-center justify-between text-xs font-bold mb-1">
+                            <span>4. Hasil & Daftar Ulang</span>
+                            <span class="text-emerald-600">✓ Lulus Seleksi</span>
+                        </div>
+                        <p class="text-[11px] text-emerald-700">Selamat! Anda dinyatakan diterima di SMK Wikrama.</p>
                     </div>
                 @else
                     <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-400">
                         <div class="flex items-center justify-between text-xs font-bold mb-1">
-                            <span>4. Daftar Ulang</span>
+                            <span>4. Wawancara & Hasil</span>
                             <span>Terkunci</span>
                         </div>
-                        <p class="text-[11px] text-slate-400">Pengumuman kelulusan dan pembayaran tagihan.</p>
+                        <p class="text-[11px] text-slate-400">Terbuka setelah kesepahaman disetujui.</p>
                     </div>
                 @endif
             </div>

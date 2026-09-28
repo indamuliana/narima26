@@ -121,6 +121,27 @@ Route::middleware(['auth', 'role:calon_siswa'])
                 Route::post('/dokumen', 'uploadDokumen')->name('dokumen');
                 Route::post('/finalize', 'finalize')->name('finalize');
             });
+
+        // Modul Kesepahaman / EULA (Fase 9)
+        Route::controller(\App\Http\Controllers\CalonSiswa\KesepahamanController::class)
+            ->prefix('kesepahaman')
+            ->name('kesepahaman.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::post('/', 'store')->name('store');
+                Route::get('/cetak', 'cetakPdf')->name('cetak');
+            });
+
+        // Hub Dokumen & Cetak PDF (Fase 9)
+        Route::controller(\App\Http\Controllers\CalonSiswa\DokumenPdfController::class)
+            ->prefix('dokumen')
+            ->name('dokumen.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/kartu', 'cetakKartu')->name('kartu');
+                Route::get('/kesepahaman', 'cetakKesepahaman')->name('kesepahaman');
+                Route::get('/akun', 'cetakAkun')->name('akun');
+            });
     });
 
 // Cascading Wilayah API (Fase 8)
