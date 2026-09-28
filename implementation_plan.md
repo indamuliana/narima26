@@ -82,7 +82,7 @@ Ruang lingkup utama:
 
 \- Web server lokal: XAMPP v3.3.0.
 
-\- Database: MySQL/MariaDB bawaan XAMPP.
+\- Database: MySQL bawaan XAMPP.
 
 \- PHP: gunakan versi PHP yang kompatibel dengan versi Laravel yang dipilih.
 
@@ -106,7 +106,7 @@ Ruang lingkup utama:
 
 \- Vite.
 
-\- MySQL/MariaDB.
+\- MySQL.
 
 \- `spatie/laravel-activitylog` untuk Audit Trail.
 
