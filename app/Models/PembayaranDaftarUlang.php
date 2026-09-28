@@ -57,4 +57,9 @@ class PembayaranDaftarUlang extends Model
     {
         return $this->belongsTo(User::class, 'verified_by');
     }
+
+    public function verifikator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by');
+    }
 }

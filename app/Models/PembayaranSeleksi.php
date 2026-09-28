@@ -52,6 +52,11 @@ class PembayaranSeleksi extends Model
         return $this->belongsTo(User::class, 'verified_by');
     }
 
+    public function verifikator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by');
+    }
+
     public function isPending(): bool
     {
         return $this->status === self::STATUS_PENDING;

@@ -82,6 +82,11 @@ class CalonSiswa extends Model
         return $this->belongsTo(MasterSekolahAsal::class, 'asal_sekolah_id');
     }
 
+    public function sekolahAsal(): BelongsTo
+    {
+        return $this->belongsTo(MasterSekolahAsal::class, 'asal_sekolah_id');
+    }
+
     public function provinsi(): BelongsTo
     {
         return $this->belongsTo(MasterProvinsi::class, 'provinsi_id');
@@ -103,6 +108,11 @@ class CalonSiswa extends Model
     }
 
     public function dataOrangtua(): HasOne
+    {
+        return $this->hasOne(DataOrangtua::class, 'calon_siswa_id');
+    }
+
+    public function orangTua(): HasOne
     {
         return $this->hasOne(DataOrangtua::class, 'calon_siswa_id');
     }
