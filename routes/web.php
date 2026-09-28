@@ -68,14 +68,21 @@ Route::middleware(['auth', 'role:bendahara'])
             });
     });
 
-// Pewawancara Area
-Route::middleware(['auth', 'role:pewawancara'])
+// Pewawancara Area (Fase 10)
+Route::middleware(['auth', 'role:pewawancara,admin'])
     ->prefix('pewawancara')
     ->name('pewawancara.')
     ->group(function () {
-        Route::get('/dashboard', function () {
-            return view('pewawancara.dashboard');
-        })->name('dashboard');
+        Route::controller(\App\Http\Controllers\Pewawancara\WawancaraController::class)->group(function () {
+            Route::get('/dashboard', 'dashboard')->name('dashboard');
+            Route::get('/antrian', 'index')->name('antrian');
+            Route::get('/wawancara', 'index')->name('wawancara.index');
+            Route::get('/wawancara/{calonSiswa}', 'form')->name('wawancara.form');
+            Route::post('/wawancara/{calonSiswa}', 'store')->name('wawancara.store');
+            Route::get('/wawancara/{calonSiswa}/detail', 'show')->name('wawancara.show');
+            Route::get('/riwayat', 'riwayat')->name('riwayat');
+            Route::get('/instrumen', 'instrumen')->name('instrumen');
+        });
     });
 
 // Kepala Sekolah Area

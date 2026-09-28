@@ -67,6 +67,11 @@ class CalonSiswa extends Model
         return $this->belongsTo(MasterProgram::class, 'program_id');
     }
 
+    public function programBelajar(): BelongsTo
+    {
+        return $this->belongsTo(MasterProgram::class, 'program_id');
+    }
+
     public function jurusan(): BelongsTo
     {
         return $this->belongsTo(MasterJurusan::class, 'jurusan_id');

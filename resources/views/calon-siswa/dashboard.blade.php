@@ -143,6 +143,23 @@
                     </a>
                 </div>
             </div>
+        @elseif($statusVal === 'SUDAH_DIWAWANCARA')
+            <div class="p-6 rounded-3xl bg-emerald-50 border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <div class="flex items-center text-emerald-900 font-black text-base gap-2">
+                        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span>Sesi Wawancara Telah Selesai Dilaksanakan</span>
+                    </div>
+                    <p class="text-xs text-emerald-800">
+                        Penilaian wawancara calon siswa dan orang tua telah selesai diinput oleh pewawancara. Saat ini hasil evaluasi sedang menunggu penetapan keputusan kelulusan oleh Kepala Sekolah dan Komite Seleksi.
+                    </p>
+                </div>
+                <div>
+                    <span class="inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                        Menunggu Penetapan Kelulusan
+                    </span>
+                </div>
+            </div>
         @endif
 
         <!-- Stepper Timeline Alur SPMB -->
@@ -206,13 +223,21 @@
                 @endif
 
                 <!-- Step 4: Wawancara & Daftar Ulang -->
-                @if($statusVal === 'MENUNGGU_WAWANCARA' || $statusVal === 'SUDAH_DIWAWANCARA')
+                @if($statusVal === 'MENUNGGU_WAWANCARA')
                     <div class="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 ring-2 ring-blue-400/30">
                         <div class="flex items-center justify-between text-xs font-bold mb-1">
                             <span>4. Tes Wawancara</span>
                             <span class="text-blue-600">Tahap Aktif</span>
                         </div>
-                        <p class="text-[11px] text-blue-700">Cetak kartu ujian & ikuti wawancara di kampus.</p>
+                        <p class="text-[11px] text-blue-700">Cetak kartu peserta & ikuti wawancara seleksi.</p>
+                    </div>
+                @elseif($statusVal === 'SUDAH_DIWAWANCARA')
+                    <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-900 ring-2 ring-indigo-400/30">
+                        <div class="flex items-center justify-between text-xs font-bold mb-1">
+                            <span>4. Tes Wawancara</span>
+                            <span class="text-indigo-600">✓ Selesai Diuji</span>
+                        </div>
+                        <p class="text-[11px] text-indigo-700">Menunggu keputusan sidang kelulusan panitia SPMB.</p>
                     </div>
                 @elseif(in_array($statusVal, ['DITERIMA', 'MENUNGGU_DAFTAR_ULANG', 'DAFTAR_ULANG_DIVERIFIKASI', 'RESMI_TERDAFTAR']))
                     <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800">
