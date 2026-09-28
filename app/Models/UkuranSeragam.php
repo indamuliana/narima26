@@ -36,4 +36,9 @@ class UkuranSeragam extends Model
     {
         return $this->belongsTo(MasterSeragam::class, 'jenis_seragam_id');
     }
+
+    public function seragam(): BelongsTo
+    {
+        return $this->belongsTo(MasterSeragam::class, 'jenis_seragam_id');
+    }
 }

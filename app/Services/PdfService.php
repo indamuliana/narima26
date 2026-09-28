@@ -176,4 +176,21 @@ class PdfService
             'keputusan' => strtoupper($keputusan),
         ]);
     }
+
+    /**
+     * Generate Rekapitulasi Data Pendaftar SPMB PDF (Landscape).
+     *
+     * @param iterable $calonSiswaList
+     * @param array $filters
+     * @return DomPdfWrapper
+     */
+    public function generateRekapCalonSiswa(iterable $calonSiswaList, array $filters = []): DomPdfWrapper
+    {
+        return $this->renderPdf('pdf.rekap_calon_siswa', [
+            'calonSiswaList' => $calonSiswaList,
+            'filters' => $filters,
+            'printedAt' => now(),
+        ], 'a4', 'landscape');
+    }
 }
+

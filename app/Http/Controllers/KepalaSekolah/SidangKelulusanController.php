@@ -102,7 +102,7 @@ class SidangKelulusanController extends Controller
 
             return [
                 'id' => $j->id,
-                'kode' => $j->kode_jurusan,
+                'kode' => $j->kode,
                 'nama' => $j->nama_jurusan,
                 'kuota' => $targetQuota,
                 'diterima' => $acceptedCount,

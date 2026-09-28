@@ -149,4 +149,12 @@ class User extends Authenticatable
     {
         return $this->hasOne(CalonSiswa::class, 'user_id');
     }
+
+    /**
+     * Relationship to Wawancara as interviewer.
+     */
+    public function wawancara(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Wawancara::class, 'pewawancara_id');
+    }
 }

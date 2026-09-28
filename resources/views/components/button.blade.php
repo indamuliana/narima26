@@ -15,13 +15,13 @@ $sizeClasses = [
 ][$size] ?? 'px-4 py-2.5 text-sm gap-2';
 
 $variantClasses = [
-    'primary' => 'bg-nampi-orange hover:bg-nampi-orange-hover text-white focus:ring-nampi-orange shadow-sm hover:shadow',
-    'cyan' => 'bg-nampi-cyan hover:bg-nampi-cyan-hover text-white focus:ring-nampi-cyan shadow-sm hover:shadow',
-    'green' => 'bg-nampi-green hover:bg-nampi-green-hover text-white focus:ring-nampi-green shadow-sm hover:shadow',
-    'secondary' => 'bg-slate-100 hover:bg-slate-200 text-slate-700 focus:ring-slate-300',
-    'outline' => 'border border-slate-300 hover:border-nampi-orange hover:text-nampi-orange bg-transparent text-slate-700 focus:ring-nampi-orange',
-    'danger' => 'bg-rose-500 hover:bg-rose-600 text-white focus:ring-rose-400 shadow-sm',
-][$variant] ?? 'bg-nampi-orange hover:bg-nampi-orange-hover text-white focus:ring-nampi-orange';
+    'primary' => 'bg-orange-600 hover:bg-orange-700 text-white font-semibold focus:ring-orange-500 shadow-sm hover:shadow',
+    'cyan' => 'bg-cyan-700 hover:bg-cyan-800 text-white font-semibold focus:ring-cyan-600 shadow-sm hover:shadow',
+    'green' => 'bg-emerald-600 hover:bg-emerald-700 text-white font-semibold focus:ring-emerald-500 shadow-sm hover:shadow',
+    'secondary' => 'bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold focus:ring-slate-300 border border-slate-200',
+    'outline' => 'border-2 border-slate-300 hover:border-orange-600 hover:text-orange-700 hover:bg-orange-50 bg-white text-slate-800 font-semibold focus:ring-orange-500',
+    'danger' => 'bg-rose-600 hover:bg-rose-700 text-white font-semibold focus:ring-rose-500 shadow-sm',
+][$variant] ?? 'bg-orange-600 hover:bg-orange-700 text-white font-semibold focus:ring-orange-500';
 
 $classes = "{$baseClasses} {$sizeClasses} {$variantClasses}";
 @endphp

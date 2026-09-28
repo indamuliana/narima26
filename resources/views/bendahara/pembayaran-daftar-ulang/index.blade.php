@@ -113,7 +113,7 @@
                                 <td class="px-4 py-4">
                                     <p class="font-bold text-slate-800">{{ $p->calonSiswa?->nama_lengkap ?? '-' }}</p>
                                     <p class="text-xs text-slate-400 font-mono mt-0.5">
-                                        {{ $p->calonSiswa?->nomor_pendaftaran }} • {{ $p->calonSiswa?->jurusan?->kode_jurusan }}
+                                        {{ $p->calonSiswa?->nomor_pendaftaran }} • {{ $p->calonSiswa?->jurusan?->kode }}
                                     </p>
                                 </td>
                                 <td class="px-4 py-4">

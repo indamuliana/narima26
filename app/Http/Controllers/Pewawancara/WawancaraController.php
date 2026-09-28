@@ -42,7 +42,7 @@ class WawancaraController extends Controller
         $statusWawancara = $request->input('status');
 
         $calonSiswaList = $this->wawancaraService->getAntrian($search, $jurusanId, $statusWawancara);
-        $jurusanList = MasterJurusan::aktif()->orderBy('kode_jurusan')->get();
+        $jurusanList = MasterJurusan::aktif()->orderBy('kode')->get();
 
         return view('pewawancara.antrian', compact('calonSiswaList', 'jurusanList', 'search', 'jurusanId', 'statusWawancara'));
     }
@@ -157,7 +157,7 @@ class WawancaraController extends Controller
         $jurusanId = $request->filled('jurusan_id') ? (int) $request->input('jurusan_id') : null;
 
         $riwayatList = $this->wawancaraService->getRiwayat($search, $jurusanId);
-        $jurusanList = MasterJurusan::aktif()->orderBy('kode_jurusan')->get();
+        $jurusanList = MasterJurusan::aktif()->orderBy('kode')->get();
 
         return view('pewawancara.riwayat', compact('riwayatList', 'jurusanList', 'search', 'jurusanId'));
     }

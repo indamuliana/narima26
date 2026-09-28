@@ -34,12 +34,19 @@
         <!-- Sidebar Navigation -->
         <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-slate-300 flex flex-col transition-transform duration-300 transform -translate-x-full lg:translate-x-0 lg:static lg:inset-0">
             <!-- Brand & Logo -->
-            <div class="h-20 px-6 flex items-center gap-3 border-b border-slate-800">
-                <img src="{{ asset('images/logo.png') }}" alt="Logo SMK Wikrama 1 Garut" class="h-10 w-auto bg-white p-1 rounded-md">
-                <div class="flex flex-col">
-                    <span class="text-lg font-bold tracking-tight text-white">NAMPI</span>
-                    <span class="text-[10px] uppercase font-bold text-nampi-orange tracking-widest">SPMB WIKRAMA</span>
+            <div class="h-20 px-6 flex items-center justify-between border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo SMK Wikrama 1 Garut" class="h-10 w-auto bg-white p-1 rounded-md">
+                    <div class="flex flex-col">
+                        <span class="text-lg font-bold tracking-tight text-white">NAMPI</span>
+                        <span class="text-[10px] uppercase font-bold text-nampi-orange tracking-widest">SPMB WIKRAMA</span>
+                    </div>
                 </div>
+                <button type="button" onclick="toggleSidebar()" class="lg:hidden p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
             </div>
 
             <!-- Navigation Links -->
@@ -95,7 +102,7 @@
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <span class="text-xs font-medium px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span class="hidden sm:inline-flex text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
                         Gelombang Aktif: 2026/2027
                     </span>
                 </div>

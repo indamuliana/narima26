@@ -31,4 +31,9 @@ class MasterSeragam extends Model
     {
         return $query->where('aktif', true);
     }
+
+    public function getNamaSeragamAttribute(): string
+    {
+        return $this->nama_jenis ?? '';
+    }
 }

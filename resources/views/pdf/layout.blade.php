@@ -12,7 +12,7 @@
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             font-size: 11pt;
             line-height: 1.4;
-            color: #1e293b;
+            color: #0A1128;
             margin: 0;
             padding: 0;
         }

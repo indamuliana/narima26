@@ -36,14 +36,78 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
 
-// Admin Area
+// Admin Area (Fase 13)
 Route::middleware(['auth', 'role:admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-        Route::get('/dashboard', function () {
-            return view('admin.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+
+        // Manajemen Calon Siswa (DataTables & Export)
+        Route::controller(\App\Http\Controllers\Admin\CalonSiswaController::class)
+            ->prefix('calon-siswa')
+            ->name('calon-siswa.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/export/csv', 'exportCsv')->name('export.csv');
+                Route::get('/export/pdf', 'exportPdf')->name('export.pdf');
+                Route::get('/{calonSiswa}', 'show')->name('show');
+            });
+
+        // Laporan & Rekapitulasi Eksekutif
+        Route::controller(\App\Http\Controllers\Admin\LaporanController::class)
+            ->prefix('laporan')
+            ->name('laporan.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/export/pdf', 'exportRekapPdf')->name('rekap.export.pdf');
+            });
+
+        // 1. Manajemen Jurusan (Kompetensi Keahlian)
+        Route::controller(\App\Http\Controllers\Admin\JurusanController::class)
+            ->prefix('jurusan')
+            ->name('jurusan.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::post('/', 'store')->name('store');
+                Route::put('/{jurusan}', 'update')->name('update');
+                Route::patch('/{jurusan}/toggle', 'toggle')->name('toggle');
+            });
+
+        // 2. Manajemen Master Keuangan (Tarif Biaya & Diskon)
+        Route::controller(\App\Http\Controllers\Admin\MasterKeuanganController::class)
+            ->prefix('keuangan')
+            ->name('keuangan.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::post('/', 'store')->name('store');
+                Route::put('/{biaya}', 'update')->name('update');
+                Route::patch('/{biaya}/toggle', 'toggle')->name('toggle');
+            });
+
+        // 3. Manajemen Master Pembayaran (Seleksi & Daftar Ulang)
+        Route::controller(\App\Http\Controllers\Admin\PembayaranController::class)
+            ->prefix('pembayaran')
+            ->name('pembayaran.')
+            ->group(function () {
+                Route::get('/seleksi', 'seleksi')->name('seleksi');
+                Route::post('/seleksi/{pembayaranSeleksi}/verify', 'verifySeleksi')->name('seleksi.verify');
+                Route::post('/seleksi/{pembayaranSeleksi}/reject', 'rejectSeleksi')->name('seleksi.reject');
+                Route::get('/daftar-ulang', 'daftarUlang')->name('daftar-ulang');
+            });
+
+        // 4. Manajemen Alokasi Pewawancara
+        Route::controller(\App\Http\Controllers\Admin\AlokasiPewawancaraController::class)
+            ->prefix('alokasi-pewawancara')
+            ->name('alokasi-pewawancara.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::post('/batch', 'alokasiBatch')->name('batch');
+                Route::post('/{calonSiswa}', 'alokasikan')->name('single');
+            });
+
+        // Log Audit Trail
+        Route::get('/audit-trail', [\App\Http\Controllers\Admin\AuditTrailController::class, 'index'])->name('audit-trail.index');
     });
 
 // Bendahara Area
@@ -95,7 +159,10 @@ Route::middleware(['auth', 'role:bendahara,admin'])
             ->name('diskon.')
             ->group(function () {
                 Route::get('/', 'index')->name('index');
+                Route::get('/search-siswa', 'searchSiswa')->name('search-siswa');
                 Route::post('/tagihan/{tagihan}', 'store')->name('store');
+                Route::post('/', 'storeFromIndex')->name('store-from-index');
+                Route::delete('/{diskon}', 'destroy')->name('destroy');
             });
 
         // Pembayaran Daftar Ulang (Fase 11)
