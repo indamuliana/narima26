@@ -178,7 +178,7 @@
                         </div>
                         <div class="p-4 rounded-xl bg-slate-800/80 border border-nampi-orange/50">
                             <h4 class="font-bold text-nampi-orange text-base">Program Unggulan</h4>
-                            <p class="text-xs text-slate-400 mt-1">Pendalaman intensif kejuruan, sertifikasi tambahan, dan pembinaan karakter khusus.</p>
+                            <p class="text-xs text-slate-400 mt-1">Pendalaman intensif kejuruan, Hafalan Qur'an, Kemandirian dan pembinaan Akhlak dan Adab.</p>
                         </div>
                     </div>
                 </div>
