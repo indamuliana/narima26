@@ -107,4 +107,32 @@ Route::middleware(['auth', 'role:calon_siswa'])
                 Route::post('/', 'store')->name('store');
                 Route::get('/cetak', 'cetakKwitansi')->name('cetak');
             });
+
+        // Modul Lengkapi Data & Upload Persyaratan (Fase 8)
+        Route::controller(\App\Http\Controllers\CalonSiswa\LengkapiDataController::class)
+            ->prefix('lengkapi-data')
+            ->name('lengkapi-data.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::post('/biodata', 'updateBiodata')->name('biodata');
+                Route::post('/orang-tua', 'updateOrangTua')->name('orang-tua');
+                Route::post('/akademik', 'updateAkademik')->name('akademik');
+                Route::post('/seragam', 'updateSeragam')->name('seragam');
+                Route::post('/dokumen', 'uploadDokumen')->name('dokumen');
+                Route::post('/finalize', 'finalize')->name('finalize');
+            });
     });
+
+// Cascading Wilayah API (Fase 8)
+Route::prefix('api/internal/wilayah')->name('api.wilayah.')->group(function () {
+    Route::get('/provinsi', [\App\Http\Controllers\Api\WilayahController::class, 'provinsi'])->name('provinsi');
+    Route::get('/kabupaten/{id}', [\App\Http\Controllers\Api\WilayahController::class, 'kabupaten'])->name('kabupaten');
+    Route::get('/kecamatan/{id}', [\App\Http\Controllers\Api\WilayahController::class, 'kecamatan'])->name('kecamatan');
+    Route::get('/desa/{id}', [\App\Http\Controllers\Api\WilayahController::class, 'desa'])->name('desa');
+});
+Route::prefix('api/wilayah')->group(function () {
+    Route::get('/provinsi', [\App\Http\Controllers\Api\WilayahController::class, 'provinsi']);
+    Route::get('/kabupaten/{id}', [\App\Http\Controllers\Api\WilayahController::class, 'kabupaten']);
+    Route::get('/kecamatan/{id}', [\App\Http\Controllers\Api\WilayahController::class, 'kecamatan']);
+    Route::get('/desa/{id}', [\App\Http\Controllers\Api\WilayahController::class, 'desa']);
+});
