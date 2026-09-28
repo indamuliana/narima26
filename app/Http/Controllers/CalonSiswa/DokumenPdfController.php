@@ -21,10 +21,12 @@ class DokumenPdfController extends Controller
     public function index(): View
     {
         $calonSiswa = auth()->user()->calonSiswa;
-        $calonSiswa->loadMissing(['program', 'jurusan', 'gelombang', 'pembayaranSeleksi', 'kesepahaman', 'dokumenPendaftaran']);
+        $calonSiswa->loadMissing(['program', 'jurusan', 'gelombang', 'pembayaranSeleksi', 'kesepahaman', 'dokumenPendaftaran', 'keputusanKelulusan', 'tagihan']);
 
         $eula = $calonSiswa->kesepahaman()->where('setuju', true)->latest()->first();
         $pembayaran = $calonSiswa->pembayaranSeleksi;
+        $keputusan = $calonSiswa->keputusanKelulusan;
+        $tagihan = $calonSiswa->tagihan()->latest('id')->first();
 
         // Ketersediaan kartu: minimal status DATA_LENGKAP atau MENUNGGU_WAWANCARA
         $eligibleForCard = !in_array($calonSiswa->status_spmb, [
@@ -34,7 +36,7 @@ class DokumenPdfController extends Controller
             SpmbStatus::MELENGKAPI_DATA,
         ], true) || $calonSiswa->status_data === 'LENGKAP';
 
-        return view('calon-siswa.dokumen.index', compact('calonSiswa', 'eula', 'pembayaran', 'eligibleForCard'));
+        return view('calon-siswa.dokumen.index', compact('calonSiswa', 'eula', 'pembayaran', 'eligibleForCard', 'keputusan', 'tagihan'));
     }
 
     /**
@@ -88,5 +90,36 @@ class DokumenPdfController extends Controller
         $pdf = $this->pdfService->generateInformasiAkun($calonSiswa);
 
         return $pdf->download("Informasi_Akun_{$calonSiswa->nomor_pendaftaran}.pdf");
+    }
+
+    /**
+     * Cetak / Unduh Surat Keputusan Hasil Seleksi (Kelulusan).
+     */
+    public function cetakKelulusan(): Response|RedirectResponse
+    {
+        $calonSiswa = auth()->user()->calonSiswa;
+        $calonSiswa->loadMissing(['keputusanKelulusan', 'program', 'jurusan', 'sekolahAsal']);
+
+        $statusVal = is_string($calonSiswa->status_spmb) ? $calonSiswa->status_spmb : $calonSiswa->status_spmb->value;
+        $keputusan = $calonSiswa->keputusanKelulusan;
+
+        $hasResult = $keputusan !== null || in_array($statusVal, [
+            SpmbStatus::DITERIMA->value,
+            SpmbStatus::DITOLAK->value,
+            SpmbStatus::MENUNGGU_DAFTAR_ULANG->value,
+            SpmbStatus::DAFTAR_ULANG_DIVERIFIKASI->value,
+            SpmbStatus::RESMI_TERDAFTAR->value,
+        ], true);
+
+        if (! $hasResult) {
+            return redirect()->route('calon-siswa.dokumen.index')
+                ->with('error', 'Surat keputusan kelulusan belum diterbitkan oleh panitia/kepala sekolah.');
+        }
+
+        $hasil = $keputusan ? $keputusan->keputusan : ($statusVal === SpmbStatus::DITOLAK->value ? 'DITOLAK' : 'DITERIMA');
+
+        $pdf = $this->pdfService->generateKelulusan($calonSiswa, $hasil);
+
+        return $pdf->download("Surat_Kelulusan_{$calonSiswa->nomor_pendaftaran}.pdf");
     }
 }

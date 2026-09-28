@@ -46,11 +46,11 @@
                             <span class="font-mono font-bold text-white text-base">{{ $calonSiswa->nisn }}</span>
                         </div>
                         <div>
-                            <span class="text-xs text-slate-400 block">Password Awal (Tanggal Lahir)</span>
+                            <span class="text-xs text-slate-400 block">Password Awal (Nomor Pendaftaran)</span>
                             <span class="font-mono font-bold text-emerald-400 text-base">
-                                {{ $sessionData['password_plain'] ?? $calonSiswa->tanggal_lahir?->format('dmY') }}
+                                {{ $sessionData['password_plain'] ?? $calonSiswa->nomor_pendaftaran }}
                             </span>
-                            <span class="text-[10px] text-slate-400 block mt-0.5">Format: ddmmyyyy</span>
+                            <span class="text-[10px] text-slate-400 block mt-0.5">Gunakan Nomor Pendaftaran sebagai password login pertama kali</span>
                         </div>
                     </div>
 

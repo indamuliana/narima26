@@ -205,6 +205,82 @@
                 </div>
             </div>
 
+            <!-- 5. SURAT KEPUTUSAN HASIL SELEKSI (SK KELULUSAN) -->
+            @php
+                $statusVal = is_string($calonSiswa->status_spmb) ? $calonSiswa->status_spmb : $calonSiswa->status_spmb->value;
+                $hasSk = $keputusan !== null || in_array($statusVal, ['DITERIMA', 'DITOLAK', 'MENUNGGU_DAFTAR_ULANG', 'DAFTAR_ULANG_DIVERIFIKASI', 'RESMI_TERDAFTAR']);
+            @endphp
+            <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200">Hasil Seleksi</span>
+                        @if($hasSk)
+                            <span class="text-xs font-bold text-emerald-600 flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Telah Diterbitkan
+                            </span>
+                        @else
+                            <span class="text-xs font-bold text-slate-400 flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-slate-300"></span> Menunggu Sidang
+                            </span>
+                        @endif
+                    </div>
+                    <h3 class="text-lg font-black text-slate-900">Surat Keputusan Kelulusan (SK)</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Surat keputusan resmi yang ditandatangani oleh Kepala Sekolah mengenai hasil seleksi wawancara dan penetapan penerimaan calon peserta didik baru.
+                    </p>
+                </div>
+
+                <div class="pt-3 border-t border-slate-100">
+                    @if($hasSk)
+                        <a href="{{ route('calon-siswa.dokumen.kelulusan') }}"
+                            class="inline-flex items-center px-5 py-2.5 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition shadow-sm text-xs cursor-pointer">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            Unduh Surat Keputusan (PDF)
+                        </a>
+                    @else
+                        <span class="inline-flex items-center text-xs text-slate-400 font-semibold">
+                            Tersedia setelah sidang pleno kelulusan
+                        </span>
+                    @endif
+                </div>
+            </div>
+
+            <!-- 6. INVOICE RINCIAN TAGIHAN DAFTAR ULANG -->
+            <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">Keuangan Daftar Ulang</span>
+                        @if($tagihan)
+                            <span class="text-xs font-bold text-emerald-600 flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Tagihan Terbit
+                            </span>
+                        @else
+                            <span class="text-xs font-bold text-slate-400 flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-slate-300"></span> Belum Terbit
+                            </span>
+                        @endif
+                    </div>
+                    <h3 class="text-lg font-black text-slate-900">Invoice Rincian Biaya Pendidikan</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Dokumen rincian biaya daftar ulang resmi (DSP, SPP, seragam, kegiatan) yang dibekukan untuk calon siswa beserta nomor rekening sekolah.
+                    </p>
+                </div>
+
+                <div class="pt-3 border-t border-slate-100">
+                    @if($tagihan)
+                        <a href="{{ route('calon-siswa.daftar-ulang.cetak-tagihan') }}" target="_blank"
+                            class="inline-flex items-center px-5 py-2.5 rounded-xl font-bold text-white bg-slate-900 hover:bg-slate-800 transition shadow-sm text-xs cursor-pointer">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            Unduh Invoice Tagihan (PDF)
+                        </a>
+                    @else
+                        <span class="inline-flex items-center text-xs text-slate-400 font-semibold">
+                            Diterbitkan pada tahap daftar ulang
+                        </span>
+                    @endif
+                </div>
+            </div>
+
         </div>
 
     </div>

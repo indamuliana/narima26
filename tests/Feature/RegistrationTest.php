@@ -96,11 +96,11 @@ class RegistrationTest extends TestCase
             'status_baru' => SpmbStatus::MENUNGGU_PEMBAYARAN_SELEKSI->value,
         ]);
 
-        // 3. User login otomatis dibuat dengan NISN dan password ddmmyyyy (17082009)
+        // 3. User login otomatis dibuat dengan NISN dan password = Nomor Pendaftaran
         $user = User::where('username', '0098765432')->first();
         $this->assertNotNull($user);
         $this->assertEquals(UserRole::CALON_SISWA->value, $user->role);
-        $this->assertTrue(Hash::check('17082009', $user->password));
+        $this->assertTrue(Hash::check($calonSiswa->nomor_pendaftaran, $user->password));
         $this->assertEquals('6281234567890', $user->phone);
 
         // 4. Record pembayaran_seleksi awal dibuat

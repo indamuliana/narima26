@@ -47,4 +47,14 @@ class Wawancara extends Model
     {
         return $this->hasMany(WawancaraDetail::class, 'wawancara_id');
     }
+
+    public function getCatatanSiswaAttribute(): ?string
+    {
+        return $this->attributes['catatan_umum'] ?? null;
+    }
+
+    public function getCatatanOrangtuaAttribute(): ?string
+    {
+        return $this->attributes['catatan_orang_tua'] ?? null;
+    }
 }

@@ -41,4 +41,14 @@ class WawancaraDetail extends Model
     {
         return $this->belongsTo(MasterKriteriaWawancara::class, 'kriteria_id');
     }
+
+    public function getSkorAttribute(): int
+    {
+        return (int) $this->nilai;
+    }
+
+    public function getCatatanKriteriaAttribute(): ?string
+    {
+        return $this->catatan;
+    }
 }

@@ -9,7 +9,7 @@ use App\Models\MasterBiaya;
 use App\Models\MasterGelombang;
 use App\Models\PembayaranSeleksi;
 use App\Models\User;
-use Carbon\Carbon;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use RuntimeException;
@@ -51,9 +51,8 @@ class RegistrationService
             $phoneAyah = $this->phoneService->normalize($data['no_hp_ayah'] ?? null);
             $phoneIbu = $this->phoneService->normalize($data['no_hp_ibu'] ?? null);
 
-            // 4. Buat password awal berbasis tanggal lahir format ddmmyyyy (Section 4)
-            $birthDate = Carbon::parse($data['tanggal_lahir']);
-            $passwordPlain = $birthDate->format('dmY');
+            // 4. Buat password awal = Nomor Pendaftaran (di-generate otomatis oleh sistem)
+            $passwordPlain = $nomorPendaftaran;
 
             // Tentukan email akun
             $email = !empty($data['email']) ? trim($data['email']) : ($data['nisn'] . '@siswa.wikrama.sch.id');

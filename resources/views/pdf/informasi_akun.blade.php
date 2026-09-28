@@ -29,7 +29,7 @@
         <tr>
             <td class="label">Kata Sandi Default</td>
             <td class="colon">:</td>
-            <td class="value"><span style="font-family: monospace;">Tanggal lahir (DDMMYYYY) contoh: {{ $calonSiswa->tanggal_lahir ? $calonSiswa->tanggal_lahir->format('dmY') : '15052010' }}</span></td>
+            <td class="value"><span style="font-family: monospace; font-weight: bold; color: #ea580c;">{{ $calonSiswa->nomor_pendaftaran }}</span><br><small style="color: #64748b;">Gunakan Nomor Pendaftaran sebagai password login pertama kali</small></td>
         </tr>
         <tr>
             <td class="label">Alamat Portal Login</td>

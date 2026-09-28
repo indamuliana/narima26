@@ -2,84 +2,154 @@
     <x-slot name="title">Dashboard Kepala Sekolah</x-slot>
 
     <x-slot name="sidebar">
-        <a href="{{ route('kepala-sekolah.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold bg-nampi-orange text-white shadow-xs">
-            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-            </svg>
-            <span>Dashboard</span>
-        </a>
-        <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-            </svg>
-            <span>Statistik SPMB</span>
-        </a>
-        <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-            </svg>
-            <span>Data Pendaftar</span>
-        </a>
-        <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <span>Keputusan Kelulusan</span>
-        </a>
-        <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
-            </svg>
-            <span>Pengunduran Diri</span>
-        </a>
-        <form method="POST" action="{{ route('logout') }}" class="pt-4 mt-4 border-t border-slate-800">
-            @csrf
-            <button type="submit" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors cursor-pointer">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                </svg>
-                <span>Keluar (Logout)</span>
-            </button>
-        </form>
+        @include('kepala-sekolah.partials.sidebar')
     </x-slot>
 
     <div class="space-y-6">
-        <!-- Welcome Banner -->
-        <div class="p-6 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-2xl text-white shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-                <span class="text-xs uppercase font-bold text-amber-400 tracking-wider">Executive Management Dashboard</span>
-                <h1 class="text-2xl font-black mt-1">Selamat Datang, {{ auth()->user()->name }}</h1>
-                <p class="text-xs text-slate-400 mt-1">Monitoring komprehensif progres SPMB, pendaftar per jurusan, keputusan kelulusan, dan status pengunduran diri.</p>
+        @if (session('success'))
+            <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center gap-3">
+                <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <span class="text-sm font-medium">{{ session('success') }}</span>
             </div>
-            <span class="px-3 py-1.5 rounded-lg bg-amber-400/20 text-xs font-semibold text-amber-300 border border-amber-400/30">
-                Role: Kepala Sekolah
-            </span>
+        @endif
+
+        @if (session('error'))
+            <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-3">
+                <svg class="w-5 h-5 text-rose-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                </svg>
+                <span class="text-sm font-medium">{{ session('error') }}</span>
+            </div>
+        @endif
+
+        <!-- Welcome Executive Banner -->
+        <div class="p-6 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl text-white shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <span class="text-xs uppercase font-bold text-amber-400 tracking-wider">Executive Management SPMB 2026/2027</span>
+                <h1 class="text-2xl font-black mt-1">Selamat Datang, {{ auth()->user()->name }}</h1>
+                <p class="text-xs text-slate-400 mt-1">Monitoring komprehensif penerimaan murid baru, penetapan sidang pleno kelulusan, dan tata kelola kuota rombel.</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('kepala-sekolah.sidang-kelulusan.index') }}" class="px-4 py-2.5 rounded-xl bg-nampi-orange text-white text-xs font-bold hover:bg-orange-600 transition-colors shadow-xs">
+                    ⚖️ Buka Sidang Pleno
+                </a>
+            </div>
         </div>
 
         <!-- Metric Grid -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-                <p class="text-xs font-medium text-slate-500">Total Pendaftar</p>
-                <p class="text-2xl font-black text-slate-900 mt-2">1</p>
-                <div class="mt-2 text-[11px] text-slate-400">Pendaftar baru</div>
+                <div class="flex items-center justify-between">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Pendaftar</p>
+                    <span class="text-xl">📋</span>
+                </div>
+                <p class="text-2xl font-black text-slate-900 mt-2">{{ number_format($stats['total_pendaftar']) }}</p>
+                <div class="mt-2 text-[11px] text-slate-400">Semua pendaftar akun</div>
             </div>
 
             <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-                <p class="text-xs font-medium text-slate-500">Program Reguler</p>
-                <p class="text-2xl font-black text-nampi-orange mt-2">1</p>
-                <div class="mt-2 text-[11px] text-slate-400">Jalur reguler</div>
+                <div class="flex items-center justify-between">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Menunggu Sidang</p>
+                    <span class="text-xl">⏳</span>
+                </div>
+                <p class="text-2xl font-black text-amber-600 mt-2">{{ number_format($stats['menunggu_sidang']) }}</p>
+                <div class="mt-2 text-[11px] text-slate-400">Siap dievaluasi kepsek</div>
             </div>
 
             <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-                <p class="text-xs font-medium text-slate-500">Program Unggulan</p>
-                <p class="text-2xl font-black text-nampi-cyan mt-2">0</p>
-                <div class="mt-2 text-[11px] text-slate-400">Jalur unggulan</div>
+                <div class="flex items-center justify-between">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Dinyatakan Diterima</p>
+                    <span class="text-xl">🎓</span>
+                </div>
+                <p class="text-2xl font-black text-emerald-600 mt-2">{{ number_format($stats['diterima']) }}</p>
+                <div class="mt-2 text-[11px] text-slate-400">Lulus seleksi SPMB</div>
             </div>
 
             <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-                <p class="text-xs font-medium text-slate-500">Resmi Terdaftar</p>
-                <p class="text-2xl font-black text-nampi-green mt-2">0</p>
-                <div class="mt-2 text-[11px] text-slate-400">Murid baru resmi</div>
+                <div class="flex items-center justify-between">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Mengundurkan Diri</p>
+                    <span class="text-xl">🚪</span>
+                </div>
+                <p class="text-2xl font-black text-slate-600 mt-2">{{ number_format($stats['mengundurkan_diri']) }}</p>
+                <div class="mt-2 text-[11px] text-slate-400">Penarikan berkas resmi</div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Left: Department Quota Progress -->
+            <div class="lg:col-span-6 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h2 class="text-base font-black text-slate-800">Keterisian Kuota Kompetensi Keahlian</h2>
+                    <span class="text-xs text-slate-400">Standar 72 Siswa (2 Rombel)</span>
+                </div>
+
+                <div class="space-y-4">
+                    @forelse ($jurusanStats as $j)
+                        @php
+                            $target = 72;
+                            $percent = min(100, round(($j->diterima_count / $target) * 100));
+                        @endphp
+                        <div class="space-y-1.5">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="font-bold text-slate-800">{{ $j->nama_jurusan }} ({{ $j->kode_jurusan }})</span>
+                                <span class="text-slate-500 font-mono">
+                                    <strong class="text-slate-900">{{ $j->diterima_count }}</strong> / {{ $target }} diterima ({{ $percent }}%)
+                                </span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                                <div class="bg-nampi-orange h-2.5 rounded-full transition-all duration-500" style="width: {{ $percent }}%"></div>
+                            </div>
+                            <div class="flex justify-between text-[11px] text-slate-400">
+                                <span>Total Peminat: {{ $j->total_count }} siswa</span>
+                                <span>Sisa Kuota: {{ max(0, $target - $j->diterima_count) }} kursi</span>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-xs text-slate-400 text-center py-4">Belum ada data jurusan.</p>
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- Right: Candidate Queue Awaiting Plenary Review -->
+            <div class="lg:col-span-6 bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-base font-black text-slate-800">Antrian Menunggu Keputusan Sidang</h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Kandidat yang telah selesai tes wawancara</p>
+                    </div>
+                    <a href="{{ route('kepala-sekolah.sidang-kelulusan.index', ['status_filter' => 'MENUNGGU_SIDANG']) }}"
+                       class="text-xs font-semibold text-nampi-orange hover:underline">
+                        Lihat Semua &rarr;
+                    </a>
+                </div>
+
+                <div class="divide-y divide-slate-100">
+                    @forelse ($antrianSidang as $kandidat)
+                        <div class="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors text-xs">
+                            <div class="space-y-0.5">
+                                <p class="font-bold text-slate-900">{{ $kandidat->nama_lengkap }}</p>
+                                <p class="text-slate-400 font-mono text-[11px]">
+                                    {{ $kandidat->nomor_pendaftaran }} &bull; {{ $kandidat->jurusan?->nama_jurusan }}
+                                </p>
+                                <p class="text-[11px] text-slate-500">
+                                    Pewawancara: <strong>{{ $kandidat->wawancaraTerakhir?->pewawancara?->name ?? '-' }}</strong>
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <a href="{{ route('kepala-sekolah.sidang-kelulusan.show', $kandidat) }}"
+                                   class="px-3 py-1.5 rounded-lg bg-slate-900 text-white font-bold hover:bg-slate-800 transition-colors text-xs">
+                                    Evaluasi & Keputusan &rarr;
+                                </a>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="p-8 text-center text-slate-400 text-xs">
+                            Tidak ada calon siswa dalam antrian sidang saat ini.
+                        </div>
+                    @endforelse
+                </div>
             </div>
         </div>
     </div>

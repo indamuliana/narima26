@@ -160,7 +160,60 @@
                     </span>
                 </div>
             </div>
-        @elseif($statusVal === 'MENUNGGU_DAFTAR_ULANG' || $statusVal === 'DITERIMA')
+        @elseif($statusVal === 'DITERIMA')
+            <div class="p-6 rounded-3xl bg-emerald-50 border border-emerald-300 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <div class="flex items-center text-emerald-900 font-black text-base gap-2">
+                        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span>Selamat! Anda Dinyatakan LULUS / DITERIMA di SMK Wikrama 1 Garut</span>
+                    </div>
+                    <p class="text-xs text-emerald-800">
+                        Berdasarkan hasil sidang pleno komite seleksi, Anda berhak melanjutkan ke tahap pendaftaran ulang. Silakan unduh Surat Keputusan resmi dan selesaikan daftar ulang.
+                    </p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <a href="{{ route('calon-siswa.dokumen.kelulusan') }}" target="_blank"
+                        class="inline-flex items-center px-4 py-2.5 rounded-xl font-bold text-xs bg-white text-emerald-800 border border-emerald-300 hover:bg-emerald-100 shadow-xs transition">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        <span>Unduh SK (PDF)</span>
+                    </a>
+                    <a href="{{ route('calon-siswa.daftar-ulang.index') }}"
+                        class="inline-flex items-center px-5 py-2.5 rounded-xl font-black text-xs bg-emerald-600 text-white hover:bg-emerald-700 shadow-md transition transform active:scale-95 whitespace-nowrap">
+                        <span>Lanjut Daftar Ulang &rarr;</span>
+                    </a>
+                </div>
+            </div>
+        @elseif($statusVal === 'DITOLAK')
+            <div class="p-6 rounded-3xl bg-rose-50 border border-rose-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <div class="flex items-center text-rose-900 font-black text-base gap-2">
+                        <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span>Pemberitahuan Hasil Seleksi SPMB</span>
+                    </div>
+                    <p class="text-xs text-rose-800">
+                        Mohon maaf, berdasarkan hasil evaluasi sidang pleno seleksi, Anda belum berhasil diterima pada periode ini. Tetap semangat dalam menggapai cita-cita di jenjang pendidikan berikutnya.
+                    </p>
+                </div>
+                <div>
+                    <a href="{{ route('calon-siswa.dokumen.kelulusan') }}" target="_blank"
+                        class="inline-flex items-center px-4 py-2.5 rounded-xl font-bold text-xs bg-white text-rose-800 border border-rose-200 hover:bg-rose-100 shadow-xs transition">
+                        <span>Unduh Surat Keputusan (PDF)</span>
+                    </a>
+                </div>
+            </div>
+        @elseif($statusVal === 'MENGUNDURKAN_DIRI')
+            <div class="p-6 rounded-3xl bg-slate-100 border border-slate-300 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <div class="flex items-center text-slate-800 font-black text-base gap-2">
+                        <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span>Status Pendaftaran: Telah Mengundurkan Diri</span>
+                    </div>
+                    <p class="text-xs text-slate-600">
+                        Berkas dan status pendaftaran Anda telah tercatat mengundurkan diri. Jika ini merupakan kekeliruan atau ingin membatalkan penarikan berkas, silakan hubungi Helpdesk Panitia SPMB.
+                    </p>
+                </div>
+            </div>
+        @elseif($statusVal === 'MENUNGGU_DAFTAR_ULANG')
             <div class="p-6 rounded-3xl bg-amber-50 border border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div class="space-y-1">
                     <div class="flex items-center text-amber-900 font-black text-base gap-2">

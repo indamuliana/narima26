@@ -139,14 +139,34 @@ Route::middleware(['auth', 'role:pewawancara,admin'])
         });
     });
 
-// Kepala Sekolah Area
-Route::middleware(['auth', 'role:kepala_sekolah'])
+// Kepala Sekolah & Admin Sidang Area (Fase 12)
+Route::middleware(['auth', 'role:kepala_sekolah,admin'])
     ->prefix('kepala-sekolah')
     ->name('kepala-sekolah.')
     ->group(function () {
-        Route::get('/dashboard', function () {
-            return view('kepala-sekolah.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [\App\Http\Controllers\KepalaSekolah\DashboardController::class, 'index'])->name('dashboard');
+
+        // Sidang Pleno Kelulusan (Fase 12)
+        Route::controller(\App\Http\Controllers\KepalaSekolah\SidangKelulusanController::class)
+            ->prefix('sidang-kelulusan')
+            ->name('sidang-kelulusan.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::post('/batch', 'batch')->name('batch');
+                Route::get('/{calonSiswa}', 'show')->name('show');
+                Route::post('/{calonSiswa}/putuskan', 'putuskan')->name('putuskan');
+                Route::get('/{calonSiswa}/cetak-sk', 'cetakSk')->name('cetak-sk');
+            });
+
+        // Pengunduran Diri & Restorasi (Fase 12)
+        Route::controller(\App\Http\Controllers\KepalaSekolah\PengunduranDiriController::class)
+            ->prefix('pengunduran-diri')
+            ->name('pengunduran-diri.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::post('/{calonSiswa}', 'store')->name('store');
+                Route::post('/{calonSiswa}/restore', 'restore')->name('restore');
+            });
     });
 
 // Calon Siswa Area
@@ -202,6 +222,7 @@ Route::middleware(['auth', 'role:calon_siswa'])
                 Route::get('/kartu', 'cetakKartu')->name('kartu');
                 Route::get('/kesepahaman', 'cetakKesepahaman')->name('kesepahaman');
                 Route::get('/akun', 'cetakAkun')->name('akun');
+                Route::get('/kelulusan', 'cetakKelulusan')->name('kelulusan');
             });
 
         // Daftar Ulang & Tagihan (Fase 11)

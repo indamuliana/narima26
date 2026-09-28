@@ -410,7 +410,7 @@ Saat registrasi berhasil:
 
 3\. Username menggunakan \*\*NISN\*\*.
 
-4\. Password awal menggunakan \*\*Nomor HP\*\*.
+4\. Password awal menggunakan **Nomor Pendaftaran** (di-generate otomatis oleh sistem).
 
 5\. Informasi akun ditampilkan setelah registrasi berhasil.
 

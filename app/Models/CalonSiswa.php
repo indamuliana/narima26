@@ -162,6 +162,24 @@ class CalonSiswa extends Model
         return $this->hasMany(Wawancara::class, 'calon_siswa_id');
     }
 
+    public function latestWawancara(): HasOne
+    {
+        return $this->hasOne(Wawancara::class, 'calon_siswa_id')->latestOfMany();
+    }
+
+    public function getWawancaraTerakhirAttribute(): ?Wawancara
+    {
+        if ($this->relationLoaded('latestWawancara')) {
+            return $this->latestWawancara;
+        }
+
+        if ($this->relationLoaded('wawancara')) {
+            return $this->wawancara->sortByDesc('id')->first();
+        }
+
+        return $this->wawancara()->latest('id')->first();
+    }
+
     public function tagihan(): HasMany
     {
         return $this->hasMany(Tagihan::class, 'calon_siswa_id');
