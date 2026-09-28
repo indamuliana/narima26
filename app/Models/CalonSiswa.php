@@ -53,6 +53,7 @@ class CalonSiswa extends Model
     {
         return [
             'tanggal_lahir' => 'date',
+            'status_spmb' => \App\Enums\SpmbStatus::class,
         ];
     }
 
