@@ -141,4 +141,12 @@ class User extends Authenticatable
             default => ucfirst(str_replace('_', ' ', (string) $this->role)),
         };
     }
+
+    /**
+     * Relationship to CalonSiswa profile.
+     */
+    public function calonSiswa(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(CalonSiswa::class, 'user_id');
+    }
 }

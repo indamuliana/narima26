@@ -54,6 +54,18 @@ Route::middleware(['auth', 'role:bendahara'])
         Route::get('/dashboard', function () {
             return view('bendahara.dashboard');
         })->name('dashboard');
+
+        // Pembayaran Seleksi (Fase 7)
+        Route::controller(\App\Http\Controllers\Bendahara\PembayaranSeleksiController::class)
+            ->prefix('pembayaran-seleksi')
+            ->name('pembayaran-seleksi.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/{pembayaranSeleksi}', 'show')->name('show');
+                Route::post('/{pembayaranSeleksi}/verify', 'verify')->name('verify');
+                Route::post('/{pembayaranSeleksi}/reject', 'reject')->name('reject');
+                Route::get('/{pembayaranSeleksi}/cetak', 'cetakKwitansi')->name('cetak');
+            });
     });
 
 // Pewawancara Area
@@ -82,6 +94,17 @@ Route::middleware(['auth', 'role:calon_siswa'])
     ->name('calon-siswa.')
     ->group(function () {
         Route::get('/dashboard', function () {
-            return view('calon-siswa.dashboard');
+            $calonSiswa = auth()->user()->calonSiswa;
+            return view('calon-siswa.dashboard', compact('calonSiswa'));
         })->name('dashboard');
+
+        // Pembayaran Seleksi (Fase 7)
+        Route::controller(\App\Http\Controllers\CalonSiswa\PembayaranSeleksiController::class)
+            ->prefix('pembayaran-seleksi')
+            ->name('pembayaran-seleksi.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::post('/', 'store')->name('store');
+                Route::get('/cetak', 'cetakKwitansi')->name('cetak');
+            });
     });
