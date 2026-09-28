@@ -1,0 +1,36 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --color-nampi-orange: #FF9D50;
+    --color-nampi-orange-hover: #f58833;
+    --color-nampi-cream: #FFF9D8;
+    --color-nampi-cream-light: #FFFCF0;
+    --color-nampi-cyan: #1DCED8;
+    --color-nampi-cyan-hover: #16b7c0;
+    --color-nampi-green: #55E07E;
+    --color-nampi-green-hover: #3ecc6b;
+    --color-nampi-dark: #1E293B;
+    --color-nampi-gray: #64748B;
+    --color-nampi-light-gray: #F8FAFC;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
