@@ -44,4 +44,24 @@ class MasterGelombang extends Model
     {
         return $query->where('aktif', true);
     }
+
+    public function getNamaGelombangAttribute(): string
+    {
+        return $this->nama;
+    }
+
+    public function getTanggalMulaiAttribute()
+    {
+        return $this->periode_mulai;
+    }
+
+    public function getTanggalSelesaiAttribute()
+    {
+        return $this->periode_selesai;
+    }
+
+    public function getTahunAjaranAttribute(): string
+    {
+        return '2026/2027';
+    }
 }

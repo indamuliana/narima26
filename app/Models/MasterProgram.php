@@ -41,4 +41,14 @@ class MasterProgram extends Model
     {
         return $query->where('aktif', true);
     }
+
+    public function getNamaProgramAttribute(): string
+    {
+        return $this->nama;
+    }
+
+    public function getKodeProgramAttribute(): string
+    {
+        return $this->kode;
+    }
 }

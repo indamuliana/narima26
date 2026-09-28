@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\RegistrationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +14,16 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+
+// Modul Registrasi Calon Siswa Baru (Fase 6)
+Route::redirect('/register', '/daftar');
+Route::controller(RegistrationController::class)->group(function () {
+    Route::get('/daftar', 'create')->name('pendaftaran.index');
+    Route::post('/daftar', 'store')->name('pendaftaran.store');
+    Route::get('/daftar/sukses/{nomorPendaftaran}', 'sukses')->name('pendaftaran.sukses');
+    Route::get('/daftar/cetak-akun/{nomorPendaftaran}', 'cetakAkun')->name('pendaftaran.cetak-akun');
+    Route::get('/daftar/login/{nomorPendaftaran}', 'loginDirect')->name('pendaftaran.login-direct');
+});
 
 // Guest Authentication Routes
 Route::middleware('guest')->group(function () {

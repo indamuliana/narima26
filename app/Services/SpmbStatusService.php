@@ -12,6 +12,25 @@ use InvalidArgumentException;
 class SpmbStatusService
 {
     /**
+     * Alias for changeStatus for transition workflow.
+     */
+    public function transition(
+        CalonSiswa $calonSiswa,
+        SpmbStatus|string|null $targetStatus = null,
+        ?string $catatan = null,
+        ?User $changedBy = null,
+        ?string $alasan = null,
+        bool $force = false,
+        SpmbStatus|string|null $newStatus = null,
+        ?User $actor = null
+    ): RiwayatStatusSpmb {
+        $status = $targetStatus ?? $newStatus;
+        $user = $changedBy ?? $actor;
+
+        return $this->changeStatus($calonSiswa, $status, $alasan, $catatan, $user, $force);
+    }
+
+    /**
      * Change SPMB status of Calon Siswa with transition validation and history logging.
      *
      * @throws InvalidArgumentException

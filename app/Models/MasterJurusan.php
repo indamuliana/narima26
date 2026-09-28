@@ -36,4 +36,14 @@ class MasterJurusan extends Model
     {
         return $query->where('aktif', true);
     }
+
+    public function getNamaJurusanAttribute(): string
+    {
+        return $this->nama;
+    }
+
+    public function getKodeJurusanAttribute(): string
+    {
+        return $this->kode;
+    }
 }
