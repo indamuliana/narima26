@@ -16,8 +16,10 @@
         $now = now();
         $isEnded = $targetSelesai ? $targetSelesai->isPast() : false;
         $diffDays = ($targetSelesai && !$isEnded) ? (int)$now->diffInDays($targetSelesai) : 0;
-        $diffHours = ($targetSelesai && !$isEnded) ? (int)$now->copy()->addDays($diffDays)->diffInHours($targetSelesai) : 0;
-        $dummyImg = asset('images/dummy-wikrama.jpg');
+        // Sumber gambar default (tersimpan di public/images/)
+        // Untuk mengganti gambar utama/default, cukup upload file gambar ke public/images/ dan ganti nama filenya di sini
+        $defaultImage = 'Lab-TJKT.jpg';
+        $dummyImg = asset('images/' . $defaultImage);
     @endphp
 
     <!-- HERO SECTION -->
@@ -111,7 +113,7 @@
                             <!-- Header Card with Wikrama Logo -->
                             <div class="flex items-center gap-4 pb-5 border-b border-slate-100">
                                 <div class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-1.5 shrink-0 shadow-2xs">
-                                    <img src="{{ $dummyImg }}" alt="Logo SMK Wikrama 1 Garut" class="w-full h-full object-contain">
+                                    <img src="{{ asset('images/logo.png') }}" alt="Logo SMK Wikrama 1 Garut" class="w-full h-full object-contain" onerror="this.src='{{ $dummyImg }}'">
                                 </div>
                                 <div>
                                     <div class="flex items-center gap-2">
@@ -293,6 +295,7 @@
                         'kategori' => 'Lab Praktik TJKT',
                         'judul' => 'Laboratorium Jaringan Komputer & Server',
                         'deskripsi' => 'Dilengkapi rack server data center, router Mikrotik, switch Cisco manageable, dan peralatan perakitan fiber optic terkini.',
+                        'gambar' => 'Lab-TJKT.jpg',
                     ],
                     [
                         'kategori' => 'Lab Praktik Perhotelan',
@@ -352,7 +355,7 @@
                     <div class="group bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden">
                         <!-- Image Container: Tinggi 200px dengan Hover Zoom -->
                         <div class="relative h-[200px] w-full overflow-hidden bg-slate-100">
-                            <img src="{{ $dummyImg }}" alt="{{ $item['judul'] }}" class="w-full h-[200px] object-cover group-hover:scale-110 transition-transform duration-500 ease-out">
+                            <img src="{{ !empty($item['gambar']) ? asset('images/' . $item['gambar']) : $dummyImg }}" alt="{{ $item['judul'] }}" class="w-full h-[200px] object-cover group-hover:scale-110 transition-transform duration-500 ease-out">
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                             <span class="absolute top-3 left-3 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/90 backdrop-blur-sm text-slate-800 border border-slate-200 shadow-2xs">
                                 {{ $item['kategori'] }}
@@ -463,7 +466,7 @@
                     <div class="group bg-slate-50 hover:bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden">
                         <!-- Image Container: Tinggi 200px dengan Hover Zoom -->
                         <div class="relative h-[200px] w-full overflow-hidden bg-slate-200">
-                            <img src="{{ $dummyImg }}" alt="{{ $item['judul'] }}" class="w-full h-[200px] object-cover group-hover:scale-110 transition-transform duration-500 ease-out">
+                            <img src="{{ !empty($item['gambar']) ? asset('images/' . $item['gambar']) : $dummyImg }}" alt="{{ $item['judul'] }}" class="w-full h-[200px] object-cover group-hover:scale-110 transition-transform duration-500 ease-out">
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                             <span class="absolute top-3 left-3 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-nampi-cyan text-white shadow-2xs">
                                 {{ $item['kategori'] }}
@@ -602,7 +605,7 @@
                             <div>
                                 <!-- Gambar Kecil Bulat -->
                                 <div class="w-14 h-14 rounded-full overflow-hidden bg-slate-100 border-2 border-amber-400 mx-auto mb-3 shadow-2xs">
-                                    <img src="{{ $dummyImg }}" alt="{{ $alumni['nama'] }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                                    <img src="{{ !empty($alumni['gambar']) ? asset('images/' . $alumni['gambar']) : $dummyImg }}" alt="{{ $alumni['nama'] }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
                                 </div>
                                 <h3 class="font-bold text-slate-900 text-xs sm:text-sm leading-tight">{{ $alumni['nama'] }}</h3>
                                 <span class="text-[10px] font-bold text-nampi-orange block mt-1 uppercase">{{ $alumni['jurusan'] }}</span>
@@ -690,7 +693,7 @@
                             <div>
                                 <div class="flex items-center gap-3 mb-4">
                                     <div class="w-12 h-12 rounded-full overflow-hidden bg-slate-100 border-2 border-emerald-400 shrink-0">
-                                        <img src="{{ $dummyImg }}" alt="{{ $item['nama'] }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                                        <img src="{{ !empty($item['gambar']) ? asset('images/' . $item['gambar']) : $dummyImg }}" alt="{{ $item['nama'] }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
                                     </div>
                                     <div>
                                         <h3 class="font-bold text-slate-900 text-sm leading-tight">{{ $item['nama'] }}</h3>
