@@ -257,14 +257,24 @@
     </table>
 
 
-        <!-- Tanda Tangan Kepala Sekolah -->
+        <!-- Tanda Tangan Kepala Sekolah (TTE) -->
         <table style="width: 100%; border-collapse: collapse;">
             <tr>
                 <td style="width: 100%; text-align: center; vertical-align: top; font-size: 9pt;">
                     Mengetahui,<br>
-                    Kepala SMK Wikrama 1 Garut
-                    <div style="height: 120px;"></div>
-                    <strong>Kunedi, S.Si., Gr.</strong>
+                    {{ $tte['penandatanganJabatan'] ?? 'Kepala SMK Wikrama 1 Garut' }}
+                    <div style="margin: 4px 0; text-align: center;">
+                        @if(!empty($tte['qrCodeBase64']))
+                            <img src="{{ $tte['qrCodeBase64'] }}" alt="QR Code TTE" style="width: 68px; height: 68px; display: inline-block;">
+                            <div style="font-size: 6.5pt; color: #475569; margin-top: 1px; line-height: 1.2;">
+                                Ditandatangani secara elektronik<br>
+                                <em>Scan QR untuk verifikasi keaslian</em>
+                            </div>
+                        @else
+                            <div style="height: 60px;"></div>
+                        @endif
+                    </div>
+                    <strong>{{ $tte['penandatanganNama'] ?? 'Kunedi, S.Si., Gr.' }}</strong>
                 </td>
             </tr>
         </table>

@@ -19,20 +19,21 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
+        [x-cloak] { display: none !important; }
     </style>
 
     <!-- Scripts and Styles via Vite -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="h-full antialiased text-slate-800 bg-slate-50 selection:bg-nampi-orange selection:text-white">
+<body class="h-full antialiased text-slate-800 bg-slate-50 selection:bg-nampi-orange selection:text-white overflow-x-hidden">
 
-    <div class="min-h-screen flex flex-col lg:flex-row">
+    <div class="min-h-screen flex flex-col lg:flex-row overflow-x-hidden">
 
         <!-- Mobile Sidebar Backdrop -->
-        <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-xs lg:hidden hidden"></div>
+        <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm lg:hidden hidden"></div>
 
         <!-- Sidebar Navigation -->
-        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-slate-300 flex flex-col transition-all duration-300 transform -translate-x-full lg:translate-x-0 lg:static lg:inset-0 shrink-0">
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-slate-300 flex flex-col lg:static lg:inset-0 shrink-0">
             <!-- Brand & Logo -->
             <div class="h-20 px-6 flex items-center justify-between border-b border-slate-800">
                 <div class="flex items-center gap-3">
@@ -89,7 +90,7 @@
 
         <!-- Main Content Area -->
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
-            <!-- Top Header -->
+            <!-- Top Header (Navbar) -->
             <header class="h-20 bg-white border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <button type="button" onclick="toggleSidebar()" class="p-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 cursor-pointer transition-colors" title="Sembunyikan/Tampilkan Menu (Ctrl+B)">
@@ -151,15 +152,18 @@
             if (!sidebar) return;
 
             if (window.innerWidth >= 1024) {
-                // Desktop toggle
-                const isCollapsed = sidebar.classList.toggle('lg:-ml-64');
+                // Desktop toggle (hide/unhide sidebar)
+                const isCollapsed = sidebar.classList.toggle('sidebar-collapsed');
+                sidebar.classList.toggle('lg:-ml-64', isCollapsed);
                 try {
                     localStorage.setItem('sidebar_collapsed', isCollapsed ? 'true' : 'false');
                 } catch (e) {}
             } else {
-                // Mobile toggle
-                sidebar.classList.toggle('-translate-x-full');
-                if (backdrop) backdrop.classList.toggle('hidden');
+                // Mobile toggle (slide in/out sidebar with backdrop)
+                const isOpen = sidebar.classList.toggle('sidebar-open');
+                if (backdrop) {
+                    backdrop.classList.toggle('hidden', !isOpen);
+                }
             }
         }
 
@@ -169,17 +173,17 @@
                 if (localStorage.getItem('sidebar_collapsed') === 'true' && window.innerWidth >= 1024) {
                     const sidebar = document.getElementById('sidebar');
                     if (sidebar) {
-                        sidebar.classList.add('lg:-ml-64');
+                        sidebar.classList.add('sidebar-collapsed', 'lg:-ml-64');
                     } else {
                         document.addEventListener('DOMContentLoaded', function() {
                             const sb = document.getElementById('sidebar');
-                            if (sb) sb.classList.add('lg:-ml-64');
+                            if (sb) sb.classList.add('sidebar-collapsed', 'lg:-ml-64');
                         });
                     }
                 }
             } catch (e) {}
 
-            // Shortcut Ctrl + B
+            // Shortcut Keyboard: Ctrl + B
             document.addEventListener('keydown', function(e) {
                 if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
                     if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName) || document.activeElement?.isContentEditable) {
@@ -187,6 +191,25 @@
                     }
                     e.preventDefault();
                     toggleSidebar();
+                }
+            });
+
+            // Sinkronisasi saat resize layar
+            window.addEventListener('resize', function() {
+                const sidebar = document.getElementById('sidebar');
+                const backdrop = document.getElementById('sidebar-backdrop');
+                if (!sidebar) return;
+
+                if (window.innerWidth >= 1024) {
+                    sidebar.classList.remove('sidebar-open');
+                    if (backdrop) backdrop.classList.add('hidden');
+                    if (localStorage.getItem('sidebar_collapsed') === 'true') {
+                        sidebar.classList.add('sidebar-collapsed', 'lg:-ml-64');
+                    } else {
+                        sidebar.classList.remove('sidebar-collapsed', 'lg:-ml-64');
+                    }
+                } else {
+                    sidebar.classList.remove('sidebar-collapsed', 'lg:-ml-64');
                 }
             });
         })();

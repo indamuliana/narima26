@@ -34,6 +34,10 @@ Route::controller(RegistrationController::class)->group(function () {
     Route::get('/daftar/login/{nomorPendaftaran}', 'loginDirect')->name('pendaftaran.login-direct');
 });
 
+// Verifikasi Keabsahan Dokumen Publik TTE (QR Code)
+Route::get('/verifikasi-dokumen/{kode}', [\App\Http\Controllers\VerifikasiDokumenController::class, 'show'])
+    ->name('dokumen.verifikasi');
+
 // Guest Authentication Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');

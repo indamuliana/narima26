@@ -1,4 +1,4 @@
-﻿@import 'tailwindcss';
+@import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -38,4 +38,27 @@
 
 ::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
+}
+
+/* Sidebar Smooth Collapse & Mobile Slide Transition */
+#sidebar {
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Desktop Collapse (screen >= 1024px) */
+@media (min-width: 1024px) {
+    #sidebar.sidebar-collapsed,
+    #sidebar.lg\:-ml-64 {
+        margin-left: -16rem !important;
+    }
+}
+
+/* Mobile Slide Open (screen < 1024px) */
+@media (max-width: 1023.98px) {
+    #sidebar {
+        transform: translateX(-100%);
+    }
+    #sidebar.sidebar-open {
+        transform: translateX(0) !important;
+    }
 }

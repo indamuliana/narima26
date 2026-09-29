@@ -154,7 +154,7 @@
             </div>
 
             <div class="mt-12 pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-                <p>&copy; {{ date('Y') }} SMK Wikrama 1 Garut. Hak Cipta Dilindungi Undang-Undang.</p>
+                <p>&copy; {{ date('Y') }} SMK Wikrama 1 Garut | <strong>Nampi<strong> by Inda Muliana (GNU GPL v3.0.)</p>
                 <p class="flex items-center gap-1">
                     Dikembangkan untuk kemudahan pendaftaran murid baru.
                 </p>
@@ -168,8 +168,20 @@
     <script>
         function toggleMobileMenu() {
             const menu = document.getElementById('mobile-menu');
-            if (menu) menu.classList.toggle('hidden');
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
         }
+        document.addEventListener('DOMContentLoaded', function() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) {
+                menu.querySelectorAll('a').forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        menu.classList.add('hidden');
+                    });
+                });
+            }
+        });
     </script>
 </body>
 </html>

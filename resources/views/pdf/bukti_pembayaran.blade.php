@@ -80,16 +80,26 @@
     <div class="signature-box">
         <table>
             <tr>
-                <td style="width: 50%;">
+                <td style="width: 50%; vertical-align: top;">
                     Penyetor / Calon Siswa,
-                    <div class="signature-space"></div>
+                    <div class="signature-space" style="height: 70px;"></div>
                     <strong>( {{ strtoupper($pembayaran->nama_pengirim ?? $calonSiswa->nama_lengkap) }} )</strong>
                 </td>
-                <td style="width: 50%;">
-                    Garut, {{ now()->translatedFormat('d F Y') }}<br>
-                    Bendahara Penerimaan Sekolah,
-                    <div class="signature-space"></div>
-                    <strong>( {{ $pembayaran->verifikator?->name ?? 'Fitria Amalia, S.Pd.' }} )</strong>
+                <td style="width: 50%; vertical-align: top;">
+                    Garut, {{ \Carbon\Carbon::parse($tte['signedAt'] ?? now())->translatedFormat('d F Y') }}<br>
+                    {{ $tte['penandatanganJabatan'] ?? 'Bendahara Penerimaan Sekolah' }},
+                    <div style="margin: 4px 0; text-align: center;">
+                        @if(!empty($tte['qrCodeBase64']))
+                            <img src="{{ $tte['qrCodeBase64'] }}" alt="QR Code TTE" style="width: 68px; height: 68px; display: inline-block;">
+                            <div style="font-size: 6.5pt; color: #475569; margin-top: 1px; line-height: 1.2;">
+                                Ditandatangani secara elektronik<br>
+                                <em>Scan QR untuk verifikasi keaslian</em>
+                            </div>
+                        @else
+                            <div class="signature-space" style="height: 70px;"></div>
+                        @endif
+                    </div>
+                    <strong>( {{ $tte['penandatanganNama'] ?? ($pembayaran->verifikator?->name ?? 'Fitria Amalia, S.Pd.') }} )</strong>
                 </td>
             </tr>
         </table>

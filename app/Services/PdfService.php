@@ -3,14 +3,21 @@
 namespace App\Services;
 
 use App\Models\CalonSiswa;
+use App\Models\DokumenVerifikasi;
 use App\Models\PembayaranDaftarUlang;
 use App\Models\PembayaranSeleksi;
 use App\Models\Tagihan;
+use App\Services\ElectronicSignatureService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Barryvdh\DomPDF\PDF as DomPdfWrapper;
 
 class PdfService
 {
+    public function __construct(
+        protected ?ElectronicSignatureService $signatureService = null
+    ) {
+        $this->signatureService = $signatureService ?? app(ElectronicSignatureService::class);
+    }
     /**
      * Dapatkan representasi base64 dari KOP_SURAT.jpg agar DomPDF dapat merender kop surat
      * secara konsisten tanpa kendala akses path atau HTTP.
@@ -96,10 +103,37 @@ class PdfService
     ): DomPdfWrapper {
         $pembayaran->loadMissing(['calonSiswa.program', 'calonSiswa.jurusan', 'verifikator']);
 
+        $calonSiswa = $pembayaran->calonSiswa;
+        $nomorDokumen = $pembayaran->nomor_referensi ?? ('TRX-' . str_pad($pembayaran->id, 6, '0', STR_PAD_LEFT));
+        $jenisDok = ($pembayaran instanceof PembayaranSeleksi)
+            ? DokumenVerifikasi::JENIS_KWITANSI_SELEKSI
+            : DokumenVerifikasi::JENIS_KWITANSI_DAFTAR_ULANG;
+
+        $namaBendahara = $pembayaran->verifikator?->name ?? 'Fitria Amalia, S.Pd.';
+        $jabatanBendahara = 'Bendahara Penerimaan Sekolah';
+
+        $tte = $this->signatureService->prepareSignatureData(
+            jenisDokumen: $jenisDok,
+            nomorDokumen: $nomorDokumen,
+            calonSiswa: $calonSiswa,
+            penandatanganRole: DokumenVerifikasi::ROLE_BENDAHARA,
+            penandatanganNama: $namaBendahara,
+            penandatanganJabatan: $jabatanBendahara,
+            metadata: [
+                'jenis_pembayaran' => $jenisPembayaran,
+                'nominal' => (float) $pembayaran->nominal_dibayar,
+                'metode_bayar' => $pembayaran->metode_bayar,
+                'bank_pengirim' => $pembayaran->bank_pengirim,
+                'tanggal_bayar' => $pembayaran->tanggal_bayar ?? $pembayaran->created_at,
+            ],
+            signedAt: $pembayaran->verified_at ?? $pembayaran->created_at
+        );
+
         return $this->renderPdf('pdf.bukti_pembayaran', [
             'pembayaran' => $pembayaran,
-            'calonSiswa' => $pembayaran->calonSiswa,
+            'calonSiswa' => $calonSiswa,
             'jenisPembayaran' => $jenisPembayaran,
+            'tte' => $tte,
         ]);
     }
 
@@ -119,11 +153,29 @@ class PdfService
 
         $remainingBalance = max(0, (float) $tagihan->total_netto - $totalPaid);
 
+        $tte = $this->signatureService->prepareSignatureData(
+            jenisDokumen: DokumenVerifikasi::JENIS_TAGIHAN_DAFTAR_ULANG,
+            nomorDokumen: $tagihan->nomor_tagihan,
+            calonSiswa: $tagihan->calonSiswa,
+            penandatanganRole: DokumenVerifikasi::ROLE_BENDAHARA,
+            penandatanganNama: 'Fitria Amalia, S.Pd.',
+            penandatanganJabatan: 'Bendahara Penerimaan SPMB',
+            metadata: [
+                'total_bruto' => (float) $tagihan->total_bruto,
+                'total_diskon' => (float) $tagihan->total_diskon,
+                'total_netto' => (float) $tagihan->total_netto,
+                'status' => $tagihan->status,
+                'sisa_bayar' => (float) $remainingBalance,
+            ],
+            signedAt: $tagihan->created_at
+        );
+
         return $this->renderPdf('pdf.tagihan_daftar_ulang', [
             'tagihan' => $tagihan,
             'calonSiswa' => $tagihan->calonSiswa,
             'totalPaid' => $totalPaid,
             'remainingBalance' => $remainingBalance,
+            'tte' => $tte,
         ]);
     }
 
@@ -162,6 +214,23 @@ class PdfService
             ? $eula->klausul_snapshot
             : $klausulData['kelompok'];
 
+        $nomorDokumen = "EULA-SPMB-" . date('Y') . "/{$calonSiswa->nomor_pendaftaran}";
+
+        $tte = $this->signatureService->prepareSignatureData(
+            jenisDokumen: DokumenVerifikasi::JENIS_KESEPAHAMAN_EULA,
+            nomorDokumen: $nomorDokumen,
+            calonSiswa: $calonSiswa,
+            penandatanganRole: DokumenVerifikasi::ROLE_KEPALA_SEKOLAH,
+            penandatanganNama: 'Kunedi, S.Si., Gr.',
+            penandatanganJabatan: 'Kepala SMK Wikrama 1 Garut',
+            metadata: [
+                'program' => $klausulData['program_title'],
+                'tahun_pelajaran' => $klausulData['tahun_pelajaran'],
+                'agreed_at' => $eula?->agreed_at,
+            ],
+            signedAt: $eula?->agreed_at ?? now()
+        );
+
         return $this->renderPdf('pdf.kesepahaman_eula', [
             'calonSiswa' => $calonSiswa,
             'eula' => $eula,
@@ -169,6 +238,7 @@ class PdfService
             'tahunPelajaran' => $klausulData['tahun_pelajaran'],
             'kelompokList' => $kelompokList,
             'hideKop' => true,
+            'tte' => $tte,
         ]);
     }
 
@@ -181,11 +251,30 @@ class PdfService
      */
     public function generateKelulusan(CalonSiswa $calonSiswa, string $keputusan = 'DITERIMA'): DomPdfWrapper
     {
-        $calonSiswa->loadMissing(['program', 'jurusan', 'sekolahAsal']);
+        $calonSiswa->loadMissing(['program', 'jurusan', 'sekolahAsal', 'keputusanKelulusan']);
+
+        $nomorDokumen = "421.5/SPMB-" . date('Y') . "/{$calonSiswa->nomor_pendaftaran}";
+
+        $tte = $this->signatureService->prepareSignatureData(
+            jenisDokumen: DokumenVerifikasi::JENIS_SK_KELULUSAN,
+            nomorDokumen: $nomorDokumen,
+            calonSiswa: $calonSiswa,
+            penandatanganRole: DokumenVerifikasi::ROLE_KEPALA_SEKOLAH,
+            penandatanganNama: 'Kunedi, S.Si., Gr.',
+            penandatanganJabatan: 'Kepala SMK Wikrama 1 Garut',
+            metadata: [
+                'keputusan' => strtoupper($keputusan),
+                'jurusan' => $calonSiswa->jurusan?->nama_jurusan,
+                'program' => $calonSiswa->program?->nama_program,
+                'tahun_pelajaran' => date('Y') . '/' . (date('Y') + 1),
+            ],
+            signedAt: $calonSiswa->keputusanKelulusan?->ditetapkan_at ?? now()
+        );
 
         return $this->renderPdf('pdf.keputusan_kelulusan', [
             'calonSiswa' => $calonSiswa,
             'keputusan' => strtoupper($keputusan),
+            'tte' => $tte,
         ]);
     }
 

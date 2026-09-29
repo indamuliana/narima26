@@ -50,6 +50,7 @@
                     </h1>
 
                     <p class="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                        Ilmu yang Amaliah,  Amal yang Ilmiah,  Akhlakul Karimah<br>
                         <i>Solusi pendidikan akhlak berkualitas di zaman modern</i><br> 
                     </p>
 
@@ -75,7 +76,7 @@
                             <svg class="w-4 h-4 text-amber-600 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            <span>Download Brosur Resmi</span>
+                            <span>Brosur</span>
                             <svg class="w-3.5 h-3.5 text-amber-500 opacity-70 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                             </svg>
@@ -985,17 +986,17 @@
     <section id="biaya" class="py-16 sm:py-20 bg-slate-50/70 border-b border-slate-200/80">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-2xl mx-auto space-y-2 mb-10">
-                <span class="text-xs font-bold uppercase tracking-wider text-nampi-orange bg-nampi-orange/10 px-3.5 py-1 rounded-full">Transparansi Biaya</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-nampi-orange bg-nampi-orange/10 px-3.5 py-1 rounded-full">Investasi Pendidikan</span>
                 <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                     Rincian Biaya Pendidikan TA 2027/2028
                 </h2>
                 <p class="text-slate-500 text-xs sm:text-sm leading-relaxed">
-                    Perbandingan pembiayaan yang transparan tanpa biaya tersembunyi antara Program Unggulan dan Program Reguler.
+                    Investasi terbaik keluarga adalah pendidikan anak, bekal berharga untuk masa depannya.
                 </p>
             </div>
 
             <!-- Ringkasan Cepat 3 Kartu Minimalis -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <!-- <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                 <div class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:shadow-xs transition-shadow">
                     <div class="flex items-center gap-3 mb-2">
                         <span class="w-9 h-9 rounded-xl bg-orange-50 text-nampi-orange flex items-center justify-center text-base shrink-0 font-bold">📋</span>
@@ -1031,7 +1032,7 @@
                     <div class="text-2xl font-black text-emerald-600 mt-2">Mulai Rp 450.000<span class="text-xs font-normal text-slate-500">/bln</span></div>
                     <p class="text-xs text-slate-500 mt-1 leading-relaxed">Tersedia opsi SPP Pondok (Boarding) untuk Program Unggulan.</p>
                 </div>
-            </div>
+            </div> -->
 
             <!-- Tabel Komparasi Biaya Minimalis -->
             <div class="overflow-hidden rounded-2xl border border-slate-200/90 shadow-2xs bg-white">

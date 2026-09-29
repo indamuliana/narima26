@@ -64,11 +64,21 @@
         <table style="width: 100%;">
             <tr>
                 <td style="width: 50%;"></td>
-                <td style="width: 50%; text-align: center;">
-                    Garut, {{ now()->translatedFormat('d F Y') }}<br>
-                    Kepala SMK Wikrama 1 Garut,
-                    <div class="signature-space"></div>
-                    <strong style="text-decoration: underline;">( Kunedi, S.Si., Gr. )</strong><br>
+                <td style="width: 50%; text-align: center; vertical-align: top;">
+                    Garut, {{ \Carbon\Carbon::parse($tte['signedAt'] ?? now())->translatedFormat('d F Y') }}<br>
+                    {{ $tte['penandatanganJabatan'] ?? 'Kepala SMK Wikrama 1 Garut' }},
+                    <div style="margin: 4px 0; text-align: center;">
+                        @if(!empty($tte['qrCodeBase64']))
+                            <img src="{{ $tte['qrCodeBase64'] }}" alt="QR Code TTE" style="width: 68px; height: 68px; display: inline-block;">
+                            <div style="font-size: 6.5pt; color: #475569; margin-top: 1px; line-height: 1.2;">
+                                Ditandatangani secara elektronik<br>
+                                <em>Scan QR untuk verifikasi keaslian</em>
+                            </div>
+                        @else
+                            <div class="signature-space" style="height: 70px;"></div>
+                        @endif
+                    </div>
+                    <strong style="text-decoration: underline;">( {{ $tte['penandatanganNama'] ?? 'Kunedi, S.Si., Gr.' }} )</strong><br>
                     <small>NIP / NUPTK. -</small>
                 </td>
             </tr>
