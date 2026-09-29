@@ -5,29 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MasterSekolahAsal extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $table = 'master_sekolah_asal';
 
     protected $fillable = [
+        'id',
         'npsn',
         'nama_sekolah',
-        'alamat',
+        'status',
+        'jenis',
+        'provinsi',
+        'kokab',
         'kecamatan',
+        // Backward-compatibility fillable aliases
         'kabupaten_kota',
-        'aktif',
     ];
-
-    protected function casts(): array
-    {
-        return [
-            'aktif' => 'boolean',
-        ];
-    }
 
     public function calonSiswa(): HasMany
     {
@@ -36,6 +32,31 @@ class MasterSekolahAsal extends Model
 
     public function scopeAktif($query)
     {
-        return $query->where('aktif', true);
+        return $query;
+    }
+
+    public function getKabupatenKotaAttribute(): ?string
+    {
+        return $this->kokab;
+    }
+
+    public function setKabupatenKotaAttribute($value): void
+    {
+        $this->attributes['kokab'] = $value;
+    }
+
+    public function getKabupatenAttribute(): ?string
+    {
+        return $this->kokab;
+    }
+
+    public function getAktifAttribute(): bool
+    {
+        return true;
+    }
+
+    public function getAlamatAttribute(): ?string
+    {
+        return null;
     }
 }

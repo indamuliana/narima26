@@ -168,6 +168,12 @@
                                 <dt class="text-slate-500">Info Wikrama dari:</dt>
                                 <dd class="col-span-2 font-medium text-slate-800">{{ $wawancaraOrangTua->info_wikrama_dari }}</dd>
                             </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <dt class="text-slate-500">Infaq Rutin Bulanan:</dt>
+                                <dd class="col-span-2 font-bold text-emerald-700">
+                                    {{ $wawancaraOrangTua->infaq_rutin_bulanan !== null ? 'Rp ' . number_format($wawancaraOrangTua->infaq_rutin_bulanan, 0, ',', '.') : '-' }}
+                                </dd>
+                            </div>
 
                             <div class="mt-4 pt-2 border-t">
                                 <dt class="text-slate-500 mb-1">Catatan Khusus (dari Ortu):</dt>

@@ -32,6 +32,9 @@ Route::controller(RegistrationController::class)->group(function () {
     Route::get('/daftar/sukses/{nomorPendaftaran}', 'sukses')->name('pendaftaran.sukses');
     Route::get('/daftar/cetak-akun/{nomorPendaftaran}', 'cetakAkun')->name('pendaftaran.cetak-akun');
     Route::get('/daftar/login/{nomorPendaftaran}', 'loginDirect')->name('pendaftaran.login-direct');
+    
+    // Endpoint AJAX Pencarian Sekolah
+    Route::get('/referensi/sekolah', 'searchSekolah')->name('referensi.sekolah');
 });
 
 // Verifikasi Keabsahan Dokumen Publik TTE (QR Code)
@@ -63,6 +66,7 @@ Route::middleware(['auth', 'role:admin,guru'])
             ->group(function () {
                 Route::get('/', 'index')->name('index');
                 Route::get('/export/csv', 'exportCsv')->name('export.csv');
+                Route::get('/export/xls', 'exportXls')->name('export.xls');
                 Route::get('/export/pdf', 'exportPdf')->name('export.pdf');
                 Route::get('/{calonSiswa}/cetak-pdf', 'cetakPdf')->name('cetak-pdf');
                 Route::get('/{calonSiswa}', 'show')->name('show');
@@ -334,6 +338,7 @@ Route::middleware(['auth', 'role:calon_siswa'])
                 Route::post('/akademik', 'updateAkademik')->name('akademik');
                 Route::post('/seragam', 'updateSeragam')->name('seragam');
                 Route::post('/dokumen', 'uploadDokumen')->name('dokumen');
+                Route::post('/kesehatan', 'updateKesehatan')->name('kesehatan');
                 Route::post('/finalize', 'finalize')->name('finalize');
             });
 

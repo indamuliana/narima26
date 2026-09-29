@@ -25,7 +25,7 @@ class ExampleTest extends TestCase
         $response->assertSee('Testimoni 6 Tokoh Masyarakat & Pendidikan', false);
         $response->assertSee('Testimoni 6 Orang Tua Siswa & Santri', false);
         $response->assertSee('Gelombang Aktif', false);
-        $response->assertSee('dummy-wikrama.jpg', false);
+        $response->assertSee('Lab-TJKT.jpg', false);
         $response->assertSee('10. Kemana saya menghubungi panitia', false);
 
         $this->assertEquals('Asia/Jakarta', config('app.timezone'));

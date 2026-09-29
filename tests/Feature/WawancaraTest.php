@@ -307,4 +307,46 @@ class WawancaraTest extends TestCase
         $response->assertOk();
         $response->assertSee('Instrumen & Rubrik Penilaian', false);
     }
+
+    public function test_pewawancara_can_save_infaq_rutin_bulanan_with_delimiter(): void
+    {
+        $payloadOrangTua = [
+            'action' => 'draft',
+            'nama_diwawancarai' => 'Siti Aminah',
+            'hubungan_dengan_siswa' => 'Ibu',
+            'tinggal_bersama' => 'Orang Tua',
+            'jarak_rumah' => '2 km',
+            'transportasi' => 'Jalan Kaki',
+            'penanggung_jawab_belajar' => 'Ibu',
+            'info_wikrama_dari' => 'Tetangga',
+            'baca_quran' => 'Ya',
+            'infaq_rutin_bulanan' => '250.000',
+            'alasan_masuk_wikrama' => 'Karakter baik',
+            'alasan_pilih_program_jurusan' => 'Bakat IT',
+            'kebiasaan_tempat_tidur' => 'Selalu',
+            'merokok' => 'Tidak',
+            'alergi' => '-',
+        ];
+
+        $response = $this->actingAs($this->pewawancaraUser)
+            ->post(route('pewawancara.wawancara.save-orang-tua', $this->calonSiswa), $payloadOrangTua);
+
+        $response->assertRedirect(route('pewawancara.wawancara.hub', $this->calonSiswa));
+
+        // Verify integer storage in DB without delimiters
+        $this->assertDatabaseHas('wawancara_orang_tua', [
+            'calon_siswa_id' => $this->calonSiswa->id,
+            'infaq_rutin_bulanan' => 250000,
+        ]);
+
+        $wawancara = WawancaraOrangTua::where('calon_siswa_id', $this->calonSiswa->id)->first();
+        $this->assertEquals(250000, $wawancara->infaq_rutin_bulanan);
+        $this->assertEquals('250.000', $wawancara->formatted_infaq_rutin_bulanan);
+
+        // Verify it renders correctly in detail view
+        $detailResponse = $this->actingAs($this->pewawancaraUser)
+            ->get(route('pewawancara.wawancara.show', $this->calonSiswa));
+        $detailResponse->assertOk();
+        $detailResponse->assertSee('250.000');
+    }
 }

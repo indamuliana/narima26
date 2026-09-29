@@ -103,16 +103,95 @@ class MasterDataSeeder extends Seeder
 
         // 4. Master Pekerjaan
         $pekerjaan = [
-            'PNS',
-            'TNI/Polri',
-            'Karyawan Swasta',
-            'Wiraswasta',
-            'Petani',
-            'Buruh',
-            'Guru',
-            'Pedagang',
-            'Tidak Bekerja',
-            'Lainnya',
+            'BELUM/TIDAK BEKERJA',
+            'MENGURUS RUMAH TANGGA',
+            'PELAJAR/MAHASISWA',
+            'PENSIUNAN',
+            'PEGAWAI NEGERI SIPIL (PNS)',
+            'TENTARA NASIONAL INDONESIA (TNI)',
+            'KEPOLISIAN RI (POLRI)',
+            'PERDAGANGAN',
+            'PETANI/PERKEBUNAN',
+            'PETERNAK',
+            'NELAYAN/PERIKANAN',
+            'INDUSTRI',
+            'KONSTRUKSI',
+            'TRANSPORTASI',
+            'KARYAWAN SWASTA',
+            'KARYAWAN BUMN',
+            'KARYAWAN BUMD',
+            'KARYAWAN HONORER',
+            'BURUH HARIAN LEPAS',
+            'BURUH TANI/PERKEBUNAN',
+            'BURUH NELAYAN/PERIKANAN',
+            'BURUH PETERNAKAN',
+            'PEMBANTU RUMAH TANGGA',
+            'TUKANG CUKUR',
+            'TUKANG LISTRIK',
+            'TUKANG BATU',
+            'TUKANG KAYU',
+            'TUKANG SOL SEPATU',
+            'TUKANG LAS/PANDAI BESI',
+            'TUKANG JAHIT',
+            'TUKANG GIGI',
+            'PENATA RIAS',
+            'PENATA BUSANA',
+            'PENATA RAMBUT',
+            'MEKANIK',
+            'SENIMAN',
+            'TABIB',
+            'PARAJI',
+            'PERANCANG BUSANA',
+            'PENTERJEMAH',
+            'IMAM MASJID',
+            'PENDETA',
+            'PASTOR',
+            'WARTAWAN',
+            'USTADZ/MUBALIGH',
+            'JURU MASAK',
+            'PROMOTOR ACARA',
+            'ANGGOTA DPR-RI',
+            'ANGGOTA DPD',
+            'ANGGOTA BPK',
+            'PRESIDEN',
+            'WAKIL PRESIDEN',
+            'ANGGOTA MAHKAMAH KONSTITUSI',
+            'ANGGOTA KABINET KEMENTERIAN',
+            'DUTA BESAR',
+            'GUBERNUR',
+            'WAKIL GUBERNUR',
+            'BUPATI',
+            'WAKIL BUPATI',
+            'WALIKOTA',
+            'WAKIL WALIKOTA',
+            'ANGGOTA DPRD PROVINSI',
+            'ANGGOTA DPRD KABUPATEN/KOTA',
+            'DOSEN',
+            'GURU',
+            'PILOT',
+            'PENGACARA',
+            'NOTARIS',
+            'ARSITEK',
+            'AKUNTAN',
+            'KONSULTAN',
+            'DOKTER',
+            'BIDAN',
+            'PERAWAT',
+            'APOTEKER',
+            'PSIKIATER/PSIKOLOG',
+            'PENYIAR TELEVISI',
+            'PENYIAR RADIO',
+            'PELAUT',
+            'PENELITI',
+            'SOPIR',
+            'PIALANG',
+            'PARANORMAL',
+            'PEDAGANG',
+            'PERANGKAT DESA',
+            'KEPALA DESA',
+            'BIARAWATI',
+            'WIRASWASTA',
+            'LAINNYA',
         ];
         foreach ($pekerjaan as $pek) {
             MasterPekerjaan::firstOrCreate(['nama' => $pek], ['aktif' => true]);
@@ -122,49 +201,109 @@ class MasterDataSeeder extends Seeder
         // 6. Master Sekolah Asal
         $sekolah = [
             [
-                'npsn' => '20225901',
-                'nama_sekolah' => 'SMP Negeri 1 Garut',
-                'alamat' => 'Jl. Ahmad Yani No. 43',
-                'kecamatan' => 'Garut Kota',
-                'kabupaten_kota' => 'Kabupaten Garut',
-                'aktif' => true,
+                'id' => 1,
+                'npsn' => '70055392',
+                'nama_sekolah' => 'Sekolah Rakyat Menengah Pertama 10 Bogor',
+                'status' => 'Negeri',
+                'jenis' => 'SMP',
+                'provinsi' => 'Jawa Barat',
+                'kokab' => 'Kab. Bogor',
+                'kecamatan' => 'Cibinong',
             ],
             [
-                'npsn' => '20225902',
-                'nama_sekolah' => 'SMP Negeri 2 Garut',
-                'alamat' => 'Jl. Pasundan No. 34',
-                'kecamatan' => 'Garut Kota',
-                'kabupaten_kota' => 'Kabupaten Garut',
-                'aktif' => true,
+                'id' => 2,
+                'npsn' => '20254243',
+                'nama_sekolah' => 'SMP N 4 CIBINONG',
+                'status' => 'Negeri',
+                'jenis' => 'SMP',
+                'provinsi' => 'Jawa Barat',
+                'kokab' => 'Kab. Bogor',
+                'kecamatan' => 'Cibinong',
             ],
             [
-                'npsn' => '20225903',
-                'nama_sekolah' => 'SMP Negeri 1 Tarogong Kidul',
-                'alamat' => 'Jl. Pembangunan No. 12',
-                'kecamatan' => 'Tarogong Kidul',
-                'kabupaten_kota' => 'Kabupaten Garut',
-                'aktif' => true,
+                'id' => 3,
+                'npsn' => '20200611',
+                'nama_sekolah' => 'SMP NEGERI 1 CIBINONG',
+                'status' => 'Negeri',
+                'jenis' => 'SMP',
+                'provinsi' => 'Jawa Barat',
+                'kokab' => 'Kab. Bogor',
+                'kecamatan' => 'Cibinong',
             ],
             [
-                'npsn' => '20277801',
-                'nama_sekolah' => 'MTs Negeri 1 Garut',
-                'alamat' => 'Jl. Suherman No. 20',
-                'kecamatan' => 'Tarogong Kaler',
-                'kabupaten_kota' => 'Kabupaten Garut',
-                'aktif' => true,
+                'id' => 4,
+                'npsn' => '20200627',
+                'nama_sekolah' => 'SMP NEGERI 2 CIBINONG',
+                'status' => 'Negeri',
+                'jenis' => 'SMP',
+                'provinsi' => 'Jawa Barat',
+                'kokab' => 'Kab. Bogor',
+                'kecamatan' => 'Cibinong',
             ],
             [
-                'npsn' => null,
-                'nama_sekolah' => 'Lainnya',
-                'alamat' => null,
-                'kecamatan' => null,
-                'kabupaten_kota' => null,
-                'aktif' => true,
+                'id' => 5,
+                'npsn' => '20200649',
+                'nama_sekolah' => 'SMP NEGERI 3 CIBINONG',
+                'status' => 'Negeri',
+                'jenis' => 'SMP',
+                'provinsi' => 'Jawa Barat',
+                'kokab' => 'Kab. Bogor',
+                'kecamatan' => 'Cibinong',
+            ],
+            [
+                'id' => 6,
+                'npsn' => '20255885',
+                'nama_sekolah' => 'SMP AL AZHAR SYIFA BUDI CIBINONG',
+                'status' => 'Swasta',
+                'jenis' => 'SMP',
+                'provinsi' => 'Jawa Barat',
+                'kokab' => 'Kab. Bogor',
+                'kecamatan' => 'Cibinong',
+            ],
+            [
+                'id' => 7,
+                'npsn' => '20230936',
+                'nama_sekolah' => 'SMP AL KHOER',
+                'status' => 'Swasta',
+                'jenis' => 'SMP',
+                'provinsi' => 'Jawa Barat',
+                'kokab' => 'Kab. Bogor',
+                'kecamatan' => 'Cibinong',
+            ],
+            [
+                'id' => 8,
+                'npsn' => '20200624',
+                'nama_sekolah' => 'SMP AL MIZAN',
+                'status' => 'Swasta',
+                'jenis' => 'SMP',
+                'provinsi' => 'Jawa Barat',
+                'kokab' => 'Kab. Bogor',
+                'kecamatan' => 'Cibinong',
+            ],
+            [
+                'id' => 9,
+                'npsn' => '20200614',
+                'nama_sekolah' => 'SMP AL NUR',
+                'status' => 'Swasta',
+                'jenis' => 'SMP',
+                'provinsi' => 'Jawa Barat',
+                'kokab' => 'Kab. Bogor',
+                'kecamatan' => 'Cibinong',
+            ],
+            [
+                'id' => 10,
+                'npsn' => '69982632',
+                'nama_sekolah' => 'SMP AL QURAN WAHDAH ISLAMIYAH CIBINONG-BOGOR',
+                'status' => 'Swasta',
+                'jenis' => 'SMP',
+                'provinsi' => 'Jawa Barat',
+                'kokab' => 'Kab. Bogor',
+                'kecamatan' => 'Cibinong',
             ],
         ];
         foreach ($sekolah as $sek) {
             MasterSekolahAsal::updateOrCreate(
-                ['nama_sekolah' => $sek['nama_sekolah']],
+                ['id' => $sek['id']],
                 $sek
             );
         }
@@ -252,50 +391,8 @@ class MasterDataSeeder extends Seeder
             MasterKriteriaWawancara::updateOrCreate(['kode' => $k['kode']], array_merge($k, ['aktif' => true]));
         }
 
-        // 9. Master Wilayah (Jawa Barat & Kab. Garut)
-        $prov = MasterProvinsi::firstOrCreate(
-            ['kode' => '32'],
-            ['nama' => 'Jawa Barat']
-        );
-
-        $kabGarut = MasterKabupaten::firstOrCreate(
-            ['kode' => '3205'],
-            ['provinsi_id' => $prov->id, 'nama' => 'Kabupaten Garut']
-        );
-
-        $kabBdg = MasterKabupaten::firstOrCreate(
-            ['kode' => '3273'],
-            ['provinsi_id' => $prov->id, 'nama' => 'Kota Bandung']
-        );
-
-        $kecTarkid = MasterKecamatan::firstOrCreate(
-            ['kode' => '320501'],
-            ['kabupaten_id' => $kabGarut->id, 'nama' => 'Tarogong Kidul']
-        );
-
-        $kecTarkal = MasterKecamatan::firstOrCreate(
-            ['kode' => '320502'],
-            ['kabupaten_id' => $kabGarut->id, 'nama' => 'Tarogong Kaler']
-        );
-
-        $kecGarkot = MasterKecamatan::firstOrCreate(
-            ['kode' => '320503'],
-            ['kabupaten_id' => $kabGarut->id, 'nama' => 'Garut Kota']
-        );
-
-        // Desa
-        MasterDesa::firstOrCreate(
-            ['kode' => '320501001'],
-            ['kecamatan_id' => $kecTarkid->id, 'nama' => 'Sukagalih', 'kode_pos' => '44151']
-        );
-        MasterDesa::firstOrCreate(
-            ['kode' => '320501002'],
-            ['kecamatan_id' => $kecTarkid->id, 'nama' => 'Patallassang', 'kode_pos' => '44151']
-        );
-        MasterDesa::firstOrCreate(
-            ['kode' => '320503001'],
-            ['kecamatan_id' => $kecGarkot->id, 'nama' => 'Kota Kulon', 'kode_pos' => '44111']
-        );
+        // 9. Master Wilayah (38 Provinsi, 27 Kab/Kota Jawa Barat, & Kab. Garut)
+        $this->call(WilayahIndonesiaSeeder::class);
 
         $this->call(TarifBiayaDanSeragamSeeder::class);
     }

@@ -107,7 +107,7 @@
 
                 <div class="flex items-center gap-3">
                     <span class="hidden sm:inline-flex text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-                        Gelombang Aktif: 2027/2028
+                        <a href="https://wa.me/628112232880">Bantuan CS</a>
                     </span>
                 </div>
             </header>

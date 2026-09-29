@@ -75,8 +75,20 @@ class RegisterCalonSiswaRequest extends FormRequest
             'program_id' => ['required', 'exists:master_program,id'],
             'jurusan_id' => ['required', 'exists:master_jurusan,id'],
             'gelombang_id' => ['nullable', 'exists:master_gelombang,id'],
-            'asal_sekolah_id' => ['nullable', 'exists:master_sekolah_asal,id'],
-            'asal_sekolah_lainnya' => ['nullable', 'string', 'max:150'],
+            'asal_sekolah_id' => [
+                'nullable', 
+                function ($attribute, $value, $fail) {
+                    if ($value !== 'lainnya' && !\Illuminate\Support\Facades\DB::table('master_sekolah_asal')->where('id', $value)->exists()) {
+                        $fail('Asal sekolah tidak valid.');
+                    }
+                }
+            ],
+            'asal_sekolah_lainnya' => [
+                'nullable', 
+                'string', 
+                'max:150',
+                Rule::requiredIf(fn () => $this->input('asal_sekolah_id') === 'lainnya')
+            ],
             'referensi_jenis' => [
                 'nullable',
                 'string',

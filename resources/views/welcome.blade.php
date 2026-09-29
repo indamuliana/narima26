@@ -16,6 +16,8 @@
         $now = now();
         $isEnded = $targetSelesai ? $targetSelesai->isPast() : false;
         $diffDays = ($targetSelesai && !$isEnded) ? (int)$now->diffInDays($targetSelesai) : 0;
+        $diffHours = ($targetSelesai && !$isEnded) ? (int)$now->copy()->addDays($diffDays)->diffInHours($targetSelesai) : 0;
+
         // Sumber gambar default (tersimpan di public/images/)
         // Untuk mengganti gambar utama/default, cukup upload file gambar ke public/images/ dan ganti nama filenya di sini
         $defaultImage = 'Lab-TJKT.jpg';
@@ -772,7 +774,7 @@
                             <div>
                                 <div class="flex items-center gap-3 mb-4">
                                     <div class="w-12 h-12 rounded-full overflow-hidden bg-slate-100 border-2 border-cyan-400 shrink-0">
-                                        <img src="{{ $dummyImg }}" alt="{{ $item['nama'] }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                                        <img src="{{ !empty($item['gambar']) ? asset('images/' . $item['gambar']) : $dummyImg }}" alt="{{ $item['nama'] }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
                                     </div>
                                     <div>
                                         <h3 class="font-bold text-slate-900 text-sm leading-tight">{{ $item['nama'] }}</h3>
@@ -851,7 +853,7 @@
                             <div>
                                 <div class="flex items-center gap-3 mb-4">
                                     <div class="w-12 h-12 rounded-full overflow-hidden bg-slate-100 border-2 border-amber-400 shrink-0">
-                                        <img src="{{ $dummyImg }}" alt="{{ $item['nama'] }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                                        <img src="{{ !empty($item['gambar']) ? asset('images/' . $item['gambar']) : $dummyImg }}" alt="{{ $item['nama'] }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
                                     </div>
                                     <div>
                                         <h3 class="font-bold text-slate-900 text-sm leading-tight">{{ $item['nama'] }}</h3>

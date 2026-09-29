@@ -44,10 +44,11 @@ class ServicesTest extends TestCase
         $service = app(RegistrationNumberService::class);
 
         // 1. Validasi regex
-        $this->assertTrue($service->isValid('A16260001'));
-        $this->assertTrue($service->isValid('A16269999'));
+        $this->assertTrue($service->isValid('A16260001', 'A1626'));
+        $this->assertTrue($service->isValid('A16269999', 'A1626'));
+        $this->assertTrue($service->isValid('260001'));
         $this->assertFalse($service->isValid('25AAY0001'));
-        $this->assertFalse($service->isValid('A1626001'));
+        $this->assertFalse($service->isValid('A1626001', 'A1626'));
         $this->assertFalse($service->isValid('INVALID'));
 
         // 2. Generate nomor awal (urutan 1)

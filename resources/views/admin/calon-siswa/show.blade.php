@@ -239,19 +239,42 @@
                             <span class="font-bold text-slate-800 mt-0.5 block">{{ $calonSiswa->email ?? $calonSiswa->user?->email ?? '-' }}</span>
                         </div>
                         <div class="sm:col-span-2">
-                            <span class="text-slate-400 block font-medium">Alamat Domisili Lengkap</span>
-                            <div class="mt-1 p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-medium leading-relaxed">
-                                {{ $calonSiswa->alamat_lengkap ?? '-' }}
-                                @if ($calonSiswa->rt || $calonSiswa->rw)
-                                    (RT {{ $calonSiswa->rt ?? '0' }} / RW {{ $calonSiswa->rw ?? '0' }})
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-400 block font-medium">Alamat Domisili Lengkap</span>
+                                @if($calonSiswa->is_luar_negeri)
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-100 text-blue-800 border border-blue-200">
+                                        🌐 LUAR NEGERI
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                                        🇮🇩 DALAM NEGERI
+                                    </span>
                                 @endif
-                                <div class="text-[11px] text-slate-500 mt-1">
-                                    @if($calonSiswa->desa) Desa/Kel. <strong>{{ $calonSiswa->desa->nama }}</strong> &bull; @endif
-                                    @if($calonSiswa->kecamatan) Kec. <strong>{{ $calonSiswa->kecamatan->nama }}</strong> &bull; @endif
-                                    @if($calonSiswa->kabupaten) Kab/Kota <strong>{{ $calonSiswa->kabupaten->nama }}</strong> &bull; @endif
-                                    @if($calonSiswa->provinsi) Prov. <strong>{{ $calonSiswa->provinsi->nama }}</strong> @endif
-                                    @if($calonSiswa->kode_pos) &bull; Kode Pos: <strong>{{ $calonSiswa->kode_pos }}</strong> @endif
-                                </div>
+                            </div>
+                            <div class="mt-1 p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-medium leading-relaxed">
+                                @if($calonSiswa->is_luar_negeri)
+                                    <div>{{ $calonSiswa->alamat_lengkap ?? '-' }}</div>
+                                    <div class="text-[11px] text-slate-500 mt-1">
+                                        @if($calonSiswa->desa_luar_negeri) {{ $calonSiswa->desa_luar_negeri }} &bull; @endif
+                                        @if($calonSiswa->kecamatan_luar_negeri) Distrik: <strong>{{ $calonSiswa->kecamatan_luar_negeri }}</strong> &bull; @endif
+                                        Kota: <strong>{{ $calonSiswa->kabupaten_luar_negeri ?? '-' }}</strong> &bull;
+                                        Prov/State: <strong>{{ $calonSiswa->provinsi_luar_negeri ?? '-' }}</strong> &bull;
+                                        Negara: <strong>{{ $calonSiswa->negara ?? '-' }}</strong>
+                                        @if($calonSiswa->kode_pos) &bull; Kode Pos: <strong>{{ $calonSiswa->kode_pos }}</strong> @endif
+                                    </div>
+                                @else
+                                    {{ $calonSiswa->alamat_lengkap ?? '-' }}
+                                    @if ($calonSiswa->rt || $calonSiswa->rw)
+                                        (RT {{ $calonSiswa->rt ?? '0' }} / RW {{ $calonSiswa->rw ?? '0' }})
+                                    @endif
+                                    <div class="text-[11px] text-slate-500 mt-1">
+                                        @if($calonSiswa->desa) Desa/Kel. <strong>{{ $calonSiswa->desa->nama }}</strong> &bull; @endif
+                                        @if($calonSiswa->kecamatan) Kec. <strong>{{ $calonSiswa->kecamatan->nama }}</strong> &bull; @endif
+                                        @if($calonSiswa->kabupaten) Kab/Kota <strong>{{ $calonSiswa->kabupaten->nama }}</strong> &bull; @endif
+                                        @if($calonSiswa->provinsi) Prov. <strong>{{ $calonSiswa->provinsi->nama }}</strong> @endif
+                                        @if($calonSiswa->kode_pos) &bull; Kode Pos: <strong>{{ $calonSiswa->kode_pos }}</strong> @endif
+                                    </div>
+                                @endif
                             </div>
                         </div>
                         <div class="sm:col-span-2">
@@ -817,6 +840,10 @@
                                 <div>
                                     <span class="text-slate-400 block text-[10px]">Tinggal Bersama:</span>
                                     <span class="font-semibold text-slate-700">{{ $wo->tinggal_bersama ?? '-' }}</span>
+                                </div>
+                                <div class="col-span-2 sm:col-span-1">
+                                    <span class="text-slate-400 block text-[10px]">Kesanggupan Infaq Bulanan:</span>
+                                    <span class="font-bold text-emerald-700 font-mono">{{ $wo->infaq_rutin_bulanan !== null ? 'Rp ' . number_format($wo->infaq_rutin_bulanan, 0, ',', '.') : '-' }}</span>
                                 </div>
                                 @if ($wo->hal_perhatian_ortu)
                                     <div class="col-span-2">

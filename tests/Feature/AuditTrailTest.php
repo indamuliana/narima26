@@ -23,6 +23,8 @@ class AuditTrailTest extends TestCase
      */
     public function test_login_event_creates_audit_trail_entry(): void
     {
+        $admin = User::where('role', User::ROLE_ADMIN)->first();
+
         $this->post('/login', [
             'login' => 'admin@wikrama.sch.id',
             'password' => 'admin123',
@@ -30,7 +32,7 @@ class AuditTrailTest extends TestCase
 
         $this->assertDatabaseHas('activity_log', [
             'log_name' => 'auth',
-            'description' => 'Pengguna Administrator SPMB (Administrator) berhasil login.',
+            'description' => "Pengguna {$admin->name} (Administrator) berhasil login.",
         ]);
     }
 
@@ -45,7 +47,7 @@ class AuditTrailTest extends TestCase
 
         $this->assertDatabaseHas('activity_log', [
             'log_name' => 'auth',
-            'description' => 'Pengguna Administrator SPMB logout.',
+            'description' => "Pengguna {$admin->name} logout.",
         ]);
     }
 }

@@ -16,9 +16,9 @@
                 </div>
                 <h1 class="text-2xl font-black">{{ $calonSiswa?->nama_lengkap ?? auth()->user()->name }}</h1>
                 <p class="text-xs text-amber-100">
-                    Program: <strong>{{ $calonSiswa?->program?->nama ?? '-' }}</strong> &bull; 
-                    Jurusan: <strong>{{ $calonSiswa?->jurusan?->nama ?? '-' }}</strong> &bull; 
-                    Gelombang: <strong>{{ $calonSiswa?->gelombang?->nama ?? '-' }}</strong>
+                    Program: <strong>{{ $calonSiswa?->program?->nama ?? '-' }}</strong> &bull;
+                   <br> Jurusan: <strong>{{ $calonSiswa?->jurusan?->nama ?? '-' }}</strong> &bull;
+                    <br>Gelombang: <strong>{{ $calonSiswa?->gelombang?->nama ?? '-' }}</strong>
                 </p>
             </div>
             <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 text-right">

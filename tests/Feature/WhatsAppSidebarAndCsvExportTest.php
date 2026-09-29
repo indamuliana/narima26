@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\CalonSiswa;
+use App\Models\DataKesehatan;
 use App\Models\DataOrangtua;
 use App\Models\KesepahamanEula;
 use App\Models\MasterGelombang;
@@ -88,6 +89,9 @@ class WhatsAppSidebarAndCsvExportTest extends TestCase
             'jurusan_id' => $jurusan->id,
             'gelombang_id' => $gelombang->id,
             'status_spmb' => \App\Enums\SpmbStatus::DATA_LENGKAP->value,
+            'anak_ke' => 2,
+            'jumlah_saudara' => 3,
+            'tahun_lulus' => 2026,
         ]);
 
         DataOrangtua::create([
@@ -98,6 +102,18 @@ class WhatsAppSidebarAndCsvExportTest extends TestCase
             'status_ibu' => 'MASIH_HIDUP',
             'nama_ibu' => 'Siti Aminah',
             'no_hp_ibu' => '081311223344',
+        ]);
+
+        DataKesehatan::create([
+            'calon_siswa_id' => $this->candidate->id,
+            'tinggi_badan' => 170,
+            'berat_badan' => 60,
+            'golongan_darah' => 'B+',
+            'buta_warna' => 'Tidak buta warna',
+            'penyakit_pernah_diderita' => 'Tipes',
+            'penyakit_sedang_diderita' => 'tidak ada',
+            'kesehatan_mata' => 'normal',
+            'jenis_alergi' => 'Debu',
         ]);
     }
 
@@ -200,14 +216,21 @@ class WhatsAppSidebarAndCsvExportTest extends TestCase
         $this->assertStringContainsString('Nama Ayah', $content);
         $this->assertStringContainsString('Nama Ibu', $content);
         $this->assertStringContainsString('Status Tagihan Daftar Ulang', $content);
+        $this->assertStringContainsString('Tinggi Badan (cm)', $content);
+        $this->assertStringContainsString('Golongan Darah', $content);
+        $this->assertStringContainsString('Tahun Lulus SMP', $content);
 
         // Check data values
         $this->assertStringContainsString('Muhammad Bintang Pratama', $content);
+        $this->assertStringContainsString('Pengembangan Perangkat Lunak dan Gim', $content);
+        $this->assertStringContainsString('Gelombang 1', $content);
         $this->assertStringContainsString('Rahmat Pratama', $content);
         $this->assertStringContainsString('Siti Aminah', $content);
         $this->assertStringContainsString('081234567890', $content);
         $this->assertStringContainsString('SETUJU', $content);
         $this->assertStringContainsString('TERIMA', $content);
+        $this->assertStringContainsString('Tipes', $content);
+        $this->assertStringContainsString('Debu', $content);
     }
 
     public function test_guru_can_access_and_download_csv_export(): void
@@ -215,6 +238,49 @@ class WhatsAppSidebarAndCsvExportTest extends TestCase
         $response = $this->actingAs($this->guru)->get(route('admin.calon-siswa.export.csv', ['mode' => 'full']));
 
         $response->assertStatus(200);
+        $this->assertStringContainsString('Muhammad Bintang Pratama', $response->streamedContent());
+    }
+
+    public function test_export_xls_simple_mode(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.calon-siswa.export.xls', ['mode' => 'simple']));
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/vnd.ms-excel; charset=UTF-8');
+
+        $content = $response->streamedContent();
+        $this->assertStringContainsString('<html xmlns:o="urn:schemas-microsoft-com:office:office"', $content);
+        $this->assertStringContainsString('mso-number-format', $content);
+        $this->assertStringContainsString('Nomor Pendaftaran', $content);
+        $this->assertStringContainsString('Muhammad Bintang Pratama', $content);
+        $this->assertStringContainsString('26REG0099', $content);
+    }
+
+    public function test_export_xls_master_full_mode(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.calon-siswa.export.xls', ['mode' => 'full']));
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/vnd.ms-excel; charset=UTF-8');
+
+        $content = $response->streamedContent();
+        $this->assertStringContainsString('<html xmlns:o="urn:schemas-microsoft-com:office:office"', $content);
+        $this->assertStringContainsString('Tinggi Badan (cm)', $content);
+        $this->assertStringContainsString('Golongan Darah', $content);
+        $this->assertStringContainsString('Tahun Lulus SMP', $content);
+        $this->assertStringContainsString('Muhammad Bintang Pratama', $content);
+        $this->assertStringContainsString('Pengembangan Perangkat Lunak dan Gim', $content);
+        $this->assertStringContainsString('Gelombang 1', $content);
+        $this->assertStringContainsString('Tipes', $content);
+        $this->assertStringContainsString('Debu', $content);
+    }
+
+    public function test_guru_can_access_and_download_xls_export(): void
+    {
+        $response = $this->actingAs($this->guru)->get(route('admin.calon-siswa.export.xls', ['mode' => 'full']));
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/vnd.ms-excel; charset=UTF-8');
         $this->assertStringContainsString('Muhammad Bintang Pratama', $response->streamedContent());
     }
 }

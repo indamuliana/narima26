@@ -1,5 +1,5 @@
 @props([
-    'phone' => '6281323314430',
+    'phone' => '628112232880',
     'message' => 'Halo Admin SPMB SMK Wikrama 1 Garut, saya ingin bertanya mengenai pendaftaran siswa baru.'
 ])
 

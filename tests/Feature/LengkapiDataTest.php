@@ -55,10 +55,10 @@ class LengkapiDataTest extends TestCase
             'gelombang_id' => $gelombang->id,
         ]);
 
-        $this->provinsi = MasterProvinsi::first();
-        $this->kabupaten = MasterKabupaten::where('provinsi_id', $this->provinsi->id)->first();
-        $this->kecamatan = MasterKecamatan::where('kabupaten_id', $this->kabupaten->id)->first();
-        $this->desa = MasterDesa::where('kecamatan_id', $this->kecamatan->id)->first();
+        $this->desa = MasterDesa::first();
+        $this->kecamatan = $this->desa ? $this->desa->kecamatan : MasterKecamatan::first();
+        $this->kabupaten = $this->kecamatan ? $this->kecamatan->kabupaten : MasterKabupaten::where('kode', '3205')->first();
+        $this->provinsi = $this->kabupaten ? $this->kabupaten->provinsi : MasterProvinsi::first();
         $this->pekerjaan = MasterPekerjaan::first();
     }
 
@@ -408,6 +408,9 @@ class LengkapiDataTest extends TestCase
             'kabupaten_id' => $this->kabupaten->id,
             'kecamatan_id' => $this->kecamatan->id,
             'desa_id' => $this->desa->id,
+            'anak_ke' => 1,
+            'jumlah_saudara' => 2,
+            'tahun_lulus' => '2025',
         ]);
 
         // 2. Data Orang Tua
@@ -445,6 +448,17 @@ class LengkapiDataTest extends TestCase
             'akta_path' => 'dokumen-siswa/1/akta.pdf',
             'ijazah_skl_path' => 'dokumen-siswa/1/ijazah.pdf',
             'pas_foto_path' => 'dokumen-siswa/1/foto.jpg',
+        ]);
+
+        // 6. Data Kesehatan
+        $this->calonSiswa->dataKesehatan()->create([
+            'tinggi_badan' => 165,
+            'berat_badan' => 55,
+            'golongan_darah' => 'O+',
+            'buta_warna' => 'Tidak buta warna',
+            'penyakit_pernah_diderita' => 'Tidak ada',
+            'penyakit_sedang_diderita' => 'Tidak ada',
+            'kesehatan_mata' => 'Normal',
         ]);
 
         $response = $this->actingAs($this->siswaUser)

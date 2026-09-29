@@ -64,7 +64,6 @@ class UpdateAkademikRequest extends FormRequest
             'nilai_matematika' => ['required', 'numeric', 'between:0,100'],
             'nilai_bahasa_inggris' => ['required', 'numeric', 'between:0,100'],
             'nilai_ipa' => ['nullable', 'numeric', 'between:0,100'],
-            'nilai_lainnya' => ['nullable', 'numeric', 'between:0,100'],
             'catatan' => ['nullable', 'string', 'max:500'],
             'prestasi' => ['nullable', 'array'],
             'prestasi.*.jenis_prestasi' => ['nullable', 'string', 'max:50'],

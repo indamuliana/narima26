@@ -209,13 +209,24 @@
             <td class="lbl">Alamat Domisili</td>
             <td class="colon">:</td>
             <td class="val" colspan="4">
-                {{ $calonSiswa->alamat_lengkap ?? '-' }}
-                @if($calonSiswa->rt || $calonSiswa->rw) (RT {{ $calonSiswa->rt ?? '0' }} / RW {{ $calonSiswa->rw ?? '0' }}) @endif
-                @if($calonSiswa->desa), Desa/Kel. {{ $calonSiswa->desa->nama }} @endif
-                @if($calonSiswa->kecamatan), Kec. {{ $calonSiswa->kecamatan->nama }} @endif
-                @if($calonSiswa->kabupaten), Kab/Kota {{ $calonSiswa->kabupaten->nama }} @endif
-                @if($calonSiswa->provinsi), Prov. {{ $calonSiswa->provinsi->nama }} @endif
-                @if($calonSiswa->kode_pos) &bull; Kode Pos: {{ $calonSiswa->kode_pos }} @endif
+                @if($calonSiswa->is_luar_negeri)
+                    <span style="font-weight: bold; color: #1e40af;">[Luar Negeri]</span>
+                    {{ $calonSiswa->alamat_lengkap ?? '-' }}
+                    @if($calonSiswa->desa_luar_negeri), {{ $calonSiswa->desa_luar_negeri }} @endif
+                    @if($calonSiswa->kecamatan_luar_negeri), Distrik: {{ $calonSiswa->kecamatan_luar_negeri }} @endif
+                    @if($calonSiswa->kabupaten_luar_negeri), Kota: {{ $calonSiswa->kabupaten_luar_negeri }} @endif
+                    @if($calonSiswa->provinsi_luar_negeri), Prov/State: {{ $calonSiswa->provinsi_luar_negeri }} @endif
+                    , Negara: {{ $calonSiswa->negara ?? '-' }}
+                    @if($calonSiswa->kode_pos) &bull; Kode Pos: {{ $calonSiswa->kode_pos }} @endif
+                @else
+                    {{ $calonSiswa->alamat_lengkap ?? '-' }}
+                    @if($calonSiswa->rt || $calonSiswa->rw) (RT {{ $calonSiswa->rt ?? '0' }} / RW {{ $calonSiswa->rw ?? '0' }}) @endif
+                    @if($calonSiswa->desa), Desa/Kel. {{ $calonSiswa->desa->nama }} @endif
+                    @if($calonSiswa->kecamatan), Kec. {{ $calonSiswa->kecamatan->nama }} @endif
+                    @if($calonSiswa->kabupaten), Kab/Kota {{ $calonSiswa->kabupaten->nama }} @endif
+                    @if($calonSiswa->provinsi), Prov. {{ $calonSiswa->provinsi->nama }} @endif
+                    @if($calonSiswa->kode_pos) &bull; Kode Pos: {{ $calonSiswa->kode_pos }} @endif
+                @endif
             </td>
         </tr>
         <tr>
@@ -599,6 +610,7 @@
                         <tr><td style="color: #475569;">Narasumber Hadir</td><td>: {{ $wOrtu->nama_diwawancarai }} ({{ $wOrtu->hubungan_dengan_siswa }})</td></tr>
                         <tr><td style="color: #475569;">Penanggung Jwb Belajar</td><td>: {{ $wOrtu->penanggung_jawab_belajar ?? '-' }}</td></tr>
                         <tr><td style="color: #475569;">Info Wikrama dari</td><td>: {{ $wOrtu->info_wikrama_dari ?? '-' }}</td></tr>
+                        <tr><td style="color: #475569;">Infaq Rutin Bulanan</td><td>: <strong>{{ $wOrtu->infaq_rutin_bulanan !== null ? 'Rp ' . number_format($wOrtu->infaq_rutin_bulanan, 0, ',', '.') : '-' }}</strong></td></tr>
                         <tr><td style="color: #475569;">Perhatian Khusus Ortu</td><td>: {{ $wOrtu->hal_perhatian_ortu ?: '-' }}</td></tr>
                         <tr><td style="color: #475569;">Kesan Pewawancara</td><td>: {{ $wOrtu->kesan_pewawancara ?: '-' }}</td></tr>
                     </table>

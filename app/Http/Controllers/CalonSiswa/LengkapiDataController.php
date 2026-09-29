@@ -198,6 +198,19 @@ class LengkapiDataController extends Controller
             ->with('success', 'Berkas dokumen persyaratan berhasil diunggah!');
     }
 
+    public function updateKesehatan(\App\Http\Requests\UpdateKesehatanRequest $request): RedirectResponse
+    {
+        $calonSiswa = auth()->user()->calonSiswa;
+        
+        $calonSiswa->dataKesehatan()->updateOrCreate(
+            ['calon_siswa_id' => $calonSiswa->id],
+            $request->validated()
+        );
+
+        return redirect()->route('calon-siswa.lengkapi-data.index', ['tab' => 'kesehatan'])
+            ->with('success', 'Data kesehatan berhasil disimpan!');
+    }
+
     /**
      * Finalisasi Data Pendaftaran.
      */

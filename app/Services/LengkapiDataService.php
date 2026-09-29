@@ -7,6 +7,10 @@ use App\Models\CalonSiswa;
 use App\Models\DataAkademik;
 use App\Models\DataOrangtua;
 use App\Models\DokumenPendaftaran;
+use App\Models\MasterDesa;
+use App\Models\MasterKabupaten;
+use App\Models\MasterKecamatan;
+use App\Models\MasterProvinsi;
 use App\Models\MasterSeragam;
 use App\Models\Prestasi;
 use App\Models\UkuranSeragam;
@@ -27,20 +31,49 @@ class LengkapiDataService
      */
     public function calculateCompletion(CalonSiswa $calonSiswa): array
     {
-        $calonSiswa->loadMissing(['dataOrangtua', 'dataAkademik', 'prestasi', 'ukuranSeragam', 'dokumenPendaftaran']);
+        $calonSiswa->loadMissing(['dataOrangtua', 'dataAkademik', 'prestasi', 'ukuranSeragam', 'dokumenPendaftaran', 'dataKesehatan']);
 
         // 1. Biodata (Pribadi & Wilayah)
-        $biodataFields = [
-            'nik', 'no_kk', 'agama', 'tempat_lahir', 'tanggal_lahir',
-            'alamat_lengkap', 'rt', 'rw', 'provinsi_id', 'kabupaten_id', 'kecamatan_id', 'desa_id'
-        ];
-        $filledBiodata = 0;
-        foreach ($biodataFields as $f) {
-            if (!empty($calonSiswa->$f)) {
+        if ($calonSiswa->is_luar_negeri) {
+            $biodataFields = [
+                'nik', 'no_kk', 'agama', 'tempat_lahir', 'tanggal_lahir',
+                'alamat_lengkap', 'negara', 'provinsi_luar_negeri', 'kabupaten_luar_negeri',
+                'anak_ke', 'jumlah_saudara', 'tahun_lulus'
+            ];
+            $filledBiodata = 0;
+            foreach ($biodataFields as $f) {
+                if (!empty($calonSiswa->$f)) {
+                    $filledBiodata++;
+                }
+            }
+            $totalBiodataFields = count($biodataFields);
+            $biodataPercent = (int) round(($filledBiodata / $totalBiodataFields) * 100);
+        } else {
+            $baseFields = [
+                'nik', 'no_kk', 'agama', 'tempat_lahir', 'tanggal_lahir',
+                'alamat_lengkap', 'rt', 'rw', 'anak_ke', 'jumlah_saudara', 'tahun_lulus'
+            ];
+            $filledBiodata = 0;
+            foreach ($baseFields as $f) {
+                if (!empty($calonSiswa->$f)) {
+                    $filledBiodata++;
+                }
+            }
+            if (!empty($calonSiswa->provinsi_nama) || !empty($calonSiswa->provinsi_id)) {
                 $filledBiodata++;
             }
+            if (!empty($calonSiswa->kabupaten_nama) || !empty($calonSiswa->kabupaten_id)) {
+                $filledBiodata++;
+            }
+            if (!empty($calonSiswa->kecamatan_nama) || !empty($calonSiswa->kecamatan_id)) {
+                $filledBiodata++;
+            }
+            if (!empty($calonSiswa->desa_nama) || !empty($calonSiswa->desa_id)) {
+                $filledBiodata++;
+            }
+            $totalBiodataFields = count($baseFields) + 4;
+            $biodataPercent = (int) round(($filledBiodata / $totalBiodataFields) * 100);
         }
-        $biodataPercent = (int) round(($filledBiodata / count($biodataFields)) * 100);
 
         // 2. Data Orang Tua
         $orangTua = $calonSiswa->dataOrangtua;
@@ -103,7 +136,7 @@ class LengkapiDataService
 
         // 5. Dokumen Persyaratan
         $dokumen = $calonSiswa->dokumenPendaftaran;
-        $mandatoryDocs = ['kk_path', 'akta_path', 'ijazah_skl_path', 'pas_foto_path'];
+        $mandatoryDocs = ['kk_path', 'pas_foto_path'];
         $filledDocs = 0;
         if ($dokumen) {
             foreach ($mandatoryDocs as $doc) {
@@ -114,22 +147,39 @@ class LengkapiDataService
         }
         $dokumenPercent = (int) round(($filledDocs / count($mandatoryDocs)) * 100);
 
+        // 6. Data Kesehatan
+        $kesehatan = $calonSiswa->dataKesehatan;
+        $kesehatanFields = [
+            'tinggi_badan', 'berat_badan', 'golongan_darah', 'buta_warna',
+            'penyakit_pernah_diderita', 'penyakit_sedang_diderita', 'kesehatan_mata'
+        ];
+        $filledKesehatan = 0;
+        if ($kesehatan) {
+            foreach ($kesehatanFields as $f) {
+                if ($kesehatan->$f !== null && $kesehatan->$f !== '') {
+                    $filledKesehatan++;
+                }
+            }
+        }
+        $kesehatanPercent = (int) round(($filledKesehatan / count($kesehatanFields)) * 100);
+
         $totalPercent = (int) round(
-            ($biodataPercent + $ortuPercent + $akademikPercent + $seragamPercent + $dokumenPercent) / 5
+            ($biodataPercent + $ortuPercent + $akademikPercent + $seragamPercent + $dokumenPercent + $kesehatanPercent) / 6
         );
 
         $isAllComplete = ($biodataPercent === 100 &&
             $ortuPercent === 100 &&
             $akademikPercent === 100 &&
             $seragamPercent === 100 &&
-            $dokumenPercent === 100);
+            $dokumenPercent === 100 &&
+            $kesehatanPercent === 100);
 
         return [
             'biodata' => [
                 'percent' => $biodataPercent,
                 'is_complete' => $biodataPercent === 100,
                 'filled' => $filledBiodata,
-                'total' => count($biodataFields),
+                'total' => $totalBiodataFields,
             ],
             'orang_tua' => [
                 'percent' => $ortuPercent,
@@ -155,6 +205,12 @@ class LengkapiDataService
                 'filled' => $filledDocs,
                 'total' => count($mandatoryDocs),
             ],
+            'kesehatan' => [
+                'percent' => $kesehatanPercent,
+                'is_complete' => $kesehatanPercent === 100,
+                'filled' => $filledKesehatan,
+                'total' => count($kesehatanFields),
+            ],
             'prestasi_count' => $calonSiswa->prestasi()->count(),
             'total_percent' => $totalPercent,
             'is_all_complete' => $isAllComplete,
@@ -169,11 +225,79 @@ class LengkapiDataService
         $allowedFields = [
             'nama_lengkap', 'nama_panggilan', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir',
             'nik', 'no_kk', 'agama', 'alamat_lengkap', 'rt', 'rw', 'kode_pos',
+            'is_luar_negeri', 'negara',
+            'provinsi_nama', 'kabupaten_nama', 'kecamatan_nama', 'desa_nama',
+            'provinsi_luar_negeri', 'kabupaten_luar_negeri',
+            'kecamatan_luar_negeri', 'desa_luar_negeri',
             'provinsi_id', 'kabupaten_id', 'kecamatan_id', 'desa_id',
-            'no_hp_siswa', 'email',
+            'no_hp_siswa', 'email', 'anak_ke', 'jumlah_saudara', 'tahun_lulus',
         ];
 
         $payload = array_intersect_key($data, array_flip($allowedFields));
+
+        $isLuarNegeri = !empty($payload['is_luar_negeri']) && (
+            $payload['is_luar_negeri'] === true ||
+            $payload['is_luar_negeri'] === 1 ||
+            $payload['is_luar_negeri'] === '1' ||
+            $payload['is_luar_negeri'] === 'true'
+        );
+
+        $payload['is_luar_negeri'] = $isLuarNegeri;
+
+        if ($isLuarNegeri) {
+            $payload['provinsi_nama'] = null;
+            $payload['kabupaten_nama'] = null;
+            $payload['kecamatan_nama'] = null;
+            $payload['desa_nama'] = null;
+            $payload['provinsi_id'] = null;
+            $payload['kabupaten_id'] = null;
+            $payload['kecamatan_id'] = null;
+            $payload['desa_id'] = null;
+            if (empty($payload['rt'])) $payload['rt'] = '-';
+            if (empty($payload['rw'])) $payload['rw'] = '-';
+        } else {
+            $payload['negara'] = 'Indonesia';
+            $payload['provinsi_luar_negeri'] = null;
+            $payload['kabupaten_luar_negeri'] = null;
+            $payload['kecamatan_luar_negeri'] = null;
+            $payload['desa_luar_negeri'] = null;
+
+            // Sync relation IDs if ID is given or lookup by name
+            if (!empty($payload['provinsi_id']) && empty($payload['provinsi_nama'])) {
+                $payload['provinsi_nama'] = MasterProvinsi::find($payload['provinsi_id'])?->nama;
+            } elseif (!empty($payload['provinsi_nama']) && empty($payload['provinsi_id'])) {
+                $prov = MasterProvinsi::whereRaw('LOWER(nama) = ?', [strtolower(trim($payload['provinsi_nama']))])->first();
+                $payload['provinsi_id'] = $prov?->id;
+            }
+
+            if (!empty($payload['kabupaten_id']) && empty($payload['kabupaten_nama'])) {
+                $payload['kabupaten_nama'] = MasterKabupaten::find($payload['kabupaten_id'])?->nama;
+            } elseif (!empty($payload['kabupaten_nama']) && empty($payload['kabupaten_id']) && !empty($payload['provinsi_id'])) {
+                $kab = MasterKabupaten::where('provinsi_id', $payload['provinsi_id'])
+                    ->whereRaw('LOWER(nama) = ?', [strtolower(trim($payload['kabupaten_nama']))])
+                    ->first();
+                $payload['kabupaten_id'] = $kab?->id;
+            }
+
+            if (!empty($payload['kecamatan_id']) && empty($payload['kecamatan_nama'])) {
+                $payload['kecamatan_nama'] = MasterKecamatan::find($payload['kecamatan_id'])?->nama;
+            } elseif (!empty($payload['kecamatan_nama']) && empty($payload['kecamatan_id']) && !empty($payload['kabupaten_id'])) {
+                $kec = MasterKecamatan::where('kabupaten_id', $payload['kabupaten_id'])
+                    ->whereRaw('LOWER(nama) = ?', [strtolower(trim($payload['kecamatan_nama']))])
+                    ->first();
+                $payload['kecamatan_id'] = $kec?->id;
+            }
+
+            if (!empty($payload['desa_id']) && empty($payload['desa_nama'])) {
+                $payload['desa_nama'] = MasterDesa::find($payload['desa_id'])?->nama;
+            } elseif (!empty($payload['desa_nama']) && empty($payload['desa_id']) && !empty($payload['kecamatan_id'])) {
+                $des = MasterDesa::where('kecamatan_id', $payload['kecamatan_id'])
+                    ->whereRaw('LOWER(nama) = ?', [strtolower(trim($payload['desa_nama']))])
+                    ->first();
+                $payload['desa_id'] = $des?->id;
+            }
+        }
+
         $calonSiswa->update($payload);
 
         // Jika status masih PEMBAYARAN_SELEKSI_DIVERIFIKASI, transisi ke MELENGKAPI_DATA
@@ -248,7 +372,7 @@ class LengkapiDataService
         $allowedAkademik = [
             'nama_sekolah', 'npsn', 'nisn', 'nilai_rata_rata',
             'nilai_bahasa_indonesia', 'nilai_matematika', 'nilai_bahasa_inggris',
-            'nilai_ipa', 'nilai_lainnya', 'catatan',
+            'nilai_ipa', 'catatan',
         ];
 
         $payload = array_intersect_key($data, array_flip($allowedAkademik));
@@ -311,9 +435,14 @@ class LengkapiDataService
     {
         DB::transaction(function () use ($calonSiswa, $seragamEntries) {
             foreach ($seragamEntries as $entry) {
-                if (!empty($entry['jenis_seragam_id']) && !empty($entry['ukuran'])) {
+                if (!empty($entry['jenis_seragam_id'])) {
+                    $ukuran = !empty($entry['ukuran']) ? $entry['ukuran'] : '-';
                     $statusPemesanan = $entry['status_pemesanan'] ?? UkuranSeragam::STATUS_PESAN_SEKARANG;
-                    if (!in_array($statusPemesanan, [UkuranSeragam::STATUS_PESAN_SEKARANG, UkuranSeragam::STATUS_PESAN_NANTI], true)) {
+                    if (!in_array($statusPemesanan, [
+                        UkuranSeragam::STATUS_PESAN_SEKARANG,
+                        UkuranSeragam::STATUS_PESAN_NANTI,
+                        UkuranSeragam::STATUS_TIDAK_PESAN,
+                    ], true)) {
                         $statusPemesanan = UkuranSeragam::STATUS_PESAN_SEKARANG;
                     }
                     $beliDiSekolah = ($statusPemesanan === UkuranSeragam::STATUS_PESAN_SEKARANG);
@@ -322,7 +451,7 @@ class LengkapiDataService
 
                     if ($existing && $existing->tagihan_id) {
                         $existing->update([
-                            'ukuran' => $entry['ukuran'],
+                            'ukuran' => $ukuran,
                             'keterangan' => $entry['keterangan'] ?? $existing->keterangan,
                         ]);
                     } else {
@@ -332,7 +461,7 @@ class LengkapiDataService
                                 'jenis_seragam_id' => $entry['jenis_seragam_id'],
                             ],
                             [
-                                'ukuran' => $entry['ukuran'],
+                                'ukuran' => $ukuran,
                                 'jumlah' => $entry['jumlah'] ?? 1,
                                 'beli_di_sekolah' => $beliDiSekolah,
                                 'status_pemesanan' => $statusPemesanan,
@@ -412,7 +541,8 @@ class LengkapiDataService
             if (!$completion['orang_tua']['is_complete']) $missing[] = 'Data Orang Tua';
             if (!$completion['akademik']['is_complete']) $missing[] = 'Data Akademik / Nilai';
             if (!$completion['seragam']['is_complete']) $missing[] = 'Ukuran Seragam';
-            if (!$completion['dokumen']['is_complete']) $missing[] = 'Dokumen Persyaratan (KK, Akta, Ijazah/SKL, Pas Foto)';
+            if (!$completion['dokumen']['is_complete']) $missing[] = 'Dokumen Persyaratan (KK, Pas Foto)';
+            if (!$completion['kesehatan']['is_complete']) $missing[] = 'Data Kesehatan';
 
             throw new InvalidArgumentException(
                 'Data belum lengkap! Bagian yang belum terisi penuh: ' . implode(', ', $missing) . '.'

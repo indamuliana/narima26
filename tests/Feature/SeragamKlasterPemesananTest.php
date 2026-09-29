@@ -54,11 +54,12 @@ class SeragamKlasterPemesananTest extends TestCase
             ->get(route('calon-siswa.lengkapi-data.index', ['tab' => 'seragam']));
 
         $response->assertOk();
-        $response->assertSee('Klaster 1: Perlengkapan Masuk Sekolah &amp; MPLS', false);
-        $response->assertSee('Klaster 2: Seragam Harian KBM Reguler', false);
-        $response->assertSee('Klaster 3: Perlengkapan Tambahan (Opsional)', false);
+        $response->assertSee('Klaster 1 prioritas', false);
+        $response->assertSee('Klaster 2', false);
+        $response->assertSee('Klaster 3', false);
         $response->assertSee('Pesan Sekarang');
         $response->assertSee('Pesan Nanti');
+        $response->assertSee('Tidak Pesan');
     }
 
     public function test_candidate_can_save_seragam_with_mixed_pesan_sekarang_and_pesan_nanti(): void
@@ -75,10 +76,14 @@ class SeragamKlasterPemesananTest extends TestCase
         $payload = [];
         $i = 0;
         foreach ($masterList as $ms) {
-            // Put MPLS in PESAN_SEKARANG, others in PESAN_NANTI
-            $status = ($ms->klaster === MasterSeragam::KLASTER_MPLS)
-                ? UkuranSeragam::STATUS_PESAN_SEKARANG
-                : UkuranSeragam::STATUS_PESAN_NANTI;
+            // Put MPLS in PESAN_SEKARANG, KBM in PESAN_NANTI, and OPSIONAL in TIDAK_PESAN
+            if ($ms->klaster === MasterSeragam::KLASTER_MPLS) {
+                $status = UkuranSeragam::STATUS_PESAN_SEKARANG;
+            } elseif ($ms->klaster === MasterSeragam::KLASTER_KBM) {
+                $status = UkuranSeragam::STATUS_PESAN_NANTI;
+            } else {
+                $status = UkuranSeragam::STATUS_TIDAK_PESAN;
+            }
 
             $payload[$i++] = [
                 'jenis_seragam_id' => $ms->id,
@@ -102,9 +107,11 @@ class SeragamKlasterPemesananTest extends TestCase
 
         $nowItems = $savedItems->where('status_pemesanan', UkuranSeragam::STATUS_PESAN_SEKARANG);
         $laterItems = $savedItems->where('status_pemesanan', UkuranSeragam::STATUS_PESAN_NANTI);
+        $noItems = $savedItems->where('status_pemesanan', UkuranSeragam::STATUS_TIDAK_PESAN);
 
         $this->assertGreaterThan(0, $nowItems->count());
         $this->assertGreaterThan(0, $laterItems->count());
+        $this->assertGreaterThan(0, $noItems->count());
 
         foreach ($nowItems as $item) {
             $this->assertTrue($item->beli_di_sekolah);
@@ -114,6 +121,11 @@ class SeragamKlasterPemesananTest extends TestCase
         foreach ($laterItems as $item) {
             $this->assertFalse($item->beli_di_sekolah);
             $this->assertTrue($item->isPesanNanti());
+        }
+
+        foreach ($noItems as $item) {
+            $this->assertFalse($item->beli_di_sekolah);
+            $this->assertTrue($item->isTidakPesan());
         }
     }
 

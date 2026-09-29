@@ -245,18 +245,19 @@
                                 <select name="asal_sekolah_id" id="asal_sekolah_id"
                                     class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition">
                                     <option value="">-- Pilih Asal Sekolah --</option>
-                                    @foreach($sekolahAsal as $sekolah)
-                                        <option value="{{ $sekolah->id }}" {{ old('asal_sekolah_id') == $sekolah->id ? 'selected' : '' }}>
-                                            {{ $sekolah->nama_sekolah }} ({{ $sekolah->kabupaten ?? 'Garut' }})
+                                    <option value="lainnya" {{ old('asal_sekolah_id') == 'lainnya' ? 'selected' : '' }}>Lainnya - isi sendiri</option>
+                                    @if(isset($selectedSekolah))
+                                        <option value="{{ $selectedSekolah->id }}" selected>
+                                            {{ $selectedSekolah->nama_sekolah }}
                                         </option>
-                                    @endforeach
+                                    @endif
                                 </select>
                             </div>
 
                             <div>
                                 <label for="asal_sekolah_lainnya" class="block text-sm font-semibold text-slate-700">Atau Ketik Nama Sekolah Jika Tidak Ada di Daftar</label>
                                 <input type="text" name="asal_sekolah_lainnya" id="asal_sekolah_lainnya" value="{{ old('asal_sekolah_lainnya') }}" placeholder="Contoh: SMP Negeri 1 Tarogong Kidul"
-                                    class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition">
+                                    class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed">
                             </div>
                         </div>
                     </div>
@@ -469,6 +470,85 @@
             const checkedProgram = document.querySelector('.program-radio:checked');
             if (checkedProgram) {
                 handleProgramChange(checkedProgram.value);
+            }
+            
+            // Logika untuk Asal Sekolah Lainnya
+            const sekolahSelect = document.getElementById('asal_sekolah_id');
+            const sekolahLainnyaInput = document.getElementById('asal_sekolah_lainnya');
+            
+            function toggleSekolahLainnya() {
+                if (sekolahSelect.value === 'lainnya') {
+                    sekolahLainnyaInput.disabled = false;
+                    sekolahLainnyaInput.focus();
+                } else {
+                    sekolahLainnyaInput.disabled = true;
+                    if (sekolahSelect.value !== '') {
+                        sekolahLainnyaInput.value = '';
+                    }
+                }
+            }
+            
+            sekolahSelect.addEventListener('change', toggleSekolahLainnya);
+            // Run on load
+            toggleSekolahLainnya();
+
+            // Load TomSelect
+            if (!window.TomSelect) {
+                const css = document.createElement('link');
+                css.rel = 'stylesheet';
+                css.href = 'https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap4.min.css';
+                document.head.appendChild(css);
+                
+                const customCss = document.createElement('style');
+                customCss.innerHTML = `
+                    .ts-control { border-radius: 0.75rem; border-color: #cbd5e1; padding: 0.625rem 1rem; font-size: 0.875rem; box-shadow: none; }
+                    .ts-control.focus { border-color: #f97316; box-shadow: 0 0 0 2px #fed7aa; }
+                    .ts-wrapper.single .ts-control { background-color: #fff; }
+                `;
+                document.head.appendChild(customCss);
+
+                const s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js';
+                s.onload = function() {
+                    initTomSelect();
+                };
+                document.head.appendChild(s);
+            } else {
+                initTomSelect();
+            }
+
+            function initTomSelect() {
+                new TomSelect('#asal_sekolah_id', {
+                    valueField: 'id',
+                    labelField: 'nama_sekolah',
+                    searchField: 'nama_sekolah',
+                    placeholder: "-- Pilih Asal Sekolah --",
+                    load: function(query, callback) {
+                        if (!query.length) return callback();
+                        fetch('/referensi/sekolah?q=' + encodeURIComponent(query))
+                            .then(response => response.json())
+                            .then(json => {
+                                callback(json);
+                            }).catch(() => {
+                                callback();
+                            });
+                    },
+                    render: {
+                        option: function(item, escape) {
+                            if (item.id === 'lainnya' || item.id === '') {
+                                return '<div>' + escape(item.nama_sekolah || item.text) + '</div>';
+                            }
+                            let lokasi = escape(item.kokab || item.kabupaten || 'Luar Kota');
+                            return '<div>' + escape(item.nama_sekolah || item.text) + ' <span class="text-xs text-slate-500">(' + lokasi + ')</span></div>';
+                        },
+                        item: function(item, escape) {
+                            return '<div>' + escape(item.nama_sekolah || item.text) + '</div>';
+                        }
+                    },
+                    onChange: function() {
+                        toggleSekolahLainnya();
+                    }
+                });
             }
         });
     </script>

@@ -240,10 +240,27 @@
                         </select>
                     </div>
 
-                    <div class="sm:col-span-2">
+                    <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase">Memiliki Hafalan Al-Qur'an (Juz / Surat)</label>
                         <input type="text" name="hafalan_quran" value="{{ old('hafalan_quran', $wawancara->hafalan_quran) }}" placeholder="Contoh: Juz 30 atau sebutkan surat"
                             class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase">Kesanggupan Infaq Rutin Bulanan</label>
+                        <div class="relative mt-1">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 font-bold text-sm">
+                                Rp
+                            </span>
+                            <input type="text" 
+                                   id="infaq_rutin_bulanan" 
+                                   name="infaq_rutin_bulanan" 
+                                   value="{{ old('infaq_rutin_bulanan', $wawancara->formatted_infaq_rutin_bulanan ?? ($wawancara->infaq_rutin_bulanan ? number_format($wawancara->infaq_rutin_bulanan, 0, ',', '.') : '')) }}" 
+                                   placeholder="0" 
+                                   autocomplete="off"
+                                   class="w-full rounded-xl border border-slate-300 pl-11 pr-3.5 py-2 text-sm font-semibold text-slate-800 focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1">Nominal per bulan (otomatis format delimiter per 3 digit).</p>
                     </div>
 
                     <div class="sm:col-span-2 md:col-span-3">
@@ -373,4 +390,37 @@
             </div>
         </form>
     </div>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const infaqInput = document.getElementById('infaq_rutin_bulanan');
+            if (infaqInput) {
+                function formatRupiah(val) {
+                    if (!val) return '';
+                    let clean = val.toString().replace(/\D/g, '');
+                    if (!clean) return '';
+                    return clean.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                }
+
+                infaqInput.addEventListener('input', function () {
+                    let cursorPosition = this.selectionStart;
+                    let originalLength = this.value.length;
+                    let formatted = formatRupiah(this.value);
+                    this.value = formatted;
+                    let newLength = formatted.length;
+                    let diff = newLength - originalLength;
+                    cursorPosition = cursorPosition + diff;
+                    if (cursorPosition >= 0) {
+                        this.setSelectionRange(cursorPosition, cursorPosition);
+                    }
+                });
+
+                if (infaqInput.value) {
+                    infaqInput.value = formatRupiah(infaqInput.value);
+                }
+            }
+        });
+    </script>
+    @endpush
 </x-layouts.app>

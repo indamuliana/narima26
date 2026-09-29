@@ -68,6 +68,12 @@ class RegistrationService
                 'is_active' => true,
             ]);
 
+            // Prepare asal sekolah
+            $asalSekolahId = $data['asal_sekolah_id'] ?? null;
+            if ($asalSekolahId === 'lainnya') {
+                $asalSekolahId = null;
+            }
+
             // 6. Buat entitas CalonSiswa
             $calonSiswa = CalonSiswa::create([
                 'nomor_pendaftaran' => $nomorPendaftaran,
@@ -82,7 +88,7 @@ class RegistrationService
                 'no_hp_ayah' => $phoneAyah,
                 'no_hp_ibu' => $phoneIbu,
                 'email' => $email,
-                'asal_sekolah_id' => $data['asal_sekolah_id'] ?? null,
+                'asal_sekolah_id' => $asalSekolahId,
                 'asal_sekolah_lainnya' => $data['asal_sekolah_lainnya'] ?? null,
                 'referensi_jenis' => $data['referensi_jenis'] ?? null,
                 'referensi_nama' => $data['referensi_nama'] ?? null,

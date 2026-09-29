@@ -166,184 +166,145 @@ class TarifBiayaDanSeragamSeeder extends Seeder
             ]
         );
 
-        // 3. Seragam Wajib (8 Item)
-        $seragamWajib = [
-            ['kode_biaya' => 'SRG-JAS', 'nama_biaya' => 'Jas Almamater', 'nominal' => 135000],
-            ['kode_biaya' => 'SRG-OLR', 'nama_biaya' => 'Baju Olahraga', 'nominal' => 150000],
-            ['kode_biaya' => 'SRG-CL-HJU', 'nama_biaya' => 'Celana/Rok Panjang Hijau', 'nominal' => 140000],
-            ['kode_biaya' => 'SRG-CL-MSL', 'nama_biaya' => 'Celana/Rok Panjang Muslim', 'nominal' => 105000],
-            ['kode_biaya' => 'SRG-BJ-MSL', 'nama_biaya' => 'Baju Muslim', 'nominal' => 105000],
-            ['kode_biaya' => 'SRG-CL-PRM', 'nama_biaya' => 'Celana/Rok Pramuka', 'nominal' => 110000],
-            ['kode_biaya' => 'SRG-BJ-PRM', 'nama_biaya' => 'Baju Pramuka', 'nominal' => 110000],
-            ['kode_biaya' => 'SRG-ATR', 'nama_biaya' => 'Atribut Sekolah', 'nominal' => 15000],
-        ];
+        // 3. Seragam Wajib & Opsional (8 Item Sesuai Revisi)
+        // Klaster 1 prioritas:
+        // - Jas Almamater 150.000
+        // - 1 stel seragam Olah Raga 200.000
+        // - Atribut sekolah 50.000
+        //
+        // Klaster 2:
+        // - Celana/Rok Hijau 150.000
+        // - 1 stel seragam muslim 250.000
+        //
+        // Klaster 3 (pilihan : Pesan sekarang, Pesan nanti, Tidak Pesan):
+        // - 1 stel seragam pramuka 200.000
+        // - Kemeja putih 100.000
+        // - Sepatu pantovel 210.000 (laki laki dan perempuan sama)
 
-        foreach ($seragamWajib as $srg) {
-            MasterBiaya::updateOrCreate(
-                ['kode_biaya' => $srg['kode_biaya']],
-                [
-                    'nama_biaya' => $srg['nama_biaya'],
-                    'kategori' => 'SERAGAM',
-                    'program_id' => null,
-                    'gelombang_id' => null,
-                    'jenis_kelamin' => null,
-                    'nominal' => $srg['nominal'],
-                    'tipe_nominal' => 'tetap',
-                    'wajib' => true,
-                    'aktif' => true,
-                    'keterangan' => 'Komponen paket seragam wajib siswa baru',
-                ]
-            );
-        }
+        MasterBiaya::where('kategori', 'SERAGAM')->update(['aktif' => false]);
+        MasterSeragam::query()->update(['aktif' => false]);
 
-        // 4. Seragam Tidak Wajib / Boleh Beli di Luar
-        $seragamTidakWajib = [
+        $seragamItems = [
+            // Klaster 1
             [
-                'kode_biaya' => 'SRG-CL-HTM',
-                'nama_biaya' => 'Celana/Rok Hitam',
-                'nominal' => 105000,
+                'kode_biaya' => 'SRG-JAS',
+                'nama' => 'Jas Almamater',
+                'nominal' => 150000,
+                'klaster' => 'MPLS',
+                'urutan_klaster' => 1,
+                'wajib' => true,
                 'jenis_kelamin' => null,
-                'keterangan' => 'Opsional: boleh beli di sekolah atau beli di luar',
+                'ukuran' => ['S', 'M', 'L', 'XL', 'XXL'],
+            ],
+            [
+                'kode_biaya' => 'SRG-OLR',
+                'nama' => '1 stel seragam Olah Raga',
+                'nominal' => 200000,
+                'klaster' => 'MPLS',
+                'urutan_klaster' => 1,
+                'wajib' => true,
+                'jenis_kelamin' => null,
+                'ukuran' => ['S', 'M', 'L', 'XL', 'XXL'],
+            ],
+            [
+                'kode_biaya' => 'SRG-ATR',
+                'nama' => 'Atribut sekolah',
+                'nominal' => 50000,
+                'klaster' => 'MPLS',
+                'urutan_klaster' => 1,
+                'wajib' => true,
+                'jenis_kelamin' => null,
+                'ukuran' => ['All Size'],
+            ],
+
+            // Klaster 2
+            [
+                'kode_biaya' => 'SRG-CL-HJU',
+                'nama' => 'Celana/Rok Hijau',
+                'nominal' => 150000,
+                'klaster' => 'KBM',
+                'urutan_klaster' => 2,
+                'wajib' => true,
+                'jenis_kelamin' => null,
+                'ukuran' => ['S', 'M', 'L', 'XL', 'XXL'],
+            ],
+            [
+                'kode_biaya' => 'SRG-MSL',
+                'nama' => '1 stel seragam muslim',
+                'nominal' => 250000,
+                'klaster' => 'KBM',
+                'urutan_klaster' => 2,
+                'wajib' => true,
+                'jenis_kelamin' => null,
+                'ukuran' => ['S', 'M', 'L', 'XL', 'XXL'],
+            ],
+
+            // Klaster 3
+            [
+                'kode_biaya' => 'SRG-PRM',
+                'nama' => '1 stel seragam pramuka',
+                'nominal' => 200000,
+                'klaster' => 'OPSIONAL',
+                'urutan_klaster' => 3,
+                'wajib' => false,
+                'jenis_kelamin' => null,
+                'ukuran' => ['S', 'M', 'L', 'XL', 'XXL'],
             ],
             [
                 'kode_biaya' => 'SRG-KM-PTH',
-                'nama_biaya' => 'Kemeja Putih',
-                'nominal' => 95000,
+                'nama' => 'Kemeja putih',
+                'nominal' => 100000,
+                'klaster' => 'OPSIONAL',
+                'urutan_klaster' => 3,
+                'wajib' => false,
                 'jenis_kelamin' => null,
-                'keterangan' => 'Opsional: boleh beli di sekolah atau beli di luar',
+                'ukuran' => ['S', 'M', 'L', 'XL', 'XXL'],
             ],
             [
-                'kode_biaya' => 'SRG-SPT-L',
-                'nama_biaya' => 'Sepatu Pantofel (Laki-laki)',
-                'nominal' => 220000,
-                'jenis_kelamin' => 'L',
-                'keterangan' => 'Opsional: Sepatu pantofel hitam putra standar sekolah (boleh beli di luar)',
-            ],
-            [
-                'kode_biaya' => 'SRG-SPT-P',
-                'nama_biaya' => 'Sepatu Pantofel (Perempuan)',
-                'nominal' => 110000,
-                'jenis_kelamin' => 'P',
-                'keterangan' => 'Opsional: Sepatu pantofel hitam putri standar sekolah (boleh beli di luar)',
+                'kode_biaya' => 'SRG-SPT',
+                'nama' => 'Sepatu pantovel',
+                'nominal' => 210000,
+                'klaster' => 'OPSIONAL',
+                'urutan_klaster' => 3,
+                'wajib' => false,
+                'jenis_kelamin' => null,
+                'ukuran' => ['36', '37', '38', '39', '40', '41', '42', '43', '44'],
             ],
         ];
 
-        foreach ($seragamTidakWajib as $srg) {
+        foreach ($seragamItems as $item) {
             MasterBiaya::updateOrCreate(
-                ['kode_biaya' => $srg['kode_biaya']],
+                ['kode_biaya' => $item['kode_biaya']],
                 [
-                    'nama_biaya' => $srg['nama_biaya'],
+                    'nama_biaya' => $item['nama'],
                     'kategori' => 'SERAGAM',
                     'program_id' => null,
                     'gelombang_id' => null,
-                    'jenis_kelamin' => $srg['jenis_kelamin'],
-                    'nominal' => $srg['nominal'],
+                    'jenis_kelamin' => $item['jenis_kelamin'],
+                    'nominal' => $item['nominal'],
                     'tipe_nominal' => 'tetap',
-                    'wajib' => false,
+                    'wajib' => $item['wajib'],
                     'aktif' => true,
-                    'keterangan' => $srg['keterangan'],
+                    'keterangan' => 'Seragam sekolah - ' . $item['nama'],
                 ]
             );
-        }
 
-        // 5. Update Master Seragam (master_seragam untuk ukuran formulir siswa)
-        $ukuranStandar = ['S', 'M', 'L', 'XL', 'XXL'];
+            foreach ($item['ukuran'] as $uk) {
+                $kode = $item['kode_biaya'] . '-' . $uk;
 
-        // Daftar jenis seragam form
-        $formSeragamWajib = [
-            'Jas Almamater',
-            'Baju Olahraga',
-            'Celana/Rok Panjang Hijau',
-            'Celana/Rok Panjang Muslim',
-            'Baju Muslim',
-            'Celana/Rok Pramuka',
-            'Baju Pramuka',
-        ];
-
-        foreach ($formSeragamWajib as $namaJenis) {
-            $klaster = in_array($namaJenis, ['Jas Almamater', 'Baju Olahraga']) ? 'MPLS' : 'KBM';
-            $urutanKlaster = ($klaster === 'MPLS') ? 1 : 2;
-
-            foreach ($ukuranStandar as $uk) {
-                $kode = strtoupper(substr(str_replace([' ', '/', '-'], '', $namaJenis), 0, 4)) . '-' . $uk;
                 MasterSeragam::updateOrCreate(
                     ['kode' => $kode],
                     [
-                        'nama_jenis' => $namaJenis,
+                        'nama_jenis' => $item['nama'],
                         'ukuran' => $uk,
-                        'wajib' => true,
-                        'klaster' => $klaster,
-                        'urutan_klaster' => $urutanKlaster,
-                        'jenis_kelamin' => null,
+                        'wajib' => $item['wajib'],
+                        'klaster' => $item['klaster'],
+                        'urutan_klaster' => $item['urutan_klaster'],
+                        'jenis_kelamin' => $item['jenis_kelamin'],
                         'aktif' => true,
                     ]
                 );
             }
-        }
-
-        // Atribut Sekolah (All Size)
-        MasterSeragam::updateOrCreate(
-            ['kode' => 'ATRIB-ALL'],
-            [
-                'nama_jenis' => 'Atribut Sekolah',
-                'ukuran' => 'All Size',
-                'wajib' => true,
-                'klaster' => 'MPLS',
-                'urutan_klaster' => 1,
-                'jenis_kelamin' => null,
-                'aktif' => true,
-            ]
-        );
-
-        // Seragam Tidak Wajib
-        foreach (['Celana/Rok Hitam', 'Kemeja Putih'] as $namaJenis) {
-            foreach ($ukuranStandar as $uk) {
-                $kode = strtoupper(substr(str_replace([' ', '/', '-'], '', $namaJenis), 0, 4)) . '-' . $uk;
-                MasterSeragam::updateOrCreate(
-                    ['kode' => $kode],
-                    [
-                        'nama_jenis' => $namaJenis,
-                        'ukuran' => $uk,
-                        'wajib' => false,
-                        'klaster' => 'OPSIONAL',
-                        'urutan_klaster' => 3,
-                        'jenis_kelamin' => null,
-                        'aktif' => true,
-                    ]
-                );
-            }
-        }
-
-        // Sepatu Pantofel Laki-laki (Ukuran sepatu 38-44)
-        foreach (['38', '39', '40', '41', '42', '43', '44'] as $uk) {
-            MasterSeragam::updateOrCreate(
-                ['kode' => 'SPT-L-' . $uk],
-                [
-                    'nama_jenis' => 'Sepatu Pantofel (Laki-laki)',
-                    'ukuran' => $uk,
-                    'wajib' => false,
-                    'klaster' => 'OPSIONAL',
-                    'urutan_klaster' => 3,
-                    'jenis_kelamin' => 'L',
-                    'aktif' => true,
-                ]
-            );
-        }
-
-        // Sepatu Pantofel Perempuan (Ukuran sepatu 36-41)
-        foreach (['36', '37', '38', '39', '40', '41'] as $uk) {
-            MasterSeragam::updateOrCreate(
-                ['kode' => 'SPT-P-' . $uk],
-                [
-                    'nama_jenis' => 'Sepatu Pantofel (Perempuan)',
-                    'ukuran' => $uk,
-                    'wajib' => false,
-                    'klaster' => 'OPSIONAL',
-                    'urutan_klaster' => 3,
-                    'jenis_kelamin' => 'P',
-                    'aktif' => true,
-                ]
-            );
         }
     }
 }

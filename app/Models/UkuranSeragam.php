@@ -14,6 +14,7 @@ class UkuranSeragam extends Model
 
     public const STATUS_PESAN_SEKARANG = 'PESAN_SEKARANG';
     public const STATUS_PESAN_NANTI = 'PESAN_NANTI';
+    public const STATUS_TIDAK_PESAN = 'TIDAK_PESAN';
 
     protected $fillable = [
         'calon_siswa_id',
@@ -66,11 +67,17 @@ class UkuranSeragam extends Model
         return $this->status_pemesanan === self::STATUS_PESAN_NANTI;
     }
 
+    public function isTidakPesan(): bool
+    {
+        return $this->status_pemesanan === self::STATUS_TIDAK_PESAN;
+    }
+
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status_pemesanan) {
             self::STATUS_PESAN_SEKARANG => 'Pesan Sekarang',
             self::STATUS_PESAN_NANTI => 'Pesan Nanti',
+            self::STATUS_TIDAK_PESAN => 'Tidak Pesan',
             default => 'Pesan Nanti',
         };
     }

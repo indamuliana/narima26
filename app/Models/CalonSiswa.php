@@ -28,6 +28,16 @@ class CalonSiswa extends Model
         'no_kk',
         'agama',
         'alamat_lengkap',
+        'is_luar_negeri',
+        'negara',
+        'provinsi_nama',
+        'kabupaten_nama',
+        'kecamatan_nama',
+        'desa_nama',
+        'provinsi_luar_negeri',
+        'kabupaten_luar_negeri',
+        'kecamatan_luar_negeri',
+        'desa_luar_negeri',
         'rt',
         'rw',
         'kode_pos',
@@ -35,6 +45,9 @@ class CalonSiswa extends Model
         'kabupaten_id',
         'kecamatan_id',
         'desa_id',
+        'anak_ke',
+        'jumlah_saudara',
+        'tahun_lulus',
         'no_hp_siswa',
         'no_hp_ayah',
         'no_hp_ibu',
@@ -58,7 +71,66 @@ class CalonSiswa extends Model
         return [
             'tanggal_lahir' => 'date',
             'status_spmb' => \App\Enums\SpmbStatus::class,
+            'is_luar_negeri' => 'boolean',
         ];
+    }
+
+    public function getNamaProvinsiAttribute(): ?string
+    {
+        if ($this->is_luar_negeri) {
+            return $this->provinsi_luar_negeri ?: $this->provinsi_nama;
+        }
+        return $this->provinsi_nama ?: $this->provinsi?->nama;
+    }
+
+    public function getNamaKabupatenAttribute(): ?string
+    {
+        if ($this->is_luar_negeri) {
+            return $this->kabupaten_luar_negeri ?: $this->kabupaten_nama;
+        }
+        return $this->kabupaten_nama ?: $this->kabupaten?->nama;
+    }
+
+    public function getNamaKecamatanAttribute(): ?string
+    {
+        if ($this->is_luar_negeri) {
+            return $this->kecamatan_luar_negeri ?: $this->kecamatan_nama;
+        }
+        return $this->kecamatan_nama ?: $this->kecamatan?->nama;
+    }
+
+    public function getNamaDesaAttribute(): ?string
+    {
+        if ($this->is_luar_negeri) {
+            return $this->desa_luar_negeri ?: $this->desa_nama;
+        }
+        return $this->desa_nama ?: $this->desa?->nama;
+    }
+
+    public function getAlamatDomisiliLengkapAttribute(): string
+    {
+        if ($this->is_luar_negeri) {
+            $parts = array_filter([
+                $this->alamat_lengkap,
+                $this->desa_luar_negeri ? "Desa/Kel: {$this->desa_luar_negeri}" : null,
+                $this->kecamatan_luar_negeri ? "Kec/Distrik: {$this->kecamatan_luar_negeri}" : null,
+                $this->kabupaten_luar_negeri ? "Kota: {$this->kabupaten_luar_negeri}" : null,
+                $this->provinsi_luar_negeri ? "Prov/State: {$this->provinsi_luar_negeri}" : null,
+                $this->negara ? "Negara: {$this->negara}" : null,
+                $this->kode_pos ? "Kode Pos: {$this->kode_pos}" : null,
+            ]);
+            return implode(', ', $parts);
+        }
+
+        $rtRw = ($this->rt || $this->rw) ? "RT {$this->rt}/RW {$this->rw}" : null;
+        $desa = $this->nama_desa ? "Desa/Kel. {$this->nama_desa}" : null;
+        $kec = $this->nama_kecamatan ? "Kec. {$this->nama_kecamatan}" : null;
+        $kab = $this->nama_kabupaten ? "Kab/Kota {$this->nama_kabupaten}" : null;
+        $prov = $this->nama_provinsi ? "Prov. {$this->nama_provinsi}" : null;
+        $kpos = $this->kode_pos ? "Kode Pos: {$this->kode_pos}" : null;
+
+        $parts = array_filter([$this->alamat_lengkap, $rtRw, $desa, $kec, $kab, $prov, $kpos]);
+        return implode(', ', $parts);
     }
 
     public function user(): BelongsTo
@@ -114,6 +186,11 @@ class CalonSiswa extends Model
     public function desa(): BelongsTo
     {
         return $this->belongsTo(MasterDesa::class, 'desa_id');
+    }
+
+    public function dataKesehatan(): HasOne
+    {
+        return $this->hasOne(DataKesehatan::class);
     }
 
     public function dataOrangtua(): HasOne

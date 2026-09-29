@@ -27,6 +27,7 @@ class WawancaraOrangTua extends Model
         'info_wikrama_dari',
         'baca_quran',
         'hafalan_quran',
+        'infaq_rutin_bulanan',
         'minat_program',
         'minat_jurusan',
         'alasan_masuk_wikrama',
@@ -44,7 +45,26 @@ class WawancaraOrangTua extends Model
 
     protected $casts = [
         'tanggal_wawancara' => 'date',
+        'infaq_rutin_bulanan' => 'integer',
     ];
+
+    public function setInfaqRutinBulananAttribute($value): void
+    {
+        if (is_null($value) || $value === '') {
+            $this->attributes['infaq_rutin_bulanan'] = null;
+            return;
+        }
+
+        $clean = preg_replace('/[^0-9]/', '', (string) $value);
+        $this->attributes['infaq_rutin_bulanan'] = $clean !== '' ? (int) $clean : null;
+    }
+
+    public function getFormattedInfaqRutinBulananAttribute(): ?string
+    {
+        return $this->infaq_rutin_bulanan !== null
+            ? number_format($this->infaq_rutin_bulanan, 0, ',', '.')
+            : null;
+    }
 
     public function calonSiswa(): BelongsTo
     {

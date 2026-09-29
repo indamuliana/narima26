@@ -10,6 +10,7 @@ use App\Models\MasterProgram;
 use App\Models\MasterSekolahAsal;
 use App\Services\PdfService;
 use App\Services\RegistrationService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -30,9 +31,31 @@ class RegistrationController extends Controller
         $programs = MasterProgram::aktif()->get();
         $jurusans = MasterJurusan::aktif()->get();
         $gelombangAktif = MasterGelombang::aktif()->first();
-        $sekolahAsal = MasterSekolahAsal::aktif()->orderBy('nama_sekolah')->get();
+        
+        $selectedSekolah = null;
+        if (old('asal_sekolah_id') && old('asal_sekolah_id') !== 'lainnya') {
+            $selectedSekolah = MasterSekolahAsal::find(old('asal_sekolah_id'));
+        }
 
-        return view('pendaftaran.index', compact('programs', 'jurusans', 'gelombangAktif', 'sekolahAsal'));
+        return view('pendaftaran.index', compact('programs', 'jurusans', 'gelombangAktif', 'selectedSekolah'));
+    }
+
+    /**
+     * Endpoint API internal untuk mencari daftar asal sekolah.
+     */
+    public function searchSekolah(Request $request): JsonResponse
+    {
+        $query = $request->get('q');
+        
+        $sekolahs = MasterSekolahAsal::aktif()
+            ->when($query, function ($q, $query) {
+                return $q->where('nama_sekolah', 'like', "%{$query}%");
+            })
+            ->orderBy('nama_sekolah')
+            ->limit(50)
+            ->get(['id', 'nama_sekolah', 'kokab', 'kabupaten']);
+
+        return response()->json($sekolahs);
     }
 
     /**

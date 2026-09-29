@@ -64,7 +64,7 @@
             </div>
 
             <!-- Status Badges Checklist -->
-            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-2">
+            <div class="grid grid-cols-2 sm:grid-cols-6 gap-3 pt-2">
                 <div class="p-3 rounded-2xl border {{ $completion['biodata']['is_complete'] ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-600' }}">
                     <div class="flex items-center justify-between text-xs font-bold">
                         <span>1. Biodata</span>
@@ -177,6 +177,14 @@
                     <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
                 @endif
             </button>
+            
+            <button type="button" onclick="switchTab('kesehatan')" id="tabBtn-kesehatan"
+                class="tab-btn px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 whitespace-nowrap {{ $currentTab === 'kesehatan' ? 'bg-orange-500 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100' }}">
+                <span>6. Kesehatan</span>
+                @if($completion['kesehatan']['is_complete'])
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                @endif
+            </button>
         </div>
 
         <!-- ========================================== -->
@@ -251,6 +259,24 @@
                         </div>
 
                         <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase">Anak Ke- <span class="text-red-500">*</span></label>
+                            <input type="number" name="anak_ke" min="1" max="9" value="{{ old('anak_ke', $calonSiswa->anak_ke) }}" placeholder="1" required
+                                class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase">Dari Berapa Bersaudara <span class="text-red-500">*</span></label>
+                            <input type="number" name="jumlah_saudara" min="1" max="9" value="{{ old('jumlah_saudara', $calonSiswa->jumlah_saudara) }}" placeholder="2" required
+                                class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase">Tahun Lulus SMP/Sederajat <span class="text-red-500">*</span></label>
+                            <input type="number" name="tahun_lulus" min="1900" max="{{ date('Y') + 1 }}" value="{{ old('tahun_lulus', $calonSiswa->tahun_lulus) }}" placeholder="Misal: 2026" required
+                                class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                        </div>
+
+                        <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase">No. Handphone Siswa (WA)</label>
                             <input type="text" name="no_hp_siswa" value="{{ old('no_hp_siswa', $calonSiswa->no_hp_siswa) }}" placeholder="Contoh: 08123456789"
                                 class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
@@ -258,98 +284,194 @@
                     </div>
 
                     <!-- Domisili & Wilayah Cascading -->
-                    <div class="pt-6 border-t border-slate-100 space-y-4">
-                        <h4 class="text-sm font-bold text-slate-900">Alamat Tempat Tinggal (Domisili)</h4>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                            <!-- Provinsi -->
+                    <div class="pt-6 border-t border-slate-100 space-y-5">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-100">
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase">Provinsi <span class="text-red-500">*</span></label>
-                                <select name="provinsi_id" id="select_provinsi" required onchange="onProvinsiChange(this.value)"
-                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none bg-white">
-                                    <option value="">-- Pilih Provinsi --</option>
-                                    @foreach($provinsi as $p)
-                                        <option value="{{ $p->id }}" {{ old('provinsi_id', $calonSiswa->provinsi_id) == $p->id ? 'selected' : '' }}>
-                                            {{ $p->nama }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <h4 class="text-sm font-bold text-slate-900">Alamat Tempat Tinggal (Domisili)</h4>
+                                <p class="text-xs text-slate-500">Pilih wilayah domisili untuk pendaftar dalam negeri atau luar negeri.</p>
                             </div>
 
-                            <!-- Kabupaten/Kota -->
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase">Kabupaten / Kota <span class="text-red-500">*</span></label>
-                                <select name="kabupaten_id" id="select_kabupaten" required onchange="onKabupatenChange(this.value)"
-                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none bg-white">
-                                    <option value="">-- Pilih Kabupaten --</option>
-                                    @foreach($kabupaten as $kb)
-                                        <option value="{{ $kb->id }}" {{ old('kabupaten_id', $calonSiswa->kabupaten_id) == $kb->id ? 'selected' : '' }}>
-                                            {{ $kb->nama }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                            <!-- Toggle Domisili Switcher -->
+                            <div class="inline-flex rounded-2xl bg-slate-100 p-1 border border-slate-200 text-xs font-bold shrink-0 self-start sm:self-auto" id="domisiliToggleGroup">
+                                <button type="button" onclick="setDomisiliMode(false)" id="btnDomisiliDalam"
+                                    class="px-3.5 py-1.5 rounded-xl transition cursor-pointer flex items-center gap-1.5">
+                                    <span>🇮🇩 Dalam Negeri</span>
+                                </button>
+                                <button type="button" onclick="setDomisiliMode(true)" id="btnDomisiliLuar"
+                                    class="px-3.5 py-1.5 rounded-xl transition cursor-pointer flex items-center gap-1.5">
+                                    <span>🌐 Luar Negeri (Isi Manual)</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Hidden Input Status Luar Negeri -->
+                        <input type="hidden" name="is_luar_negeri" id="input_is_luar_negeri" value="{{ old('is_luar_negeri', $calonSiswa->is_luar_negeri ? '1' : '0') }}">
+
+                        <!-- ============================================== -->
+                        <!-- 1. KONTEN WILAYAH DALAM NEGERI (INDONESIA)    -->
+                        <!-- ============================================== -->
+                        <div id="container_wilayah_dalam" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                                <!-- Provinsi (Input Manual dengan Saran Cepat Datalist) -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase">
+                                        Provinsi <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" name="provinsi_nama" id="input_provinsi" list="list_provinsi"
+                                        value="{{ old('provinsi_nama', $calonSiswa->nama_provinsi) }}"
+                                        placeholder="Contoh: Jawa Barat" required
+                                        class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                                    <datalist id="list_provinsi">
+                                        @foreach($provinsi as $p)
+                                            <option value="{{ $p->nama }}"></option>
+                                        @endforeach
+                                    </datalist>
+                                </div>
+
+                                <!-- Kabupaten/Kota (Input Manual) -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase">
+                                        Kabupaten / Kota <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" name="kabupaten_nama" id="input_kabupaten"
+                                        value="{{ old('kabupaten_nama', $calonSiswa->nama_kabupaten) }}"
+                                        placeholder="Contoh: Kabupaten Garut" required
+                                        class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                                </div>
+
+                                <!-- Kecamatan (Input Manual) -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase">
+                                        Kecamatan <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" name="kecamatan_nama" id="input_kecamatan"
+                                        value="{{ old('kecamatan_nama', $calonSiswa->nama_kecamatan) }}"
+                                        placeholder="Contoh: Tarogong Kidul" required
+                                        class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                                </div>
+
+                                <!-- Desa / Kelurahan (Input Manual) -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase">
+                                        Desa / Kelurahan <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" name="desa_nama" id="input_desa"
+                                        value="{{ old('desa_nama', $calonSiswa->nama_desa) }}"
+                                        placeholder="Contoh: Sukagalih" required
+                                        class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                                </div>
+
+                                <!-- RT -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase">RT <span class="text-red-500">*</span></label>
+                                    <input type="text" name="rt" id="input_rt" value="{{ old('rt', $calonSiswa->rt) }}" placeholder="Contoh: 01"
+                                        class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                                </div>
+
+                                <!-- RW -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase">RW <span class="text-red-500">*</span></label>
+                                    <input type="text" name="rw" id="input_rw" value="{{ old('rw', $calonSiswa->rw) }}" placeholder="Contoh: 05"
+                                        class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                                </div>
+
+                                <!-- Kode Pos -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase">Kode Pos</label>
+                                    <input type="text" name="kode_pos" id="input_kode_pos" value="{{ old('kode_pos', $calonSiswa->kode_pos) }}" placeholder="5 digit kode pos"
+                                        class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ============================================== -->
+                        <!-- 2. KONTEN WILAYAH LUAR NEGERI (ISI MANUAL)    -->
+                        <!-- ============================================== -->
+                        <div id="container_wilayah_luar" class="space-y-4 hidden">
+                            <div class="p-3.5 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 text-xs flex items-start gap-2.5">
+                                <svg class="w-5 h-5 text-blue-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <div>
+                                    <span class="font-extrabold text-blue-950">Formulir Alamat Luar Negeri:</span>
+                                    <p class="mt-0.5 text-blue-800">
+                                        Silakan ketik nama Negara, Provinsi / State, dan Kota tempat tinggal Anda saat ini. Kolom RT/RW tidak diwajibkan untuk calon siswa dari luar negeri.
+                                    </p>
+                                </div>
                             </div>
 
-                            <!-- Kecamatan -->
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase">Kecamatan <span class="text-red-500">*</span></label>
-                                <select name="kecamatan_id" id="select_kecamatan" required onchange="onKecamatanChange(this.value)"
-                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none bg-white">
-                                    <option value="">-- Pilih Kecamatan --</option>
-                                    @foreach($kecamatan as $kc)
-                                        <option value="{{ $kc->id }}" {{ old('kecamatan_id', $calonSiswa->kecamatan_id) == $kc->id ? 'selected' : '' }}>
-                                            {{ $kc->nama }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                <!-- Negara -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase">
+                                        Nama Negara <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" name="negara" id="input_negara" value="{{ old('negara', $calonSiswa->negara ?? ($calonSiswa->is_luar_negeri ? '' : '')) }}" placeholder="Contoh: Malaysia, Arab Saudi, Jepang"
+                                        class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                                </div>
 
-                            <!-- Desa / Kelurahan -->
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase">Desa / Kelurahan <span class="text-red-500">*</span></label>
-                                <select name="desa_id" id="select_desa" required onchange="onDesaChange(this)"
-                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none bg-white">
-                                    <option value="">-- Pilih Desa --</option>
-                                    @foreach($desa as $ds)
-                                        <option value="{{ $ds->id }}" data-kodepos="{{ $ds->kode_pos }}" {{ old('desa_id', $calonSiswa->desa_id) == $ds->id ? 'selected' : '' }}>
-                                            {{ $ds->nama }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                                <!-- Provinsi / State / Wilayah Bagian -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase">
+                                        Provinsi / State / Bagian <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" name="provinsi_luar_negeri" id="input_provinsi_ln" value="{{ old('provinsi_luar_negeri', $calonSiswa->provinsi_luar_negeri) }}" placeholder="Contoh: Selangor, Tokyo, Makkah"
+                                        class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                                </div>
 
-                            <!-- RT -->
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase">RT <span class="text-red-500">*</span></label>
-                                <input type="text" name="rt" value="{{ old('rt', $calonSiswa->rt) }}" placeholder="Contoh: 01" required
-                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
-                            </div>
+                                <!-- Kabupaten / Kota / City -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase">
+                                        Kota / Kabupaten <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" name="kabupaten_luar_negeri" id="input_kabupaten_ln" value="{{ old('kabupaten_luar_negeri', $calonSiswa->kabupaten_luar_negeri) }}" placeholder="Contoh: Petaling Jaya, Jeddah, Yokohama"
+                                        class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                                </div>
 
-                            <!-- RW -->
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase">RW <span class="text-red-500">*</span></label>
-                                <input type="text" name="rw" value="{{ old('rw', $calonSiswa->rw) }}" placeholder="Contoh: 05" required
-                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
-                            </div>
+                                <!-- Distrik / Kecamatan (Opsional) -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase">
+                                        Kecamatan / Distrik <span class="text-xs font-normal text-slate-400 lowercase">(opsional)</span>
+                                    </label>
+                                    <input type="text" name="kecamatan_luar_negeri" id="input_kecamatan_ln" value="{{ old('kecamatan_luar_negeri', $calonSiswa->kecamatan_luar_negeri) }}" placeholder="Nama distrik/area"
+                                        class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                                </div>
 
-                            <!-- Kode Pos -->
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase">Kode Pos</label>
-                                <input type="text" name="kode_pos" id="input_kode_pos" value="{{ old('kode_pos', $calonSiswa->kode_pos) }}" placeholder="5 digit kode pos"
-                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
-                            </div>
+                                <!-- Desa / Sub-distrik (Opsional) -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase">
+                                        Desa / Kelurahan / Sub-Distrik <span class="text-xs font-normal text-slate-400 lowercase">(opsional)</span>
+                                    </label>
+                                    <input type="text" name="desa_luar_negeri" id="input_desa_ln" value="{{ old('desa_luar_negeri', $calonSiswa->desa_luar_negeri) }}" placeholder="Nama kelurahan/suburb"
+                                        class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                                </div>
 
+                                <!-- Postal / Zip Code -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase">
+                                        Kode Pos / Postal Code
+                                    </label>
+                                    <input type="text" name="kode_pos_ln" id="input_kode_pos_ln" value="{{ old('kode_pos', $calonSiswa->kode_pos) }}" placeholder="Contoh: 50450 / 90210" oninput="document.getElementById('input_kode_pos').value = this.value"
+                                        class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ============================================== -->
+                        <!-- 3. EMAIL & ALAMAT LENGKAP JALAN (BERSAMA)      -->
+                        <!-- ============================================== -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-2">
                             <!-- Email -->
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase">Email</label>
+                            <div class="sm:col-span-2 md:col-span-1">
+                                <label class="block text-xs font-bold text-slate-700 uppercase">Email Siswa</label>
                                 <input type="email" name="email" value="{{ old('email', $calonSiswa->email) }}" placeholder="email@contoh.com"
                                     class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
                             </div>
 
                             <!-- Alamat Jalan / Rumah -->
-                            <div class="sm:col-span-2 md:col-span-4">
-                                <label class="block text-xs font-bold text-slate-700 uppercase">Alamat Jalan / Dusun / Kampung <span class="text-red-500">*</span></label>
-                                <textarea name="alamat_lengkap" rows="2" placeholder="Nama jalan, nomor rumah, nama gang/komplek..." required
+                            <div class="sm:col-span-2 md:col-span-3">
+                                <label class="block text-xs font-bold text-slate-700 uppercase">
+                                    Alamat Jalan / Komplek / No. Rumah <span class="text-red-500">*</span>
+                                </label>
+                                <textarea name="alamat_lengkap" rows="2" placeholder="Nama jalan, nomor rumah, nama gang/komplek, gedung/apartemen..." required
                                     class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">{{ old('alamat_lengkap', $calonSiswa->alamat_lengkap) }}</textarea>
                             </div>
                         </div>
@@ -786,11 +908,7 @@
                                 class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-mono focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
                         </div>
 
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase">Nilai Lainnya (Opsional)</label>
-                            <input type="number" step="0.01" name="nilai_lainnya" value="{{ old('nilai_lainnya', $akademik?->nilai_lainnya) }}" min="0" max="100" placeholder="Opsional"
-                                class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-mono focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
-                        </div>
+
 
                         <div class="sm:col-span-2 md:col-span-3">
                             <label class="block text-xs font-bold text-slate-700 uppercase">Catatan Prestasi Akademik / Nilai Khusus</label>
@@ -876,10 +994,10 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                         <h3 class="text-lg font-black text-slate-900">Formulir Pemilihan & Ukuran Seragam</h3>
-                        <p class="text-xs text-slate-500">Pilih ukuran dan waktu pemesanan untuk setiap seragam sekolah. Anda dapat mencicil dengan memesan sebagian seragam sekarang (misal: klaster MPLS) dan memesan sisa seragam nanti.</p>
+                        <p class="text-xs text-slate-500">Pilih ukuran dan waktu pemesanan untuk setiap seragam sekolah. Anda dapat mencicil dengan memesan sebagian seragam sekarang dan memesan sisa seragam nanti.</p>
                     </div>
                     <span class="px-3 py-1 rounded-full text-xs font-bold bg-teal-50 text-teal-800 border border-teal-200 shrink-0 self-start sm:self-auto">
-                        👕 Pengadaan Fleksibel
+                        👕 Pemesanan Seragam Awal
                     </span>
                 </div>
 
@@ -911,25 +1029,28 @@
 
                     $klasterConfig = [
                         'MPLS' => [
-                            'nama' => 'Klaster 1: Perlengkapan Masuk Sekolah & MPLS',
-                            'badge' => 'Prioritas 1: Digunakan Saat MPLS',
+                            'nama' => 'Klaster 1 prioritas',
+                            'badge' => 'Prioritas 1: Wajib Utama',
                             'badge_color' => 'bg-orange-100 text-orange-800 border-orange-200',
-                            'desc' => 'Perlengkapan esensial yang digunakan saat hari pertama masuk sekolah dan rangkaian kegiatan MPLS.',
+                            'desc' => 'Perlengkapan seragam utama siswa. Pilihan: Pesan Sekarang atau Pesan Nanti.',
                             'border' => 'border-orange-200 bg-orange-50/20',
+                            'allow_tidak_pesan' => false,
                         ],
                         'KBM' => [
-                            'nama' => 'Klaster 2: Seragam Harian KBM Reguler',
-                            'badge' => 'Prioritas 2: Boleh Dicicil / Pesan Nanti',
+                            'nama' => 'Klaster 2',
+                            'badge' => 'Prioritas 2',
                             'badge_color' => 'bg-blue-100 text-blue-800 border-blue-200',
-                            'desc' => 'Seragam pembelajaran reguler di kelas. Dapat dipesan sekarang atau dicicil / dipesan nanti sebelum KBM efektif dimulai.',
+                            'desc' => 'Seragam pembelajaran KBM reguler. Pilihan: Pesan Sekarang atau Pesan Nanti.',
                             'border' => 'border-blue-200 bg-blue-50/20',
+                            'allow_tidak_pesan' => false,
                         ],
                         'OPSIONAL' => [
-                            'nama' => 'Klaster 3: Perlengkapan Tambahan (Opsional)',
-                            'badge' => 'Opsional: Boleh Beli Mandiri di Luar',
+                            'nama' => 'Klaster 3',
+                            'badge' => 'Pilihan: Pesan sekarang, Pesan nanti, Tidak Pesan',
                             'badge_color' => 'bg-amber-100 text-amber-800 border-amber-200',
-                            'desc' => 'Perlengkapan pelengkap standar sekolah. Calon siswa diperbolehkan membeli sendiri di luar.',
+                            'desc' => 'Perlengkapan seragam pelengkap. Anda dapat memilih Pesan sekarang, Pesan nanti, atau Tidak Pesan jika ingin beli mandiri di luar.',
                             'border' => 'border-slate-200 bg-slate-50/50',
+                            'allow_tidak_pesan' => true,
                         ],
                     ];
 
@@ -986,6 +1107,10 @@
                               return Object.values(this.items)
                                   .filter(i => i.status === 'PESAN_NANTI').length;
                           },
+                          countTidakPesan() {
+                              return Object.values(this.items)
+                                  .filter(i => i.status === 'TIDAK_PESAN').length;
+                          },
                           formatRupiah(val) {
                               return 'Rp ' + Number(val).toLocaleString('id-ID');
                           }
@@ -1005,7 +1130,9 @@
                                     'badge_color' => 'bg-slate-100 text-slate-700 border-slate-200',
                                     'desc' => '',
                                     'border' => 'border-slate-200 bg-slate-50',
+                                    'allow_tidak_pesan' => false,
                                 ];
+                                $allowTidakPesan = !empty($cfg['allow_tidak_pesan']);
                                 $groupIndices = [];
                             @endphp
 
@@ -1080,7 +1207,7 @@
                                                 </div>
 
                                                 <!-- Status Pemesanan Pills -->
-                                                <div class="flex items-center gap-2 shrink-0">
+                                                <div class="flex items-center gap-2 shrink-0 flex-wrap">
                                                     <label class="cursor-pointer">
                                                         <input type="radio" 
                                                                name="seragam[{{ $currentIndex }}][status_pemesanan]" 
@@ -1089,7 +1216,7 @@
                                                                @change="setStatus({{ $currentIndex }}, 'PESAN_SEKARANG')"
                                                                class="sr-only">
                                                         <div :class="status === 'PESAN_SEKARANG' ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
-                                                             class="px-3.5 py-1.5 rounded-xl border text-xs font-bold transition flex items-center gap-1.5">
+                                                             class="px-3 py-1.5 rounded-xl border text-xs font-bold transition flex items-center gap-1.5">
                                                             <span x-show="status === 'PESAN_SEKARANG'">✓</span>
                                                             <span>Pesan Sekarang</span>
                                                         </div>
@@ -1103,11 +1230,27 @@
                                                                @change="setStatus({{ $currentIndex }}, 'PESAN_NANTI')"
                                                                class="sr-only">
                                                         <div :class="status === 'PESAN_NANTI' ? 'bg-amber-500 text-white border-amber-500 shadow-xs' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
-                                                             class="px-3.5 py-1.5 rounded-xl border text-xs font-bold transition flex items-center gap-1.5">
+                                                             class="px-3 py-1.5 rounded-xl border text-xs font-bold transition flex items-center gap-1.5">
                                                             <span x-show="status === 'PESAN_NANTI'">⏳</span>
                                                             <span>Pesan Nanti</span>
                                                         </div>
                                                     </label>
+
+                                                    @if($allowTidakPesan)
+                                                        <label class="cursor-pointer">
+                                                            <input type="radio" 
+                                                                   name="seragam[{{ $currentIndex }}][status_pemesanan]" 
+                                                                   value="TIDAK_PESAN" 
+                                                                   x-model="status" 
+                                                                   @change="setStatus({{ $currentIndex }}, 'TIDAK_PESAN')"
+                                                                   class="sr-only">
+                                                            <div :class="status === 'TIDAK_PESAN' ? 'bg-rose-600 text-white border-rose-600 shadow-xs' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
+                                                                 class="px-3 py-1.5 rounded-xl border text-xs font-bold transition flex items-center gap-1.5">
+                                                                <span x-show="status === 'TIDAK_PESAN'">✕</span>
+                                                                <span>Tidak Pesan</span>
+                                                            </div>
+                                                        </label>
+                                                    @endif
 
                                                     <!-- Hidden compatibility field -->
                                                     <input type="hidden" name="seragam[{{ $currentIndex }}][beli_di_sekolah]" :value="status === 'PESAN_SEKARANG' ? '1' : '0'">
@@ -1115,13 +1258,13 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Size Picker (Selalu Tampil agar ukuran terarsip) -->
+                                            <!-- Size Picker -->
                                             <div class="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
                                                 <div class="flex flex-wrap items-center gap-2">
                                                     <span class="text-xs font-bold text-slate-600 mr-1">Pilih Ukuran:</span>
                                                     @foreach($availableSizes as $size)
                                                         <label class="cursor-pointer">
-                                                            <input type="radio" name="seragam[{{ $currentIndex }}][ukuran]" value="{{ $size }}" {{ ($selectedSize === $size) ? 'checked' : '' }} class="peer sr-only" required>
+                                                            <input type="radio" name="seragam[{{ $currentIndex }}][ukuran]" value="{{ $size }}" {{ ($selectedSize === $size) ? 'checked' : '' }} class="peer sr-only">
                                                             <div class="px-3.5 py-1.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 peer-checked:bg-orange-500 peer-checked:text-white peer-checked:border-orange-500 peer-checked:shadow-xs transition">
                                                                 {{ $size }}
                                                             </div>
@@ -1129,12 +1272,15 @@
                                                     @endforeach
                                                 </div>
 
-                                                <div class="text-[11px] font-medium" :class="status === 'PESAN_SEKARANG' ? 'text-emerald-700' : 'text-amber-700'">
+                                                <div class="text-[11px] font-medium" :class="status === 'PESAN_SEKARANG' ? 'text-emerald-700' : (status === 'PESAN_NANTI' ? 'text-amber-700' : 'text-slate-500')">
                                                     <span x-show="status === 'PESAN_SEKARANG'">
                                                         &bull; Masuk ke Tagihan Seragam Tahap 1
                                                     </span>
                                                     <span x-show="status === 'PESAN_NANTI'">
                                                         &bull; Ukuran dicatat, pembayaran ditunda (bisa diaktifkan nanti)
+                                                    </span>
+                                                    <span x-show="status === 'TIDAK_PESAN'">
+                                                        &bull; Tidak memesan di sekolah (membeli mandiri / sudah punya)
                                                     </span>
                                                 </div>
                                             </div>
@@ -1157,9 +1303,9 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                             <div class="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-1">
-                                <span class="text-slate-400 block text-[11px] uppercase tracking-wider font-bold">1. Pesan Sekarang (Masuk Tagihan Daftar Ulang):</span>
+                                <span class="text-slate-400 block text-[11px] uppercase tracking-wider font-bold">1. Pesan Sekarang:</span>
                                 <div class="flex items-baseline gap-2">
                                     <span class="text-xl sm:text-2xl font-black text-emerald-400" x-text="formatRupiah(totalSekarang())"></span>
                                     <span class="text-xs text-slate-400" x-text="'(' + countSekarang() + ' item)'"></span>
@@ -1168,12 +1314,20 @@
                             </div>
 
                             <div class="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-1">
-                                <span class="text-slate-400 block text-[11px] uppercase tracking-wider font-bold">2. Pesan Nanti (Ditunda Pembayarannya):</span>
+                                <span class="text-slate-400 block text-[11px] uppercase tracking-wider font-bold">2. Pesan Nanti:</span>
                                 <div class="flex items-baseline gap-2">
                                     <span class="text-xl sm:text-2xl font-black text-amber-400" x-text="formatRupiah(totalNanti())"></span>
                                     <span class="text-xs text-slate-400" x-text="'(' + countNanti() + ' item)'"></span>
                                 </div>
-                                <p class="text-[10px] text-slate-400 mt-1">Dapat Anda aktifkan dan pesan sewaktu-waktu melalui portal siswa sebelum KBM dimulai.</p>
+                                <p class="text-[10px] text-slate-400 mt-1">Dapat Anda aktifkan dan pesan sewaktu-waktu sebelum KBM dimulai.</p>
+                            </div>
+
+                            <div class="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-1">
+                                <span class="text-slate-400 block text-[11px] uppercase tracking-wider font-bold">3. Tidak Pesan:</span>
+                                <div class="flex items-baseline gap-2">
+                                    <span class="text-xl sm:text-2xl font-black text-slate-300" x-text="countTidakPesan() + ' item'"></span>
+                                </div>
+                                <p class="text-[10px] text-slate-400 mt-1">Item tidak dipesan di sekolah (membeli mandiri di luar).</p>
                             </div>
                         </div>
                     </div>
@@ -1205,7 +1359,7 @@
             <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
                 <div>
                     <h3 class="text-lg font-black text-slate-900">Upload Berkas Persyaratan Pendaftaran</h3>
-                    <p class="text-xs text-slate-500">Unggah berkas resmi dalam format PDF, JPG, atau PNG (Maks. 5 MB per berkas; Pas foto maks. 2 MB).</p>
+                    <p class="text-xs text-slate-500">Unggah berkas resmi dalam format PDF, JPG, atau PNG (Maks. 10 MB per berkas; Pas foto maks. 2 MB).</p>
                 </div>
 
                 <form action="{{ route('calon-siswa.lengkapi-data.dokumen') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
@@ -1247,14 +1401,14 @@
                         <!-- 2. AKTA KELAHIRAN -->
                         <div class="p-5 rounded-2xl border {{ $docs?->akta_path ? 'bg-emerald-50/50 border-emerald-300' : 'bg-slate-50 border-slate-200' }} space-y-3">
                             <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold text-slate-900 uppercase">2. Akta Kelahiran <span class="text-red-500">*</span></span>
+                                <span class="text-xs font-bold text-slate-900 uppercase">2. Akta Kelahiran</span>
                                 @if($docs?->akta_path)
                                     <span class="inline-flex items-center text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">
                                         ✓ Sudah Diunggah
                                     </span>
                                 @else
                                     <span class="inline-flex items-center text-[11px] font-bold text-slate-500 bg-slate-200 px-2.5 py-0.5 rounded-full">
-                                        Wajib
+                                        Opsional
                                     </span>
                                 @endif
                             </div>
@@ -1278,14 +1432,14 @@
                         <!-- 3. IJAZAH / SURAT KETERANGAN LULUS (SKL) -->
                         <div class="p-5 rounded-2xl border {{ $docs?->ijazah_skl_path ? 'bg-emerald-50/50 border-emerald-300' : 'bg-slate-50 border-slate-200' }} space-y-3">
                             <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold text-slate-900 uppercase">3. Ijazah / SKL / Ket. Kelas 9 <span class="text-red-500">*</span></span>
+                                <span class="text-xs font-bold text-slate-900 uppercase">3. Ijazah / SKL / Ket. Kelas 9</span>
                                 @if($docs?->ijazah_skl_path)
                                     <span class="inline-flex items-center text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">
                                         ✓ Sudah Diunggah
                                     </span>
                                 @else
                                     <span class="inline-flex items-center text-[11px] font-bold text-slate-500 bg-slate-200 px-2.5 py-0.5 rounded-full">
-                                        Wajib
+                                        Opsional
                                     </span>
                                 @endif
                             </div>
@@ -1309,7 +1463,7 @@
                         <!-- 4. PAS FOTO RESMI (3X4) -->
                         <div class="p-5 rounded-2xl border {{ $docs?->pas_foto_path ? 'bg-emerald-50/50 border-emerald-300' : 'bg-slate-50 border-slate-200' }} space-y-3">
                             <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold text-slate-900 uppercase">4. Pas Foto Resmi 3x4 <span class="text-red-500">*</span></span>
+                                <span class="text-xs font-bold text-slate-900 uppercase">4. Pas Foto / Foto Wajah Non-Formal <span class="text-red-500">*</span></span>
                                 @if($docs?->pas_foto_path)
                                     <span class="inline-flex items-center text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">
                                         ✓ Sudah Diunggah
@@ -1320,7 +1474,7 @@
                                     </span>
                                 @endif
                             </div>
-                            <p class="text-xs text-slate-500">Pas foto berseragam sekolah dengan latar belakang merah atau biru (JPG/PNG maks. 2MB).</p>
+                            <p class="text-xs text-slate-500">Pas foto berseragam sekolah dengan latar belakang merah atau biru (JPG/PNG maks. 2MB). atau foto tidak resmi sopan menampilkan wajah</p>
 
                             @if($docs?->pas_foto_path)
                                 <div class="flex items-center gap-3 pt-1 text-xs">
@@ -1351,7 +1505,7 @@
                                     </span>
                                 @endif
                             </div>
-                            <p class="text-xs text-slate-500">Scan sertifikat/piagam penghargaan, KIP/PKH (jika ada), atau dokumen pendukung lainnya.</p>
+                            <p class="text-xs text-slate-500"><strong>wajib jika mencantumkan prestasi</strong> Scan sertifikat/piagam penghargaan, KIP/PKH (jika ada), atau dokumen pendukung lainnya.</p>
 
                             @if($docs?->dokumen_pendukung_path)
                                 <div class="flex items-center gap-2 pt-1 text-xs">
@@ -1388,6 +1542,126 @@
 
     </div>
 
+        <!-- ========================================== -->
+        <!-- TAB 6: KESEHATAN                           -->
+        <!-- ========================================== -->
+        @php
+            $kesehatan = $calonSiswa->dataKesehatan;
+        @endphp
+        <div id="tabContent-kesehatan" class="tab-pane {{ $currentTab === 'kesehatan' ? '' : 'hidden' }}">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+                <div>
+                    <h3 class="text-lg font-black text-slate-900">Formulir Data Kesehatan</h3>
+                    <p class="text-xs text-slate-500">Lengkapi data kesehatan calon siswa.</p>
+                </div>
+
+                <form action="{{ route('calon-siswa.lengkapi-data.kesehatan') }}" method="POST" class="space-y-6">
+                    @csrf
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase">Tinggi Badan (cm)</label>
+                            <input type="number" name="tinggi_badan" value="{{ old('tinggi_badan', $kesehatan?->tinggi_badan) }}" placeholder="Misal: 160"
+                                class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase">Berat Badan (kg)</label>
+                            <input type="number" name="berat_badan" value="{{ old('berat_badan', $kesehatan?->berat_badan) }}" placeholder="Misal: 50"
+                                class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase">Golongan Darah</label>
+                            <select name="golongan_darah"
+                                class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none bg-white">
+                                <option value="">-- Pilih --</option>
+                                @foreach(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'Tidak Tahu'] as $g)
+                                    <option value="{{ $g }}" {{ old('golongan_darah', $kesehatan?->golongan_darah) === $g ? 'selected' : '' }}>{{ $g }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase">Buta Warna</label>
+                            <select name="buta_warna"
+                                class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none bg-white">
+                                <option value="">-- Pilih --</option>
+                                @foreach(['Tidak buta warna', 'Buta warna parsial', 'Buta warna'] as $bw)
+                                    <option value="{{ $bw }}" {{ old('buta_warna', $kesehatan?->buta_warna) === $bw ? 'selected' : '' }}>{{ $bw }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase">Kesehatan Mata</label>
+                            <select name="kesehatan_mata"
+                                class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none bg-white">
+                                <option value="">-- Pilih --</option>
+                                @foreach(['Normal', 'Minus', 'Plus', 'Silinder'] as $m)
+                                    <option value="{{ $m }}" {{ old('kesehatan_mata', $kesehatan?->kesehatan_mata) === $m ? 'selected' : '' }}>{{ $m }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase">Jenis Alergi</label>
+                            <input type="text" name="jenis_alergi" value="{{ old('jenis_alergi', $kesehatan?->jenis_alergi) }}" placeholder="Misal: Debu, Udang (Kosongkan jika tidak ada)"
+                                class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-4 border p-4 rounded-xl border-slate-200">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase">Penyakit Berat Pernah Diderita</label>
+                                <select name="penyakit_pernah_diderita" onchange="togglePenyakitLainnya('pernah', this.value)"
+                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none bg-white">
+                                    <option value="">-- Pilih --</option>
+                                    @foreach(['Asma', 'Hepatitis', 'Tipes', 'TBC', 'Penyakit jantung', 'Usus buntu', 'Diabetes', 'Lupus', 'Patah tulang', 'Tidak ada', 'Lainnya'] as $p)
+                                        <option value="{{ $p }}" {{ old('penyakit_pernah_diderita', $kesehatan?->penyakit_pernah_diderita) === $p ? 'selected' : '' }}>{{ $p }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            
+                            <div id="container_penyakit_pernah_lainnya" class="{{ old('penyakit_pernah_diderita', $kesehatan?->penyakit_pernah_diderita) === 'Lainnya' ? '' : 'hidden' }}">
+                                <label class="block text-xs font-bold text-slate-700 uppercase">Sebutkan (Pernah Diderita)</label>
+                                <input type="text" name="penyakit_pernah_diderita_lainnya" id="penyakit_pernah_diderita_lainnya" value="{{ old('penyakit_pernah_diderita_lainnya', $kesehatan?->penyakit_pernah_diderita_lainnya) }}"
+                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                            </div>
+                        </div>
+
+                        <div class="space-y-4 border p-4 rounded-xl border-slate-200">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase">Penyakit Berat Sedang Diderita</label>
+                                <select name="penyakit_sedang_diderita" onchange="togglePenyakitLainnya('sedang', this.value)"
+                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none bg-white">
+                                    <option value="">-- Pilih --</option>
+                                    @foreach(['Asma', 'Hepatitis', 'Tipes', 'TBC', 'Penyakit jantung', 'Usus buntu', 'Diabetes', 'Lupus', 'Patah tulang', 'Tidak ada', 'Lainnya'] as $p)
+                                        <option value="{{ $p }}" {{ old('penyakit_sedang_diderita', $kesehatan?->penyakit_sedang_diderita) === $p ? 'selected' : '' }}>{{ $p }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            
+                            <div id="container_penyakit_sedang_lainnya" class="{{ old('penyakit_sedang_diderita', $kesehatan?->penyakit_sedang_diderita) === 'Lainnya' ? '' : 'hidden' }}">
+                                <label class="block text-xs font-bold text-slate-700 uppercase">Sebutkan (Sedang Diderita)</label>
+                                <input type="text" name="penyakit_sedang_diderita_lainnya" id="penyakit_sedang_diderita_lainnya" value="{{ old('penyakit_sedang_diderita_lainnya', $kesehatan?->penyakit_sedang_diderita_lainnya) }}"
+                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-200 pt-5 flex flex-col sm:flex-row gap-3 justify-end items-center">
+                        <button type="submit"
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-sm transition text-xs cursor-pointer">
+                            <span>Simpan Data Kesehatan</span>
+                            <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
     <!-- SCRIPT TABS, CASCADING WILAYAH & PRESTASI DYNAMIC -->
     <script>
         // Tab Switcher
@@ -1413,101 +1687,62 @@
             window.history.replaceState({}, '', url);
         }
 
-        // Cascading Dropdowns
-        async function onProvinsiChange(provId) {
-            const kabSelect = document.getElementById('select_kabupaten');
-            const kecSelect = document.getElementById('select_kecamatan');
-            const desaSelect = document.getElementById('select_desa');
+        // Domisili Mode Switcher (Dalam Negeri vs Luar Negeri)
+        function setDomisiliMode(isLuar) {
+            const hiddenInput = document.getElementById('input_is_luar_negeri');
+            const dalamContainer = document.getElementById('container_wilayah_dalam');
+            const luarContainer = document.getElementById('container_wilayah_luar');
+            const btnDalam = document.getElementById('btnDomisiliDalam');
+            const btnLuar = document.getElementById('btnDomisiliLuar');
 
-            kabSelect.innerHTML = '<option value="">-- Memuat Kabupaten... --</option>';
-            kecSelect.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
-            desaSelect.innerHTML = '<option value="">-- Pilih Desa --</option>';
+            if (!hiddenInput) return;
+            hiddenInput.value = isLuar ? '1' : '0';
 
-            if(!provId) {
-                kabSelect.innerHTML = '<option value="">-- Pilih Kabupaten --</option>';
-                return;
-            }
+            const provInput = document.getElementById('input_provinsi');
+            const kabInput = document.getElementById('input_kabupaten');
+            const kecInput = document.getElementById('input_kecamatan');
+            const desaInput = document.getElementById('input_desa');
+            const rtInput = document.getElementById('input_rt');
+            const rwInput = document.getElementById('input_rw');
 
-            try {
-                const res = await fetch(`/api/internal/wilayah/kabupaten/${provId}`);
-                const data = await res.json();
-                kabSelect.innerHTML = '<option value="">-- Pilih Kabupaten --</option>';
-                data.data.forEach(item => {
-                    const opt = document.createElement('option');
-                    opt.value = item.id;
-                    opt.textContent = item.nama;
-                    kabSelect.appendChild(opt);
-                });
-            } catch(e) {
-                console.error(e);
-                kabSelect.innerHTML = '<option value="">-- Gagal memuat data --</option>';
-            }
-        }
+            const negaraInput = document.getElementById('input_negara');
+            const provLnInput = document.getElementById('input_provinsi_ln');
+            const kabLnInput = document.getElementById('input_kabupaten_ln');
 
-        async function onKabupatenChange(kabId) {
-            const kecSelect = document.getElementById('select_kecamatan');
-            const desaSelect = document.getElementById('select_desa');
+            if (isLuar) {
+                if (btnLuar) btnLuar.className = 'px-3.5 py-1.5 rounded-xl transition cursor-pointer flex items-center gap-1.5 bg-white text-orange-600 shadow-xs font-black';
+                if (btnDalam) btnDalam.className = 'px-3.5 py-1.5 rounded-xl transition cursor-pointer flex items-center gap-1.5 text-slate-500 hover:text-slate-800 font-bold';
 
-            kecSelect.innerHTML = '<option value="">-- Memuat Kecamatan... --</option>';
-            desaSelect.innerHTML = '<option value="">-- Pilih Desa --</option>';
+                if (dalamContainer) dalamContainer.classList.add('hidden');
+                if (luarContainer) luarContainer.classList.remove('hidden');
 
-            if(!kabId) {
-                kecSelect.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
-                return;
-            }
+                if (provInput) provInput.removeAttribute('required');
+                if (kabInput) kabInput.removeAttribute('required');
+                if (kecInput) kecInput.removeAttribute('required');
+                if (desaInput) desaInput.removeAttribute('required');
+                if (rtInput) rtInput.removeAttribute('required');
+                if (rwInput) rwInput.removeAttribute('required');
 
-            try {
-                const res = await fetch(`/api/internal/wilayah/kecamatan/${kabId}`);
-                const data = await res.json();
-                kecSelect.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
-                data.data.forEach(item => {
-                    const opt = document.createElement('option');
-                    opt.value = item.id;
-                    opt.textContent = item.nama;
-                    kecSelect.appendChild(opt);
-                });
-            } catch(e) {
-                console.error(e);
-                kecSelect.innerHTML = '<option value="">-- Gagal memuat data --</option>';
-            }
-        }
+                if (negaraInput) negaraInput.setAttribute('required', 'required');
+                if (provLnInput) provLnInput.setAttribute('required', 'required');
+                if (kabLnInput) kabLnInput.setAttribute('required', 'required');
+            } else {
+                if (btnDalam) btnDalam.className = 'px-3.5 py-1.5 rounded-xl transition cursor-pointer flex items-center gap-1.5 bg-white text-orange-600 shadow-xs font-black';
+                if (btnLuar) btnLuar.className = 'px-3.5 py-1.5 rounded-xl transition cursor-pointer flex items-center gap-1.5 text-slate-500 hover:text-slate-800 font-bold';
 
-        async function onKecamatanChange(kecId) {
-            const desaSelect = document.getElementById('select_desa');
-            desaSelect.innerHTML = '<option value="">-- Memuat Desa... --</option>';
+                if (dalamContainer) dalamContainer.classList.remove('hidden');
+                if (luarContainer) luarContainer.classList.add('hidden');
 
-            if(!kecId) {
-                desaSelect.innerHTML = '<option value="">-- Pilih Desa --</option>';
-                return;
-            }
+                if (provInput) provInput.setAttribute('required', 'required');
+                if (kabInput) kabInput.setAttribute('required', 'required');
+                if (kecInput) kecInput.setAttribute('required', 'required');
+                if (desaInput) desaInput.setAttribute('required', 'required');
+                if (rtInput) rtInput.setAttribute('required', 'required');
+                if (rwInput) rwInput.setAttribute('required', 'required');
 
-            try {
-                const res = await fetch(`/api/internal/wilayah/desa/${kecId}`);
-                const data = await res.json();
-                desaSelect.innerHTML = '<option value="">-- Pilih Desa --</option>';
-                data.data.forEach(item => {
-                    const opt = document.createElement('option');
-                    opt.value = item.id;
-                    opt.textContent = item.nama;
-                    if(item.kode_pos) {
-                        opt.setAttribute('data-kodepos', item.kode_pos);
-                    }
-                    desaSelect.appendChild(opt);
-                });
-            } catch(e) {
-                console.error(e);
-                desaSelect.innerHTML = '<option value="">-- Gagal memuat data --</option>';
-            }
-        }
-
-        function onDesaChange(selectEl) {
-            const selectedOpt = selectEl.options[selectEl.selectedIndex];
-            const kodepos = selectedOpt ? selectedOpt.getAttribute('data-kodepos') : null;
-            if(kodepos) {
-                const posInput = document.getElementById('input_kode_pos');
-                if(posInput && !posInput.value) {
-                    posInput.value = kodepos;
-                }
+                if (negaraInput) negaraInput.removeAttribute('required');
+                if (provLnInput) provLnInput.removeAttribute('required');
+                if (kabLnInput) kabLnInput.removeAttribute('required');
             }
         }
 
@@ -1589,6 +1824,18 @@
             calculateOverallAverage();
         }
 
+        function togglePenyakitLainnya(type, value) {
+            const container = document.getElementById('container_penyakit_' + type + '_lainnya');
+            const input = document.getElementById('penyakit_' + type + '_diderita_lainnya');
+            if (value === 'Lainnya') {
+                container.classList.remove('hidden');
+                input.setAttribute('required', 'required');
+            } else {
+                container.classList.add('hidden');
+                input.removeAttribute('required');
+                input.value = '';
+            }
+        }
         function calculateOverallAverage() {
             const prefixes = ['mtk', 'ind', 'eng', 'pai'];
             let totalSum = 0;
@@ -1615,9 +1862,13 @@
             }
         }
 
-        // Initialize calculations on DOM ready
+        // Initialize calculations & domisili mode on DOM ready
         document.addEventListener('DOMContentLoaded', function() {
             ['mtk', 'ind', 'eng', 'pai'].forEach(p => calculateMatrixRow(p));
+            const isLn = document.getElementById('input_is_luar_negeri')?.value === '1';
+            setDomisiliMode(isLn);
         });
     </script>
 </x-layouts.app>
+
+
