@@ -152,18 +152,18 @@
                                                class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition-colors">
                                                 Lihat Detail
                                             </a>
-                                            <a href="{{ route('pewawancara.wawancara.form', $cs) }}"
+                                            <a href="{{ route('pewawancara.wawancara.hub', $cs) }}"
                                                class="px-2.5 py-1.5 rounded-lg border border-blue-200 text-blue-700 text-xs font-semibold hover:bg-blue-50 transition-colors">
                                                 Edit
                                             </a>
                                         </div>
                                     @elseif ($wStatus === 'PROSES')
-                                        <a href="{{ route('pewawancara.wawancara.form', $cs) }}"
+                                        <a href="{{ route('pewawancara.wawancara.hub', $cs) }}"
                                            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition-colors shadow-xs">
                                             Lanjutkan Draft
                                         </a>
                                     @else
-                                        <a href="{{ route('pewawancara.wawancara.form', $cs) }}"
+                                        <a href="{{ route('pewawancara.wawancara.hub', $cs) }}"
                                            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-nampi-orange text-white text-xs font-bold hover:bg-orange-600 transition-colors shadow-xs">
                                             Mulai Wawancara →
                                         </a>

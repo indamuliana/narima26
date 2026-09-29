@@ -182,7 +182,9 @@
                         <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Kategori *</label>
                         <select name="kategori" required class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30">
                             <option value="DAFTAR_ULANG">Daftar Ulang</option>
+                            <option value="DSP">DSP / Uang Pangkal</option>
                             <option value="SPP">SPP Bulanan</option>
+                            <option value="ASRAMA">Biaya Asrama / Pondok</option>
                             <option value="SERAGAM">Seragam & Atribut</option>
                             <option value="PRAKTIK">Praktik Kejuruan</option>
                             <option value="LAINNYA">Lainnya</option>

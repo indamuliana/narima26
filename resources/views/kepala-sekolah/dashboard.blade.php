@@ -27,11 +27,14 @@
         <!-- Welcome Executive Banner -->
         <div class="p-6 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl text-white shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-                <span class="text-xs uppercase font-bold text-amber-400 tracking-wider">Executive Management SPMB 2026/2027</span>
+                <span class="text-xs uppercase font-bold text-amber-400 tracking-wider">Executive Management SPMB 2027/2028</span>
                 <h1 class="text-2xl font-black mt-1">Selamat Datang, {{ auth()->user()->name }}</h1>
                 <p class="text-xs text-slate-400 mt-1">Monitoring komprehensif penerimaan murid baru, penetapan sidang pleno kelulusan, dan tata kelola kuota rombel.</p>
             </div>
             <div class="flex items-center gap-2">
+                <a href="{{ route('kepala-sekolah.diskon.index') }}" class="px-4 py-2.5 rounded-xl bg-slate-800 text-white text-xs font-bold hover:bg-slate-700 border border-slate-700 transition-colors shadow-xs">
+                    🏷️ Kelola Diskon
+                </a>
                 <a href="{{ route('kepala-sekolah.sidang-kelulusan.index') }}" class="px-4 py-2.5 rounded-xl bg-nampi-orange text-white text-xs font-bold hover:bg-orange-600 transition-colors shadow-xs">
                     ⚖️ Buka Sidang Pleno
                 </a>
@@ -39,49 +42,84 @@
         </div>
 
         <!-- Metric Grid -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
+            <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between h-full">
                 <div class="flex items-center justify-between">
                     <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Pendaftar</p>
-                    <span class="text-xl">📋</span>
+                    <span class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold shadow-xs">
+                        📋
+                    </span>
                 </div>
-                <p class="text-2xl font-black text-slate-900 mt-2">{{ number_format($stats['total_pendaftar']) }}</p>
-                <div class="mt-2 text-[11px] text-slate-400">Semua pendaftar akun</div>
+                <div class="mt-3">
+                    <p class="text-2xl font-black text-slate-900">{{ number_format($stats['total_pendaftar']) }}</p>
+                    <div class="mt-2 text-[11px] text-slate-400">Semua pendaftar akun</div>
+                </div>
             </div>
 
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+            <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between h-full">
                 <div class="flex items-center justify-between">
                     <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Menunggu Sidang</p>
-                    <span class="text-xl">⏳</span>
+                    <span class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-sm font-bold shadow-xs">
+                        ⏳
+                    </span>
                 </div>
-                <p class="text-2xl font-black text-amber-600 mt-2">{{ number_format($stats['menunggu_sidang']) }}</p>
-                <div class="mt-2 text-[11px] text-slate-400">Siap dievaluasi kepsek</div>
+                <div class="mt-3">
+                    <p class="text-2xl font-black text-amber-600">{{ number_format($stats['menunggu_sidang']) }}</p>
+                    <div class="mt-2 text-[11px] text-slate-400">Siap dievaluasi kepsek</div>
+                </div>
             </div>
 
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+            <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between h-full">
                 <div class="flex items-center justify-between">
                     <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Dinyatakan Diterima</p>
-                    <span class="text-xl">🎓</span>
+                    <span class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm font-bold shadow-xs">
+                        🎓
+                    </span>
                 </div>
-                <p class="text-2xl font-black text-emerald-600 mt-2">{{ number_format($stats['diterima']) }}</p>
-                <div class="mt-2 text-[11px] text-slate-400">Lulus seleksi SPMB</div>
+                <div class="mt-3">
+                    <p class="text-2xl font-black text-emerald-600">{{ number_format($stats['diterima']) }}</p>
+                    <div class="mt-2 text-[11px] text-slate-400">Lulus seleksi SPMB</div>
+                </div>
             </div>
 
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+            <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between h-full">
                 <div class="flex items-center justify-between">
                     <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Mengundurkan Diri</p>
-                    <span class="text-xl">🚪</span>
+                    <span class="w-9 h-9 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center text-sm font-bold shadow-xs">
+                        🚪
+                    </span>
                 </div>
-                <p class="text-2xl font-black text-slate-600 mt-2">{{ number_format($stats['mengundurkan_diri']) }}</p>
-                <div class="mt-2 text-[11px] text-slate-400">Penarikan berkas resmi</div>
+                <div class="mt-3">
+                    <p class="text-2xl font-black text-slate-600">{{ number_format($stats['mengundurkan_diri']) }}</p>
+                    <div class="mt-2 text-[11px] text-slate-400">Penarikan berkas resmi</div>
+                </div>
             </div>
+
+            <a href="{{ route('kepala-sekolah.diskon.index') }}" class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs hover:border-nampi-orange/50 transition-colors flex flex-col justify-between h-full cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Diskon Disetujui</p>
+                    <span class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-sm font-bold shadow-xs">
+                        🏷️
+                    </span>
+                </div>
+                <div class="mt-3">
+                    <p class="text-2xl font-black text-purple-600">{{ number_format($stats['total_diskon']) }} Siswa</p>
+                    <div class="mt-2 text-[11px] font-semibold text-emerald-600">Rp {{ number_format($stats['nominal_diskon'], 0, ',', '.') }}</div>
+                </div>
+            </a>
         </div>
+
+        <!-- Timeline Trend Chart (September 2026 - Juni 2027) -->
+        @include('partials.dashboard-timeline-chart')
+
+        <!-- Executive Analytics: Conversion Funnel, Demographics & Top Feeder Schools -->
+        @include('partials.dashboard-executive-insights')
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <!-- Left: Department Quota Progress -->
-            <div class="lg:col-span-6 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+            <div class="lg:col-span-6 bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <h2 class="text-base font-black text-slate-800">Keterisian Kuota Kompetensi Keahlian</h2>
+                    <h2 class="text-base sm:text-lg font-black text-slate-900">Keterisian Kuota Kompetensi Keahlian</h2>
                     <span class="text-xs text-slate-400">Standar 72 Siswa (2 Rombel)</span>
                 </div>
 
@@ -113,17 +151,18 @@
             </div>
 
             <!-- Right: Candidate Queue Awaiting Plenary Review -->
-            <div class="lg:col-span-6 bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-                <div class="p-5 border-b border-slate-100 flex items-center justify-between">
-                    <div>
-                        <h2 class="text-base font-black text-slate-800">Antrian Menunggu Keputusan Sidang</h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Kandidat yang telah selesai tes wawancara</p>
+            <div class="lg:col-span-6 bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col justify-between">
+                <div>
+                    <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                        <div>
+                            <h2 class="text-base sm:text-lg font-black text-slate-900">Antrian Menunggu Keputusan Sidang</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Kandidat yang telah selesai tes wawancara</p>
+                        </div>
+                        <a href="{{ route('kepala-sekolah.sidang-kelulusan.index', ['status_filter' => 'MENUNGGU_SIDANG']) }}"
+                           class="text-xs font-semibold text-nampi-orange hover:underline">
+                            Lihat Semua &rarr;
+                        </a>
                     </div>
-                    <a href="{{ route('kepala-sekolah.sidang-kelulusan.index', ['status_filter' => 'MENUNGGU_SIDANG']) }}"
-                       class="text-xs font-semibold text-nampi-orange hover:underline">
-                        Lihat Semua &rarr;
-                    </a>
-                </div>
 
                 <div class="divide-y divide-slate-100">
                     @forelse ($antrianSidang as $kandidat)

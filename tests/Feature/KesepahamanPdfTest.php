@@ -63,8 +63,25 @@ class KesepahamanPdfTest extends TestCase
             ->get(route('calon-siswa.kesepahaman.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('Surat Pernyataan & Kesepahaman Bersama (EULA)', false);
-        $response->assertSee('PASAL 1 — KEABSAHAN & KEASLIAN DATA', false);
+        $response->assertSee('Kesepahaman Bersama (EULA)', false);
+        $response->assertSee('Dalam kaitannya dengan penerimaan peserta didik baru', false);
+        $response->assertSee('PROGRAM REGULER', false);
+    }
+
+    public function test_unggulan_candidate_sees_unggulan_clauses_and_asrama(): void
+    {
+        $programUnggulan = MasterProgram::where('kode', 'UGG')->first();
+        if ($programUnggulan) {
+            $this->calonSiswa->update(['program_id' => $programUnggulan->id]);
+        }
+
+        $response = $this->actingAs($this->siswaUser)
+            ->get(route('calon-siswa.kesepahaman.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('PROGRAM UNGGULAN', false);
+        $response->assertSee('wajib tinggal di Asrama', false);
+        $response->assertSee('Dalam kaitannya dengan Program Unggulan, orang tua bersedia', false);
     }
 
     public function test_candidate_cannot_agree_without_checking_checkbox(): void
@@ -72,14 +89,29 @@ class KesepahamanPdfTest extends TestCase
         $response = $this->actingAs($this->siswaUser)
             ->post(route('calon-siswa.kesepahaman.store'), []);
 
-        $response->assertSessionHasErrors('setuju');
+        $response->assertSessionHasErrors(['setuju', 'checklist_poin']);
     }
 
-    public function test_candidate_can_agree_to_kesepahaman_and_transitions_to_menunggu_wawancara(): void
+    public function test_candidate_cannot_agree_with_incomplete_checklist(): void
     {
         $response = $this->actingAs($this->siswaUser)
             ->post(route('calon-siswa.kesepahaman.store'), [
                 'setuju' => '1',
+                'checklist_poin' => ['reg_a_1'], // Incomplete
+            ]);
+
+        $response->assertSessionHas('error');
+    }
+
+    public function test_candidate_can_agree_to_kesepahaman_and_transitions_to_menunggu_wawancara(): void
+    {
+        $kesepahamanService = app(\App\Services\KesepahamanService::class);
+        $requiredPoints = $kesepahamanService->getRequiredPointIds('reguler');
+
+        $response = $this->actingAs($this->siswaUser)
+            ->post(route('calon-siswa.kesepahaman.store'), [
+                'setuju' => '1',
+                'checklist_poin' => $requiredPoints,
             ]);
 
         $response->assertRedirect(route('calon-siswa.kesepahaman.index'));
@@ -89,7 +121,8 @@ class KesepahamanPdfTest extends TestCase
         $this->assertDatabaseHas('kesepahaman_eula', [
             'calon_siswa_id' => $this->calonSiswa->id,
             'setuju' => 1,
-            'versi_dokumen' => 'v1.0 - 2026/2027',
+            'program_snapshot' => 'REGULER',
+            'versi_dokumen' => 'v2.0 - 2027/2028',
         ]);
 
         // Assert status transition
@@ -105,10 +138,16 @@ class KesepahamanPdfTest extends TestCase
 
     public function test_candidate_can_download_pdf_kesepahaman_after_agreement(): void
     {
+        $kesepahamanService = app(\App\Services\KesepahamanService::class);
+        $klausulData = $kesepahamanService->getKlausulByCalonSiswa($this->calonSiswa);
+
         KesepahamanEula::create([
             'calon_siswa_id' => $this->calonSiswa->id,
-            'versi_dokumen' => 'v1.0 - 2026/2027',
-            'isi_dokumen_atau_referensi_dokumen' => 'Klausul SPMB',
+            'versi_dokumen' => 'v2.0 - 2027/2028',
+            'program_snapshot' => 'REGULER',
+            'isi_dokumen_atau_referensi_dokumen' => 'Naskah Persetujuan SPMB',
+            'poin_disetujui' => $kesepahamanService->getRequiredPointIds('reguler'),
+            'klausul_snapshot' => $klausulData['kelompok'],
             'setuju' => true,
             'agreed_at' => now(),
             'agreed_by' => $this->siswaUser->id,
@@ -122,6 +161,26 @@ class KesepahamanPdfTest extends TestCase
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/pdf');
         $this->assertStringStartsWith('%PDF', $response->getContent());
+    }
+
+    public function test_kesepahaman_pdf_view_does_not_contain_kop_surat(): void
+    {
+        $kesepahamanService = app(\App\Services\KesepahamanService::class);
+        $klausulData = $kesepahamanService->getKlausulByCalonSiswa($this->calonSiswa);
+
+        $html = view('pdf.kesepahaman_eula', [
+            'calonSiswa' => $this->calonSiswa,
+            'eula' => null,
+            'programNama' => $klausulData['program_title'],
+            'tahunPelajaran' => $klausulData['tahun_pelajaran'],
+            'kelompokList' => $klausulData['kelompok'],
+            'hideKop' => true,
+        ])->render();
+
+        $this->assertStringNotContainsString('class="header-kop"', $html);
+        $this->assertStringNotContainsString('Kop Surat SMK Wikrama 1 Garut', $html);
+        $this->assertStringContainsString('NASKAH PERSETUJUAN', $html);
+        $this->assertStringContainsString('class="fixed-footer-paraf"', $html);
     }
 
     public function test_unagreed_candidate_cannot_download_kesepahaman_pdf(): void

@@ -44,15 +44,15 @@ class ServicesTest extends TestCase
         $service = app(RegistrationNumberService::class);
 
         // 1. Validasi regex
-        $this->assertTrue($service->isValid('26AAY0001'));
-        $this->assertTrue($service->isValid('26AAY9999'));
+        $this->assertTrue($service->isValid('A16260001'));
+        $this->assertTrue($service->isValid('A16269999'));
         $this->assertFalse($service->isValid('25AAY0001'));
-        $this->assertFalse($service->isValid('26AAY001'));
+        $this->assertFalse($service->isValid('A1626001'));
         $this->assertFalse($service->isValid('INVALID'));
 
         // 2. Generate nomor awal (urutan 1)
-        $num1 = $service->generate('26AAY');
-        $this->assertEquals('26AAY0001', $num1);
+        $num1 = $service->generate('A1626');
+        $this->assertEquals('A16260001', $num1);
 
         // Simpan calon siswa dengan nomor ini
         $program = MasterProgram::first();
@@ -67,8 +67,8 @@ class ServicesTest extends TestCase
         ]);
 
         // 3. Generate nomor kedua (urutan 2)
-        $num2 = $service->generate('26AAY');
-        $this->assertEquals('26AAY0002', $num2);
+        $num2 = $service->generate('A1626');
+        $this->assertEquals('A16260002', $num2);
     }
 
     /**
@@ -165,7 +165,8 @@ class ServicesTest extends TestCase
         $originalBruto = (float) $tagihan->total_bruto;
 
         // UBAH MASTER BIAYA SETELAH TAGIHAN DIBUAT (simulasi perubahan tarif di kemudian hari)
-        $firstBiaya = MasterBiaya::first();
+        $detailToTest = $tagihan->details->first();
+        $firstBiaya = MasterBiaya::where('kode_biaya', $detailToTest->kode_biaya_snapshot)->first();
         $oldNominal = $firstBiaya->nominal;
         $firstBiaya->update(['nominal' => 99999999]);
 
@@ -292,8 +293,8 @@ class ServicesTest extends TestCase
         // 5. Render Bukti Pembayaran Seleksi
         $pembayaranSeleksi = PembayaranSeleksi::create([
             'calon_siswa_id' => $calonSiswa->id,
-            'nominal_tagihan' => 250000,
-            'nominal_dibayar' => 250000,
+            'nominal_tagihan' => 200000,
+            'nominal_dibayar' => 200000,
             'metode_bayar' => 'transfer_bank',
             'bank_pengirim' => 'BCA',
             'nama_pengirim' => 'Budi Santoso',

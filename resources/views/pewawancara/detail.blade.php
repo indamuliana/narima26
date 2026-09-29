@@ -13,10 +13,10 @@
                     ← Kembali ke Riwayat
                 </a>
                 <h1 class="text-2xl font-black text-slate-800">Hasil Penilaian Wawancara</h1>
-                <p class="text-xs text-slate-500 mt-0.5">Ringkasan evaluasi seleksi calon siswa dan kesepahaman orang tua.</p>
+                <p class="text-xs text-slate-500 mt-0.5">Ringkasan evaluasi seleksi calon siswa dan orang tua.</p>
             </div>
             <div class="flex items-center gap-2">
-                <a href="{{ route('pewawancara.wawancara.form', $calonSiswa) }}"
+                <a href="{{ route('pewawancara.wawancara.hub', $calonSiswa) }}"
                    class="px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-xs">
                     ✏️ Edit Penilaian
                 </a>
@@ -65,124 +65,129 @@
                 <div class="sm:text-right">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
                         <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                        Status: {{ $wawancara?->status ?? 'SELESAI' }}
+                        Status: {{ $calonSiswa->status_spmb instanceof \BackedEnum ? $calonSiswa->status_spmb->label() : $calonSiswa->status_spmb }}
                     </span>
-                    <p class="text-xs text-slate-300 mt-2">
-                        Pewawancara: <strong>{{ $wawancara?->pewawancara?->name ?? '-' }}</strong>
-                    </p>
-                    <p class="text-[11px] text-slate-400 mt-0.5">
-                        Tgl Uji: {{ $wawancara?->tanggal_wawancara?->format('d F Y') ?? '-' }}
-                    </p>
                 </div>
             </div>
 
             <!-- Scoring Breakdown Table -->
             <div class="p-6 space-y-6">
-                <h3 class="text-base font-bold text-slate-800">Rincian Nilai & Indikator Rubrik</h3>
-
-                <div class="overflow-x-auto rounded-xl border border-slate-200">
-                    <table class="w-full text-left text-xs text-slate-600">
-                        <thead class="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider">
-                            <tr>
-                                <th class="px-4 py-3">Kode</th>
-                                <th class="px-4 py-3">Kriteria Penilaian</th>
-                                <th class="px-4 py-3">Kategori</th>
-                                <th class="px-4 py-3 text-center">Skor (0-100)</th>
-                                <th class="px-4 py-3 text-center">Indikator Warna</th>
-                                <th class="px-4 py-3">Catatan Pengamatan</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100">
-                            @php
-                                $totalSkor = 0;
-                                $count = 0;
-                            @endphp
-                            @forelse ($wawancara?->details ?? [] as $det)
-                                @php
-                                    $totalSkor += $det->nilai;
-                                    $count++;
-                                @endphp
-                                <tr class="hover:bg-slate-50/50">
-                                    <td class="px-4 py-3 font-mono font-bold text-slate-500">
-                                        {{ $det->kriteria?->kode ?? '-' }}
-                                    </td>
-                                    <td class="px-4 py-3 font-semibold text-slate-800">
-                                        {{ $det->kriteria?->nama_kriteria ?? '-' }}
-                                    </td>
-                                    <td class="px-4 py-3">
-                                        @if ($det->kriteria?->jenis_penilaian === 'orang_tua')
-                                            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-cyan-50 text-cyan-700 border border-cyan-200">Orang Tua</span>
-                                        @else
-                                            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">Siswa</span>
-                                        @endif
-                                    </td>
-                                    <td class="px-4 py-3 text-center font-black text-sm text-slate-800">
-                                        {{ $det->nilai }}
-                                    </td>
-                                    <td class="px-4 py-3 text-center">
-                                        @if ($det->warna === 'HIJAU')
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                                HIJAU ({{ $det->indikator ?? 'Baik' }})
-                                            </span>
-                                        @elseif ($det->warna === 'ORANYE')
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                                ORANYE ({{ $det->indikator ?? 'Cukup' }})
-                                            </span>
-                                        @else
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                                                MERAH ({{ $det->indikator ?? 'Kurang' }})
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td class="px-4 py-3 text-slate-600">
-                                        {{ $det->catatan ?: '-' }}
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="px-4 py-6 text-center text-slate-400">
-                                        Rincian rubrik penilaian belum diinput.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                        @if ($count > 0)
-                            <tfoot class="bg-slate-50 font-bold border-t border-slate-200 text-xs">
-                                <tr>
-                                    <td colspan="3" class="px-4 py-3 text-right uppercase tracking-wider text-slate-700">
-                                        Rata-rata Skor Wawancara:
-                                    </td>
-                                    <td class="px-4 py-3 text-center text-sm font-black text-nampi-orange">
-                                        {{ number_format($totalSkor / $count, 1) }} / 100
-                                    </td>
-                                    <td colspan="2" class="px-4 py-3 text-slate-500">
-                                        Evaluasi terisi {{ $count }} indikator
-                                    </td>
-                                </tr>
-                            </tfoot>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Ringkasan Wawancara Siswa -->
+                    <div class="border rounded-xl p-4 bg-slate-50">
+                        <h3 class="text-sm font-bold text-slate-800 border-b pb-2 mb-3">
+                            Wawancara Siswa
+                            @if($wawancaraSiswa?->status === 'SELESAI')
+                                <span class="ml-2 px-2 py-0.5 text-[10px] font-semibold bg-emerald-100 text-emerald-700 rounded-full">Selesai</span>
+                            @else
+                                <span class="ml-2 px-2 py-0.5 text-[10px] font-semibold bg-amber-100 text-amber-700 rounded-full">Draft/Belum</span>
+                            @endif
+                        </h3>
+                        
+                        @if($wawancaraSiswa)
+                        <dl class="space-y-2 text-xs">
+                            <div class="grid grid-cols-3 gap-2">
+                                <dt class="text-slate-500">Pewawancara:</dt>
+                                <dd class="col-span-2 font-medium text-slate-800">{{ $wawancaraSiswa->pewawancara?->name ?? $wawancaraSiswa->nama_petugas }}</dd>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <dt class="text-slate-500">Tanggal:</dt>
+                                <dd class="col-span-2 font-medium text-slate-800">{{ $wawancaraSiswa->tanggal_wawancara?->format('d M Y') }}</dd>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 mt-4 pt-2 border-t">
+                                <dt class="text-slate-500">Baca Al-Quran:</dt>
+                                <dd class="col-span-2 font-medium text-slate-800">{{ $wawancaraSiswa->baca_quran }}</dd>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <dt class="text-slate-500">Kesehatan:</dt>
+                                <dd class="col-span-2 font-medium text-slate-800">{{ $wawancaraSiswa->kondisi_kesehatan }}</dd>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <dt class="text-slate-500">Observasi (Rambut/Seragam/Pendengaran):</dt>
+                                <dd class="col-span-2 font-medium text-slate-800">
+                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-bold text-white {{ $wawancaraSiswa->kerapihan_rambut == 'HIJAU' ? 'bg-emerald-500' : ($wawancaraSiswa->kerapihan_rambut == 'OREN' ? 'bg-amber-500' : 'bg-red-500') }}">{{ $wawancaraSiswa->kerapihan_rambut }}</span> / 
+                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-bold text-white {{ $wawancaraSiswa->kerapihan_seragam == 'HIJAU' ? 'bg-emerald-500' : ($wawancaraSiswa->kerapihan_seragam == 'OREN' ? 'bg-amber-500' : 'bg-red-500') }}">{{ $wawancaraSiswa->kerapihan_seragam }}</span> / 
+                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-bold text-white {{ $wawancaraSiswa->status_pendengaran == 'HIJAU' ? 'bg-emerald-500' : ($wawancaraSiswa->status_pendengaran == 'OREN' ? 'bg-amber-500' : 'bg-red-500') }}">{{ $wawancaraSiswa->status_pendengaran }}</span>
+                                </dd>
+                            </div>
+                            
+                            <div class="mt-4 pt-2 border-t">
+                                <dt class="text-slate-500 font-bold mb-1">Rekomendasi Pewawancara:</dt>
+                                <dd class="font-bold text-slate-800 text-sm">
+                                    @if($wawancaraSiswa->rekomendasi == 'TERIMA')
+                                        <span class="text-emerald-600">TERIMA</span>
+                                    @elseif($wawancaraSiswa->rekomendasi == 'PERTIMBANGKAN')
+                                        <span class="text-amber-600">PERTIMBANGKAN</span>
+                                    @else
+                                        <span class="text-red-600">TOLAK</span>
+                                    @endif
+                                </dd>
+                            </div>
+                            <div class="mt-2">
+                                <dt class="text-slate-500 mb-1">Catatan Rahasia:</dt>
+                                <dd class="text-slate-700 bg-yellow-50 p-2 border rounded border-yellow-200">
+                                    {{ $wawancaraSiswa->catatan_pewawancara ?: '-' }}
+                                </dd>
+                            </div>
+                        </dl>
+                        @else
+                        <p class="text-xs text-slate-500 italic">Belum ada data wawancara siswa.</p>
                         @endif
-                    </table>
-                </div>
-
-                <!-- Notes Section -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Catatan Umum & Rekomendasi Siswa</h4>
-                        <p class="text-xs text-slate-600 whitespace-pre-line leading-relaxed">
-                            {{ $wawancara?->catatan_umum ?: 'Tidak ada catatan umum.' }}
-                        </p>
                     </div>
 
-                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Hasil / Catatan Wawancara Orang Tua</h4>
-                        <p class="text-xs text-slate-600 whitespace-pre-line leading-relaxed">
-                            {{ $wawancara?->catatan_orang_tua ?: 'Tidak ada catatan wawancara orang tua.' }}
-                        </p>
+                    <!-- Ringkasan Wawancara Orang Tua -->
+                    <div class="border rounded-xl p-4 bg-slate-50">
+                        <h3 class="text-sm font-bold text-slate-800 border-b pb-2 mb-3">
+                            Wawancara Orang Tua
+                            @if($wawancaraOrangTua?->status === 'SELESAI')
+                                <span class="ml-2 px-2 py-0.5 text-[10px] font-semibold bg-emerald-100 text-emerald-700 rounded-full">Selesai</span>
+                            @else
+                                <span class="ml-2 px-2 py-0.5 text-[10px] font-semibold bg-amber-100 text-amber-700 rounded-full">Draft/Belum</span>
+                            @endif
+                        </h3>
+                        
+                        @if($wawancaraOrangTua)
+                        <dl class="space-y-2 text-xs">
+                            <div class="grid grid-cols-3 gap-2">
+                                <dt class="text-slate-500">Pewawancara:</dt>
+                                <dd class="col-span-2 font-medium text-slate-800">{{ $wawancaraOrangTua->pewawancara?->name ?? $wawancaraOrangTua->nama_petugas }}</dd>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <dt class="text-slate-500">Tanggal:</dt>
+                                <dd class="col-span-2 font-medium text-slate-800">{{ $wawancaraOrangTua->tanggal_wawancara?->format('d M Y') }}</dd>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 mt-4 pt-2 border-t">
+                                <dt class="text-slate-500">Narasumber:</dt>
+                                <dd class="col-span-2 font-medium text-slate-800">{{ $wawancaraOrangTua->nama_diwawancarai }} ({{ $wawancaraOrangTua->hubungan_dengan_siswa }})</dd>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <dt class="text-slate-500">Penanggung Jwb Belajar:</dt>
+                                <dd class="col-span-2 font-medium text-slate-800">{{ $wawancaraOrangTua->penanggung_jawab_belajar }}</dd>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <dt class="text-slate-500">Info Wikrama dari:</dt>
+                                <dd class="col-span-2 font-medium text-slate-800">{{ $wawancaraOrangTua->info_wikrama_dari }}</dd>
+                            </div>
+
+                            <div class="mt-4 pt-2 border-t">
+                                <dt class="text-slate-500 mb-1">Catatan Khusus (dari Ortu):</dt>
+                                <dd class="text-slate-700 p-2 border rounded bg-white">
+                                    {{ $wawancaraOrangTua->hal_perhatian_ortu ?: '-' }}
+                                </dd>
+                            </div>
+                            <div class="mt-2">
+                                <dt class="text-slate-500 mb-1">Kesan Pewawancara (Rahasia):</dt>
+                                <dd class="text-slate-700 bg-yellow-50 p-2 border rounded border-yellow-200">
+                                    {{ $wawancaraOrangTua->kesan_pewawancara ?: '-' }}
+                                </dd>
+                            </div>
+                        </dl>
+                        @else
+                        <p class="text-xs text-slate-500 italic">Belum ada data wawancara orang tua.</p>
+                        @endif
                     </div>
                 </div>
+
             </div>
         </div>
     </div>

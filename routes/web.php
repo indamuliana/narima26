@@ -12,7 +12,16 @@ use Illuminate\Support\Facades\Route;
 
 // Public / Landing Page
 Route::get('/', function () {
-    return view('welcome');
+    $gelombangAktif = null;
+    try {
+        if (\Illuminate\Support\Facades\Schema::hasTable('master_gelombang')) {
+            $gelombangAktif = \App\Models\MasterGelombang::aktif()->first() ?? \App\Models\MasterGelombang::first();
+        }
+    } catch (\Throwable $e) {
+        $gelombangAktif = null;
+    }
+
+    return view('welcome', compact('gelombangAktif'));
 })->name('home');
 
 // Modul Registrasi Calon Siswa Baru (Fase 6)
@@ -36,8 +45,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
 
-// Admin Area (Fase 13)
-Route::middleware(['auth', 'role:admin'])
+// Admin & Guru Shared Area (Executive & Read-Only Directory Access)
+Route::middleware(['auth', 'role:admin,guru'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
@@ -51,6 +60,7 @@ Route::middleware(['auth', 'role:admin'])
                 Route::get('/', 'index')->name('index');
                 Route::get('/export/csv', 'exportCsv')->name('export.csv');
                 Route::get('/export/pdf', 'exportPdf')->name('export.pdf');
+                Route::get('/{calonSiswa}/cetak-pdf', 'cetakPdf')->name('cetak-pdf');
                 Route::get('/{calonSiswa}', 'show')->name('show');
             });
 
@@ -62,6 +72,16 @@ Route::middleware(['auth', 'role:admin'])
                 Route::get('/', 'index')->name('index');
                 Route::get('/export/pdf', 'exportRekapPdf')->name('rekap.export.pdf');
             });
+    });
+
+// Admin Exclusive Area (Fase 13 - User Management & Master Configurations)
+Route::middleware(['auth', 'role:admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        // Manajemen Pengguna (User Management)
+        Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except(['show']);
+        Route::patch('/users/{user}/toggle', [\App\Http\Controllers\Admin\UserController::class, 'toggleStatus'])->name('users.toggle');
 
         // 1. Manajemen Jurusan (Kompetensi Keahlian)
         Route::controller(\App\Http\Controllers\Admin\JurusanController::class)
@@ -175,6 +195,7 @@ Route::middleware(['auth', 'role:bendahara,admin'])
                 Route::post('/{pembayaranDaftarUlang}/verify', 'verify')->name('verify');
                 Route::post('/{pembayaranDaftarUlang}/reject', 'reject')->name('reject');
                 Route::get('/{pembayaranDaftarUlang}/cetak', 'cetakKwitansi')->name('cetak-kwitansi');
+                Route::get('/{pembayaranDaftarUlang}/kwitansi', 'cetakKwitansi')->name('cetak');
             });
 
         // Master Biaya (Fase 11)
@@ -187,6 +208,17 @@ Route::middleware(['auth', 'role:bendahara,admin'])
                 Route::put('/{masterBiaya}', 'update')->name('update');
                 Route::patch('/{masterBiaya}/toggle', 'toggle')->name('toggle');
             });
+
+        // Master Diskon
+        Route::controller(\App\Http\Controllers\Bendahara\MasterDiskonController::class)
+            ->prefix('master-diskon')
+            ->name('master-diskon.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::post('/', 'store')->name('store');
+                Route::put('/{masterDiskon}', 'update')->name('update');
+                Route::delete('/{masterDiskon}', 'destroy')->name('destroy');
+            });
     });
 
 // Pewawancara Area (Fase 10)
@@ -198,8 +230,11 @@ Route::middleware(['auth', 'role:pewawancara,admin'])
             Route::get('/dashboard', 'dashboard')->name('dashboard');
             Route::get('/antrian', 'index')->name('antrian');
             Route::get('/wawancara', 'index')->name('wawancara.index');
-            Route::get('/wawancara/{calonSiswa}', 'form')->name('wawancara.form');
-            Route::post('/wawancara/{calonSiswa}', 'store')->name('wawancara.store');
+            Route::get('/wawancara/{calonSiswa}', 'hub')->name('wawancara.hub');
+            Route::get('/wawancara/{calonSiswa}/siswa', 'formSiswa')->name('wawancara.form-siswa');
+            Route::post('/wawancara/{calonSiswa}/siswa', 'saveSiswa')->name('wawancara.save-siswa');
+            Route::get('/wawancara/{calonSiswa}/orang-tua', 'formOrangTua')->name('wawancara.form-orang-tua');
+            Route::post('/wawancara/{calonSiswa}/orang-tua', 'saveOrangTua')->name('wawancara.save-orang-tua');
             Route::get('/wawancara/{calonSiswa}/detail', 'show')->name('wawancara.show');
             Route::get('/riwayat', 'riwayat')->name('riwayat');
             Route::get('/instrumen', 'instrumen')->name('instrumen');
@@ -234,6 +269,30 @@ Route::middleware(['auth', 'role:kepala_sekolah,admin'])
                 Route::post('/{calonSiswa}', 'store')->name('store');
                 Route::post('/{calonSiswa}/restore', 'restore')->name('restore');
             });
+
+        // Kelola Diskon & Keringanan (Otoritas Kepala Sekolah)
+        Route::controller(\App\Http\Controllers\KepalaSekolah\DiskonController::class)
+            ->prefix('diskon')
+            ->name('diskon.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::post('/', 'store')->name('store');
+                Route::delete('/{diskon}', 'destroy')->name('destroy');
+                Route::get('/search-siswa', 'searchSiswa')->name('search-siswa');
+                Route::post('/master', 'storeMaster')->name('master.store');
+                Route::put('/master/{masterDiskon}', 'updateMaster')->name('master.update');
+                Route::delete('/master/{masterDiskon}', 'destroyMaster')->name('master.destroy');
+            });
+
+        // Direktori Data Calon Siswa (Eksekutif)
+        Route::controller(\App\Http\Controllers\KepalaSekolah\CalonSiswaController::class)
+            ->prefix('calon-siswa')
+            ->name('calon-siswa.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/{calonSiswa}', 'show')->name('show');
+                Route::get('/{calonSiswa}/cetak-pdf', 'cetakPdf')->name('cetak-pdf');
+            });
     });
 
 // Calon Siswa Area
@@ -241,6 +300,10 @@ Route::middleware(['auth', 'role:calon_siswa'])
     ->prefix('calon-siswa')
     ->name('calon-siswa.')
     ->group(function () {
+        Route::get('/', function () {
+            return redirect()->route('calon-siswa.dashboard');
+        })->name('index');
+
         Route::get('/dashboard', function () {
             $calonSiswa = auth()->user()->calonSiswa;
             return view('calon-siswa.dashboard', compact('calonSiswa'));
@@ -302,6 +365,7 @@ Route::middleware(['auth', 'role:calon_siswa'])
                 Route::post('/bayar', 'storeBayar')->name('store-bayar');
                 Route::get('/cetak-tagihan', 'cetakTagihan')->name('cetak-tagihan');
                 Route::get('/cetak-kwitansi/{pembayaranDaftarUlang}', 'cetakKwitansi')->name('cetak-kwitansi');
+                Route::post('/aktivasi-seragam', 'aktivasiSeragam')->name('aktivasi-seragam');
             });
     });
 

@@ -10,6 +10,7 @@ use App\Models\MasterJurusan;
 use App\Models\PembayaranDaftarUlang;
 use App\Models\PembayaranSeleksi;
 use App\Models\Tagihan;
+use App\Services\DashboardMetricsService;
 use Illuminate\View\View;
 use Spatie\Activitylog\Models\Activity;
 
@@ -18,9 +19,13 @@ class DashboardController extends Controller
     /**
      * Display Administrator executive dashboard with live metrics.
      */
-    public function index(): View
+    public function index(DashboardMetricsService $metricsService): View
     {
         $totalPendaftar = CalonSiswa::count();
+        $timeline       = $metricsService->getTimelinePendaftar();
+        $funnel         = $metricsService->getFunnelKonversi();
+        $demografi      = $metricsService->getDemografiData();
+        $topSekolah     = $metricsService->getTopAsalSekolah(5);
 
         // Status Counts
         $stats = [
@@ -116,7 +121,11 @@ class DashboardController extends Controller
             'gelombangStats',
             'keuangan',
             'recentCandidates',
-            'recentActivities'
+            'recentActivities',
+            'timeline',
+            'funnel',
+            'demografi',
+            'topSekolah'
         ));
     }
 }

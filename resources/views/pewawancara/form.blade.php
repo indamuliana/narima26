@@ -121,22 +121,35 @@
                         <div class="pt-1">
                             <p class="text-[11px] font-bold text-slate-800 uppercase tracking-wider mb-2">Profil Orang Tua / Wali</p>
                             @if ($calonSiswa->dataOrangtua)
+                                @php
+                                    $ot = $calonSiswa->dataOrangtua;
+                                    $pekAyah = $ot->pekerjaanAyah?->nama ?? $ot->pekerjaan_ayah ?? '-';
+                                    $pekIbu = $ot->pekerjaanIbu?->nama ?? $ot->pekerjaan_ibu ?? '-';
+                                @endphp
                                 <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200/80 space-y-2">
                                     <div class="flex justify-between">
                                         <span class="text-slate-500">Ayah:</span>
-                                        <span class="font-semibold text-slate-800">{{ $calonSiswa->dataOrangtua->nama_ayah ?? '-' }} ({{ $calonSiswa->dataOrangtua->pekerjaan_ayah ?? '-' }})</span>
+                                        <span class="font-semibold text-slate-800">{{ $ot->nama_ayah ?? '-' }} ({{ $pekAyah }})</span>
                                     </div>
+                                    @if ($ot->penghasilan_ayah)
+                                        <div class="flex justify-between text-[11px]">
+                                            <span class="text-slate-500">Penghasilan Ayah:</span>
+                                            <span class="font-medium text-slate-700">{{ $ot->penghasilan_ayah }}</span>
+                                        </div>
+                                    @endif
                                     <div class="flex justify-between">
                                         <span class="text-slate-500">Ibu:</span>
-                                        <span class="font-semibold text-slate-800">{{ $calonSiswa->dataOrangtua->nama_ibu ?? '-' }} ({{ $calonSiswa->dataOrangtua->pekerjaan_ibu ?? '-' }})</span>
+                                        <span class="font-semibold text-slate-800">{{ $ot->nama_ibu ?? '-' }} ({{ $pekIbu }})</span>
                                     </div>
+                                    @if ($ot->penghasilan_ibu)
+                                        <div class="flex justify-between text-[11px]">
+                                            <span class="text-slate-500">Penghasilan Ibu:</span>
+                                            <span class="font-medium text-slate-700">{{ $ot->penghasilan_ibu }}</span>
+                                        </div>
+                                    @endif
                                     <div class="flex justify-between">
                                         <span class="text-slate-500">No HP Orang Tua:</span>
-                                        <span class="font-mono text-slate-800">{{ $calonSiswa->dataOrangtua->no_hp_ayah ?? $calonSiswa->dataOrangtua->no_hp_ibu ?? $calonSiswa->no_hp }}</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-slate-500">Penghasilan Gabungan:</span>
-                                        <span class="font-semibold text-emerald-700">Rp {{ number_format(($calonSiswa->dataOrangtua->penghasilan_ayah ?? 0) + ($calonSiswa->dataOrangtua->penghasilan_ibu ?? 0), 0, ',', '.') }}</span>
+                                        <span class="font-mono text-slate-800">{{ $ot->no_hp_ayah ?? $ot->no_hp_ibu ?? $calonSiswa->no_hp_siswa ?? $calonSiswa->no_hp }}</span>
                                     </div>
                                 </div>
                             @else

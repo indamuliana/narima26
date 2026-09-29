@@ -34,7 +34,7 @@
         <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-xs lg:hidden hidden"></div>
 
         <!-- Sidebar Navigation -->
-        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-slate-300 flex flex-col transition-transform duration-300 transform -translate-x-full lg:translate-x-0 lg:static lg:inset-0">
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-slate-300 flex flex-col transition-all duration-300 transform -translate-x-full lg:translate-x-0 lg:static lg:inset-0 shrink-0">
             <!-- Brand & Logo -->
             <div class="h-20 px-6 flex items-center justify-between border-b border-slate-800">
                 <div class="flex items-center gap-3">
@@ -44,8 +44,11 @@
                         <span class="text-[10px] uppercase font-bold text-nampi-orange tracking-widest">SPMB WIKRAMA</span>
                     </div>
                 </div>
-                <button type="button" onclick="toggleSidebar()" class="lg:hidden p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 cursor-pointer">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <button type="button" onclick="toggleSidebar()" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 cursor-pointer transition-colors" title="Sembunyikan Menu Samping (Ctrl+B)">
+                    <svg class="w-5 h-5 hidden lg:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+                    </svg>
+                    <svg class="w-5 h-5 lg:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
@@ -91,7 +94,7 @@
             <!-- Top Header -->
             <header class="h-20 bg-white border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
                 <div class="flex items-center gap-4">
-                    <button type="button" onclick="toggleSidebar()" class="lg:hidden p-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100">
+                    <button type="button" onclick="toggleSidebar()" class="p-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 cursor-pointer transition-colors" title="Sembunyikan/Tampilkan Menu (Ctrl+B)">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                         </svg>
@@ -105,7 +108,7 @@
 
                 <div class="flex items-center gap-3">
                     <span class="hidden sm:inline-flex text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-                        Gelombang Aktif: 2026/2027
+                        Gelombang Aktif: 2027/2028
                     </span>
                 </div>
             </header>
@@ -147,9 +150,50 @@
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const backdrop = document.getElementById('sidebar-backdrop');
-            if (sidebar) sidebar.classList.toggle('-translate-x-full');
-            if (backdrop) backdrop.classList.toggle('hidden');
+            if (!sidebar) return;
+
+            if (window.innerWidth >= 1024) {
+                // Desktop toggle
+                const isCollapsed = sidebar.classList.toggle('lg:-ml-64');
+                try {
+                    localStorage.setItem('sidebar_collapsed', isCollapsed ? 'true' : 'false');
+                } catch (e) {}
+            } else {
+                // Mobile toggle
+                sidebar.classList.toggle('-translate-x-full');
+                if (backdrop) backdrop.classList.toggle('hidden');
+            }
         }
+
+        // Apply saved desktop state immediately
+        (function() {
+            try {
+                if (localStorage.getItem('sidebar_collapsed') === 'true' && window.innerWidth >= 1024) {
+                    const sidebar = document.getElementById('sidebar');
+                    if (sidebar) {
+                        sidebar.classList.add('lg:-ml-64');
+                    } else {
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const sb = document.getElementById('sidebar');
+                            if (sb) sb.classList.add('lg:-ml-64');
+                        });
+                    }
+                }
+            } catch (e) {}
+
+            // Shortcut Ctrl + B
+            document.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+                    if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName) || document.activeElement?.isContentEditable) {
+                        return;
+                    }
+                    e.preventDefault();
+                    toggleSidebar();
+                }
+            });
+        })();
     </script>
+
+    @stack('scripts')
 </body>
 </html>

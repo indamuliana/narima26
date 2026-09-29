@@ -962,7 +962,7 @@ Contoh dummy biaya:
 
 ```text
 
-Seleksi                  Rp 250.000
+Seleksi                  Rp 200.000
 
 DSP                      Rp 3.000.000
 
@@ -1836,7 +1836,7 @@ Nominal awal:
 
 ```text
 
-Rp 250.000
+Rp 200.000
 
 ```
 

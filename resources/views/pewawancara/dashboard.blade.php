@@ -109,7 +109,7 @@
                                     <p class="text-xs text-slate-400 mt-0.5 font-mono">{{ $cs->nomor_pendaftaran }} • {{ $cs->sekolahAsal?->nama_sekolah ?? $cs->sekolah_asal_text ?? '-' }}</p>
                                 </div>
                             </div>
-                            <a href="{{ route('pewawancara.wawancara.form', $cs) }}"
+                            <a href="{{ route('pewawancara.wawancara.hub', $cs) }}"
                                class="px-3 py-1.5 rounded-lg bg-orange-500 text-white text-xs font-semibold hover:bg-orange-600 transition-colors shrink-0 shadow-xs">
                                 Mulai Uji
                             </a>
@@ -135,20 +135,20 @@
                 </div>
 
                 <div class="divide-y divide-slate-100">
-                    @forelse ($recentRiwayat as $w)
+                    @forelse ($recentRiwayat as $cs)
                         <div class="p-4 hover:bg-slate-50/80 transition-colors flex items-center justify-between gap-4">
                             <div>
                                 <div class="flex items-center gap-2">
-                                    <p class="text-sm font-bold text-slate-800">{{ $w->calonSiswa?->nama_lengkap }}</p>
+                                    <p class="text-sm font-bold text-slate-800">{{ $cs->nama_lengkap }}</p>
                                     <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                         SELESAI
                                     </span>
                                 </div>
                                 <p class="text-xs text-slate-400 mt-0.5 font-mono">
-                                    {{ $w->calonSiswa?->nomor_pendaftaran }} • Tgl: {{ $w->tanggal_wawancara?->format('d/m/Y') ?? '-' }}
+                                    {{ $cs->nomor_pendaftaran }} • Tgl: {{ $cs->wawancaraSiswa?->tanggal_wawancara?->format('d/m/Y') ?? $cs->wawancaraOrangTua?->tanggal_wawancara?->format('d/m/Y') ?? '-' }}
                                 </p>
                             </div>
-                            <a href="{{ route('pewawancara.wawancara.show', $w->calonSiswa) }}"
+                            <a href="{{ route('pewawancara.wawancara.show', $cs) }}"
                                class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition-colors shrink-0">
                                 Detail Hasil
                             </a>

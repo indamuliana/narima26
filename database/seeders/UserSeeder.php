@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
     {
         $users = [
             [
-                'name' => 'Administrator SPMB',
+                'name' => 'Inda Muliana',
                 'email' => 'admin@wikrama.sch.id',
                 'username' => 'admin',
                 'password' => Hash::make('admin123'),
@@ -48,6 +48,15 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('kepsek123'),
                 'role' => User::ROLE_KEPALA_SEKOLAH,
                 'phone' => '081200000004',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Dewan Guru SMK Wikrama',
+                'email' => 'guru@wikrama.sch.id',
+                'username' => 'guru',
+                'password' => Hash::make('guru123'),
+                'role' => User::ROLE_GURU,
+                'phone' => '081200000005',
                 'is_active' => true,
             ],
             [

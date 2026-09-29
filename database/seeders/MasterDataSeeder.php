@@ -118,25 +118,6 @@ class MasterDataSeeder extends Seeder
             MasterPekerjaan::firstOrCreate(['nama' => $pek], ['aktif' => true]);
         }
 
-        // 5. Master Seragam
-        $seragamJenis = [
-            'Baju Olahraga',
-            'Seragam Batik',
-            'Seragam Kejuruan / Wearpack',
-            'Jas Almamater',
-        ];
-        $ukuranList = ['S', 'M', 'L', 'XL', 'XXL'];
-
-        foreach ($seragamJenis as $jenis) {
-            foreach ($ukuranList as $uk) {
-                $kode = strtoupper(substr(str_replace(' ', '', $jenis), 0, 3)) . '-' . $uk;
-                MasterSeragam::updateOrCreate(['kode' => $kode], [
-                    'nama_jenis' => $jenis,
-                    'ukuran' => $uk,
-                    'aktif' => true,
-                ]);
-            }
-        }
 
         // 6. Master Sekolah Asal
         $sekolah = [
@@ -194,7 +175,7 @@ class MasterDataSeeder extends Seeder
                 'kode_biaya' => 'BIAYA-SEL',
                 'nama_biaya' => 'Biaya Pendaftaran & Seleksi Masuk',
                 'kategori' => 'seleksi',
-                'nominal' => 250000,
+                'nominal' => 200000,
                 'tipe_nominal' => 'tetap',
                 'wajib' => true,
                 'aktif' => true,
@@ -315,5 +296,7 @@ class MasterDataSeeder extends Seeder
             ['kode' => '320503001'],
             ['kecamatan_id' => $kecGarkot->id, 'nama' => 'Kota Kulon', 'kode_pos' => '44111']
         );
+
+        $this->call(TarifBiayaDanSeragamSeeder::class);
     }
 }

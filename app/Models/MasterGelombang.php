@@ -62,6 +62,6 @@ class MasterGelombang extends Model
 
     public function getTahunAjaranAttribute(): string
     {
-        return '2026/2027';
+        return '2027/2028';
     }
 }

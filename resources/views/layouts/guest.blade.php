@@ -19,10 +19,21 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
+        [x-cloak] { display: none !important; }
     </style>
 
     <!-- Scripts and Styles via Vite -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!window.Alpine) {
+                const s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js';
+                s.defer = true;
+                document.head.appendChild(s);
+            }
+        });
+    </script>
 </head>
 <body class="flex flex-col min-h-screen text-slate-800 antialiased selection:bg-nampi-orange selection:text-white">
 
@@ -111,7 +122,7 @@
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-800 text-emerald-400 font-medium">
                             <span class="h-2 w-2 rounded-full bg-emerald-400"></span> Sistem Online Aktif
                         </span>
-                        <span>Tahun Ajaran 2026/2027</span>
+                        <span>Tahun Ajaran 2027/2028</span>
                     </div>
                 </div>
 

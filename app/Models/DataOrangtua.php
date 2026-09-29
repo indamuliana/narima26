@@ -14,6 +14,8 @@ class DataOrangtua extends Model
 
     protected $fillable = [
         'calon_siswa_id',
+        'status_ayah',
+        'status_ibu',
         // Ayah
         'nama_ayah',
         'nik_ayah',
@@ -59,5 +61,28 @@ class DataOrangtua extends Model
     public function pekerjaanWali(): BelongsTo
     {
         return $this->belongsTo(MasterPekerjaan::class, 'pekerjaan_wali_id');
+    }
+
+    public function getPekerjaanAyahNamaAttribute(): ?string
+    {
+        return $this->pekerjaanAyah?->nama;
+    }
+
+    public function getPekerjaanIbuNamaAttribute(): ?string
+    {
+        return $this->pekerjaanIbu?->nama;
+    }
+
+    public function getPenghasilanGabunganAttribute(): string
+    {
+        $parts = [];
+        if (!empty($this->penghasilan_ayah)) {
+            $parts[] = "Ayah: {$this->penghasilan_ayah}";
+        }
+        if (!empty($this->penghasilan_ibu)) {
+            $parts[] = "Ibu: {$this->penghasilan_ibu}";
+        }
+
+        return !empty($parts) ? implode(' • ', $parts) : '-';
     }
 }

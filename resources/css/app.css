@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+﻿@import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -18,6 +18,8 @@
     --color-nampi-gray: #64748B;
     --color-nampi-light-gray: #F8FAFC;
 }
+
+[x-cloak] { display: none !important; }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {

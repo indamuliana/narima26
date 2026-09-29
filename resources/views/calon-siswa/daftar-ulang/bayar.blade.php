@@ -2,51 +2,7 @@
     <x-slot name="title">Konfirmasi Pembayaran Daftar Ulang</x-slot>
 
     <x-slot name="sidebar">
-        <a href="{{ route('calon-siswa.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-            </svg>
-            <span>Dashboard</span>
-        </a>
-        <a href="{{ route('calon-siswa.pembayaran-seleksi.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-            </svg>
-            <span>Pembayaran Seleksi</span>
-        </a>
-        <a href="{{ route('calon-siswa.lengkapi-data.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-            </svg>
-            <span>Lengkapi Data & Berkas</span>
-        </a>
-        <a href="{{ route('calon-siswa.kesepahaman.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-            </svg>
-            <span>Kesepahaman SPMB</span>
-        </a>
-        <a href="{{ route('calon-siswa.dokumen.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-            </svg>
-            <span>Dokumen & Cetak PDF</span>
-        </a>
-        <a href="{{ route('calon-siswa.daftar-ulang.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold bg-nampi-orange text-white shadow-xs">
-            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
-            <span>Tagihan Daftar Ulang</span>
-        </a>
-        <form method="POST" action="{{ route('logout') }}" class="pt-4 mt-4 border-t border-slate-800">
-            @csrf
-            <button type="submit" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors cursor-pointer">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                </svg>
-                <span>Keluar (Logout)</span>
-            </button>
-        </form>
+        @include('calon-siswa.partials.sidebar')
     </x-slot>
 
     <div class="max-w-3xl mx-auto space-y-6">
@@ -75,8 +31,15 @@
         <!-- Outstanding Position Card -->
         <div class="p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
             <div>
-                <span class="text-xs uppercase font-bold text-slate-400 tracking-wider">Nomor Tagihan: {{ $tagihan->nomor_tagihan }}</span>
-                <h3 class="text-lg font-black mt-0.5">Sisa Kewajiban Tagihan</h3>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs uppercase font-bold text-slate-400 tracking-wider">#{{ $tagihan->nomor_tagihan }}</span>
+                    @if($tagihan->jenis_tagihan === 'SERAGAM')
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">Seragam & Atribut</span>
+                    @else
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">Daftar Ulang (DSP & SPP)</span>
+                    @endif
+                </div>
+                <h3 class="text-lg font-black mt-1">Sisa Kewajiban Tagihan</h3>
                 <p class="text-xs text-slate-300">Calon Siswa: {{ $calonSiswa->nama_lengkap }} ({{ $calonSiswa->nomor_pendaftaran }})</p>
             </div>
             <div class="text-right sm:border-l sm:border-slate-700 sm:pl-6">
@@ -85,10 +48,43 @@
             </div>
         </div>
 
+        @if ($tagihan->total_diskon > 0)
+            <div class="p-4 sm:p-5 rounded-2xl bg-emerald-50 border border-emerald-200/90 text-emerald-900 flex items-start gap-3.5 shadow-xs">
+                <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0 text-xl border border-emerald-200">
+                    🏷️
+                </div>
+                <div class="space-y-1 flex-1">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-black uppercase tracking-wider text-emerald-800">Diskon Diterapkan</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-200 text-emerald-900">
+                                HEMAT Rp {{ number_format($tagihan->total_diskon, 0, ',', '.') }}
+                            </span>
+                        </div>
+                        <span class="text-xs font-bold text-emerald-700">
+                            {{ $tagihan->diskon?->jenis_diskon ?? 'Keringanan Biaya' }}
+                            @if ($tagihan->diskon?->metode_diskon === 'persentase')
+                                ({{ (float) $tagihan->diskon->nilai_diskon }}%)
+                            @endif
+                        </span>
+                    </div>
+                    <p class="text-xs text-emerald-800 leading-relaxed">
+                        Tagihan bruto semula <strong>Rp {{ number_format($tagihan->total_bruto, 0, ',', '.') }}</strong>, dipotong diskon sebesar <strong class="text-emerald-700 font-black">- Rp {{ number_format($tagihan->total_diskon, 0, ',', '.') }}</strong>, sehingga total kewajiban netto Anda menjadi <strong>Rp {{ number_format($tagihan->total_netto, 0, ',', '.') }}</strong>.
+                    </p>
+                    @if ($tagihan->diskon?->alasan)
+                        <p class="text-[11px] text-emerald-700 italic pt-0.5">
+                            Keterangan: {{ $tagihan->diskon->alasan }}
+                        </p>
+                    @endif
+                </div>
+            </div>
+        @endif
+
         <!-- Submission Form -->
         <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs">
             <form method="POST" action="{{ route('calon-siswa.daftar-ulang.store-bayar') }}" enctype="multipart/form-data" class="space-y-6">
                 @csrf
+                <input type="hidden" name="tagihan_id" value="{{ $tagihan->id }}">
 
                 <!-- Nominal Dibayar -->
                 <div>

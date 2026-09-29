@@ -42,17 +42,17 @@ class RegisterCalonSiswaRequest extends FormRequest
                 'required',
                 'string',
                 function ($attribute, $value, $fail) use ($phoneService) {
-                    if (!$phoneService->isValid($value)) {
-                        $fail('Nomor HP siswa harus berupa nomor seluler Indonesia yang valid (contoh: 081234567890).');
+                    if (!empty($value) && !$phoneService->isValid($value)) {
+                        $fail('Nomor WhatsApp Siswa harus berupa nomor seluler Indonesia yang valid (contoh: 081234567890).');
                     }
                 },
             ],
             'no_hp_ayah' => [
-                'nullable',
+                'required',
                 'string',
                 function ($attribute, $value, $fail) use ($phoneService) {
                     if (!empty($value) && !$phoneService->isValid($value)) {
-                        $fail('Nomor HP ayah harus berupa nomor seluler Indonesia yang valid.');
+                        $fail('Nomor WhatsApp Ayah harus berupa nomor seluler Indonesia yang valid (contoh: 081234567890).');
                     }
                 },
             ],
@@ -61,12 +61,12 @@ class RegisterCalonSiswaRequest extends FormRequest
                 'string',
                 function ($attribute, $value, $fail) use ($phoneService) {
                     if (!empty($value) && !$phoneService->isValid($value)) {
-                        $fail('Nomor HP ibu harus berupa nomor seluler Indonesia yang valid.');
+                        $fail('Nomor WhatsApp Ibu harus berupa nomor seluler Indonesia yang valid (contoh: 081234567890).');
                     }
                 },
             ],
             'email' => [
-                'nullable',
+                'required',
                 'email',
                 'max:150',
                 Rule::unique('users', 'email'),
@@ -77,6 +77,35 @@ class RegisterCalonSiswaRequest extends FormRequest
             'gelombang_id' => ['nullable', 'exists:master_gelombang,id'],
             'asal_sekolah_id' => ['nullable', 'exists:master_sekolah_asal,id'],
             'asal_sekolah_lainnya' => ['nullable', 'string', 'max:150'],
+            'referensi_jenis' => [
+                'nullable',
+                'string',
+                'in:GURU_WIKRAMA_GARUT,GURU_WIKRAMA_BOGOR,SISWA_WIKRAMA_AKTIF,ALUMNI_WIKRAMA,CALON_SISWA_WIKRAMA,LAINNYA',
+            ],
+            'referensi_nama' => [
+                'nullable',
+                'string',
+                'max:150',
+                Rule::requiredIf(fn () => in_array($this->input('referensi_jenis'), [
+                    'GURU_WIKRAMA_GARUT',
+                    'GURU_WIKRAMA_BOGOR',
+                    'SISWA_WIKRAMA_AKTIF',
+                    'ALUMNI_WIKRAMA',
+                    'CALON_SISWA_WIKRAMA',
+                ])),
+            ],
+            'referensi_rayon' => [
+                'nullable',
+                'string',
+                'max:100',
+                Rule::requiredIf(fn () => $this->input('referensi_jenis') === 'SISWA_WIKRAMA_AKTIF'),
+            ],
+            'referensi_nomor_seleksi' => [
+                'nullable',
+                'string',
+                'max:50',
+                Rule::requiredIf(fn () => $this->input('referensi_jenis') === 'CALON_SISWA_WIKRAMA'),
+            ],
         ];
     }
 
@@ -97,11 +126,16 @@ class RegisterCalonSiswaRequest extends FormRequest
             'tempat_lahir.required' => 'Tempat lahir wajib diisi.',
             'tanggal_lahir.required' => 'Tanggal lahir wajib diisi.',
             'tanggal_lahir.before' => 'Tanggal lahir harus sebelum hari ini.',
-            'no_hp_siswa.required' => 'Nomor HP siswa wajib diisi untuk koordinasi dan verifikasi WhatsApp.',
+            'no_hp_siswa.required' => 'Nomor WhatsApp Siswa wajib diisi.',
+            'no_hp_ayah.required' => 'Nomor WhatsApp Ayah wajib diisi.',
             'program_id.required' => 'Program pendidikan (Reguler/Unggulan) wajib dipilih.',
             'jurusan_id.required' => 'Kompetensi keahlian / jurusan pilihan wajib dipilih.',
+            'email.required' => 'Alamat email aktif wajib diisi.',
             'email.email' => 'Format alamat email tidak valid.',
             'email.unique' => 'Alamat email ini telah terdaftar di sistem.',
+            'referensi_nama.required' => 'Nama referensi / promotor wajib diisi.',
+            'referensi_rayon.required' => 'Rayon siswa aktif wajib dipilih.',
+            'referensi_nomor_seleksi.required' => 'Nomor seleksi calon siswa referensi wajib diisi.',
         ];
     }
 }

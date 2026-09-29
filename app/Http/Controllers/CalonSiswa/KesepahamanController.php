@@ -5,6 +5,7 @@ namespace App\Http\Controllers\CalonSiswa;
 use App\Enums\SpmbStatus;
 use App\Http\Controllers\Controller;
 use App\Models\KesepahamanEula;
+use App\Services\KesepahamanService;
 use App\Services\PdfService;
 use App\Services\SpmbStatusService;
 use Illuminate\Http\RedirectResponse;
@@ -16,7 +17,8 @@ class KesepahamanController extends Controller
 {
     public function __construct(
         protected SpmbStatusService $spmbStatusService,
-        protected PdfService $pdfService
+        protected PdfService $pdfService,
+        protected KesepahamanService $kesepahamanService
     ) {}
 
     /**
@@ -43,11 +45,12 @@ class KesepahamanController extends Controller
                 ->with('error', 'Silakan lengkapi seluruh formulir biodata dan berkas persyaratan terlebih dahulu sebelum menyetujui Lembar Kesepahaman.');
         }
 
-        $calonSiswa->loadMissing(['program', 'jurusan', 'gelombang', 'sekolahAsal', 'orangTua']);
+        $calonSiswa->loadMissing(['program', 'jurusan', 'gelombang', 'sekolahAsal', 'orangTua', 'dataOrangtua']);
 
         $eula = $calonSiswa->kesepahaman()->where('setuju', true)->latest()->first();
+        $klausulData = $this->kesepahamanService->getKlausulByCalonSiswa($calonSiswa);
 
-        return view('calon-siswa.kesepahaman.index', compact('calonSiswa', 'eula'));
+        return view('calon-siswa.kesepahaman.index', compact('calonSiswa', 'eula', 'klausulData'));
     }
 
     /**
@@ -61,20 +64,37 @@ class KesepahamanController extends Controller
             abort(404, 'Data pendaftaran tidak ditemukan.');
         }
 
+        $klausulData = $this->kesepahamanService->getKlausulByCalonSiswa($calonSiswa);
+        $programKey = $klausulData['program_key'];
+        $requiredPointIds = $this->kesepahamanService->getRequiredPointIds($programKey);
+
         $request->validate([
             'setuju' => ['required', 'accepted'],
+            'checklist_poin' => ['required', 'array', 'min:1'],
         ], [
             'setuju.accepted' => 'Anda wajib mencentang persetujuan lembar kesepahaman dan tata tertib SPMB untuk melanjutkan.',
+            'checklist_poin.required' => 'Anda wajib mencentang setiap butir poin kesepahaman.',
+            'checklist_poin.min' => 'Anda wajib mencentang setiap butir poin kesepahaman.',
         ]);
 
-        $versiDokumen = 'v1.0 - 2026/2027';
-        $klausul = 'Pakta Integritas & Kesepahaman Bersama Penerimaan Murid Baru (SPMB) SMK Wikrama 1 Garut Tahun Pelajaran 2026/2027 mengenai keabsahan data, kepatuhan tata tertib, pembiayaan pendidikan, dan integritas calon siswa serta orang tua.';
+        $submittedPoints = $request->input('checklist_poin', []);
+        $missingPoints = array_diff($requiredPointIds, $submittedPoints);
+
+        if (!empty($missingPoints)) {
+            return back()->withInput()->with('error', 'Seluruh butir poin kesepahaman (' . count($requiredPointIds) . ' butir) wajib dicentang secara lengkap.');
+        }
+
+        $versiDokumen = 'v2.0 - 2027/2028';
+        $klausulSummary = "Naskah Persetujuan Siswa SMK Wikrama 1 Garut dan Orang Tua tentang Ketentuan Umum SMK Wikrama 1 Garut {$klausulData['program_title']} Tahun Pelajaran 2027/2028.";
 
         // Simpan / update record persetujuan
         $eula = KesepahamanEula::create([
             'calon_siswa_id' => $calonSiswa->id,
             'versi_dokumen' => $versiDokumen,
-            'isi_dokumen_atau_referensi_dokumen' => $klausul,
+            'program_snapshot' => $klausulData['program_type'],
+            'isi_dokumen_atau_referensi_dokumen' => $klausulSummary,
+            'poin_disetujui' => $submittedPoints,
+            'klausul_snapshot' => $klausulData['kelompok'],
             'setuju' => true,
             'agreed_at' => now(),
             'agreed_by' => auth()->id(),
@@ -99,11 +119,13 @@ class KesepahamanController extends Controller
                 ->causedBy(auth()->user())
                 ->withProperties([
                     'nomor_pendaftaran' => $calonSiswa->nomor_pendaftaran,
+                    'program' => $klausulData['program_type'],
                     'versi_dokumen' => $versiDokumen,
+                    'total_poin' => count($submittedPoints),
                     'agreed_at' => $eula->agreed_at,
                     'ip_address' => $eula->ip_address,
                 ])
-                ->log("Calon siswa {$calonSiswa->nama_lengkap} ({$calonSiswa->nomor_pendaftaran}) menyetujui lembar kesepahaman SPMB.");
+                ->log("Calon siswa {$calonSiswa->nama_lengkap} ({$calonSiswa->nomor_pendaftaran}) menyetujui lembar kesepahaman SPMB {$klausulData['program_title']}.");
         }
 
         return redirect()->route('calon-siswa.kesepahaman.index')

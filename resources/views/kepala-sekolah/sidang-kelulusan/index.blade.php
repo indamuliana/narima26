@@ -5,18 +5,12 @@
         @include('kepala-sekolah.partials.sidebar')
     </x-slot>
 
-    <div class="space-y-6" x-data="{ selectedIds: [], batchModal: false, batchDecision: 'DITERIMA' }">
+    <div class="space-y-6">
         <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
                 <h1 class="text-2xl font-black text-slate-800">Sidang Pleno Kelulusan SPMB</h1>
                 <p class="text-xs text-slate-500 mt-1">Penetapan keputusan hasil seleksi penerimaan murid baru oleh Kepala Sekolah dan Komite Seleksi.</p>
-            </div>
-            <div class="flex items-center gap-2">
-                <button type="button" @click="batchModal = true" :disabled="selectedIds.length === 0"
-                        class="px-4 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-xs cursor-pointer">
-                    ⚖️ Sidang Pleno Massal (<span x-text="selectedIds.length"></span> Siswa)
-                </button>
             </div>
         </div>
 
@@ -110,11 +104,6 @@
                 <table class="w-full text-left text-sm text-slate-600">
                     <thead class="bg-slate-50 border-b border-slate-100 text-xs font-bold text-slate-500 uppercase tracking-wider">
                         <tr>
-                            <th class="px-4 py-3.5 w-10 text-center">
-                                <input type="checkbox"
-                                       @change="if($el.checked) { selectedIds = {{ json_encode($calonSiswaList->pluck('id')->toArray()) }} } else { selectedIds = [] }"
-                                       class="rounded text-nampi-orange focus:ring-nampi-orange">
-                            </th>
                             <th class="px-5 py-3.5">Calon Siswa</th>
                             <th class="px-4 py-3.5">Kompetensi Keahlian</th>
                             <th class="px-4 py-3.5">Evaluasi Wawancara</th>
@@ -131,10 +120,6 @@
                                 $isDecided = in_array($statusVal, ['DITERIMA', 'DITOLAK', 'MENUNGGU_DAFTAR_ULANG', 'DAFTAR_ULANG_DIVERIFIKASI', 'RESMI_TERDAFTAR']);
                             @endphp
                             <tr class="hover:bg-slate-50/70 transition-colors">
-                                <td class="px-4 py-4 text-center">
-                                    <input type="checkbox" value="{{ $siswa->id }}" x-model="selectedIds"
-                                           class="rounded text-nampi-orange focus:ring-nampi-orange">
-                                </td>
                                 <td class="px-5 py-4">
                                     <p class="font-bold text-slate-800">{{ $siswa->nama_lengkap }}</p>
                                     <p class="text-xs text-slate-400 font-mono mt-0.5">
@@ -142,8 +127,13 @@
                                     </p>
                                 </td>
                                 <td class="px-4 py-4">
-                                    <span class="text-xs font-semibold text-slate-800 block">{{ $siswa->jurusan?->nama_jurusan }}</span>
-                                    <span class="text-[11px] text-slate-400">{{ $siswa->program?->nama_program }} &bull; {{ $siswa->gelombang?->nama_gelombang }}</span>
+                                    <span class="text-xs font-bold text-slate-800 block">{{ $siswa->jurusan?->nama_jurusan ?? '-' }}</span>
+                                    <div class="mt-1 flex items-center gap-1.5 flex-wrap">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold {{ str_contains(strtolower($siswa->program?->nama_program ?? ''), 'unggul') ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-blue-50 text-blue-700 border border-blue-200' }}">
+                                            {{ $siswa->program?->nama_program ?? 'Reguler' }}
+                                        </span>
+                                        <span class="text-[10px] text-slate-400">&bull; {{ $siswa->gelombang?->nama_gelombang ?? 'Gelombang 1' }}</span>
+                                    </div>
                                 </td>
                                 <td class="px-4 py-4">
                                     @if ($wawancara)
@@ -181,9 +171,10 @@
                                     @endif
                                 </td>
                                 <td class="px-5 py-4 text-right">
-                                    <div class="flex items-center justify-end gap-2">
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <x-whatsapp-contact-dropdown :calonSiswa="$siswa" />
                                         <a href="{{ route('kepala-sekolah.sidang-kelulusan.show', $siswa) }}"
-                                           class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition-colors">
+                                           class="px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition-colors">
                                             {{ $isDecided ? 'Tinjau Keputusan' : 'Evaluasi Sidang' }}
                                         </a>
                                         @if ($isDecided)
@@ -214,59 +205,5 @@
             @endif
         </div>
 
-        <!-- Modal Sidang Pleno Massal -->
-        <div x-show="batchModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto" style="background-color: rgba(15, 23, 42, 0.6);">
-            <div class="min-h-screen px-4 flex items-center justify-center">
-                <div @click.away="batchModal = false" class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-xl space-y-6">
-                    <div>
-                        <h3 class="text-lg font-black text-slate-800">Sidang Pleno Kelulusan Massal</h3>
-                        <p class="text-xs text-slate-500 mt-1">
-                            Anda akan menetapkan hasil seleksi secara serempak untuk <strong class="text-slate-800" x-text="selectedIds.length"></strong> calon siswa terpilih.
-                        </p>
-                    </div>
-
-                    <form method="POST" action="{{ route('kepala-sekolah.sidang-kelulusan.batch') }}" class="space-y-4">
-                        @csrf
-                        <template x-for="id in selectedIds" :key="id">
-                            <input type="hidden" name="calon_siswa_ids[]" :value="id">
-                        </template>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1.5">Keputusan Seleksi Pleno <span class="text-rose-500">*</span></label>
-                            <div class="grid grid-cols-2 gap-3">
-                                <label class="p-3.5 rounded-2xl border-2 cursor-pointer flex items-center gap-3 transition-colors"
-                                       :class="batchDecision === 'DITERIMA' ? 'border-emerald-500 bg-emerald-50/50' : 'border-slate-200'">
-                                    <input type="radio" name="keputusan" value="DITERIMA" x-model="batchDecision" class="text-emerald-600 focus:ring-emerald-500">
-                                    <span class="text-xs font-black text-emerald-800">LULUS / DITERIMA</span>
-                                </label>
-                                <label class="p-3.5 rounded-2xl border-2 cursor-pointer flex items-center gap-3 transition-colors"
-                                       :class="batchDecision === 'DITOLAK' ? 'border-rose-500 bg-rose-50/50' : 'border-slate-200'">
-                                    <input type="radio" name="keputusan" value="DITOLAK" x-model="batchDecision" class="text-rose-600 focus:ring-rose-500">
-                                    <span class="text-xs font-black text-rose-800">TIDAK DITERIMA</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1.5">Catatan Hasil Rapat Sidang Pleno</label>
-                            <textarea name="catatan_sidang" rows="3"
-                                      placeholder="Contoh: Dinyatakan lulus berdasarkan rapat pleno komite seleksi SPMB gelombang 1..."
-                                      class="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30 focus:border-nampi-orange"></textarea>
-                        </div>
-
-                        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
-                            <button type="button" @click="batchModal = false"
-                                    class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50">
-                                Batal
-                            </button>
-                            <button type="submit" onclick="return confirm('Apakah Anda yakin akan menetapkan keputusan sidang pleno massal ini? Status seluruh siswa terpilih akan diperbarui.')"
-                                    class="px-5 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-black hover:bg-slate-800 transition-colors shadow-xs cursor-pointer">
-                                Tetapkan Keputusan Massal
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
     </div>
 </x-layouts.app>

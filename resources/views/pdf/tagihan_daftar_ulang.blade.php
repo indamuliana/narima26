@@ -1,7 +1,11 @@
 @extends('pdf.layout', ['title' => 'Tagihan Daftar Ulang - ' . $tagihan->nomor_tagihan])
 
 @section('content')
-    <div class="doc-title">RINCIAN TAGIHAN BIAYA DAFTAR ULANG</div>
+    <div class="doc-title">
+        {{ $tagihan->jenis_tagihan === 'SERAGAM' 
+            ? 'RINCIAN TAGIHAN PAKET SERAGAM & ATRIBUT' 
+            : ($tagihan->details->where('kategori_snapshot', 'ASRAMA')->isNotEmpty() ? 'RINCIAN TAGIHAN BIAYA PENDIDIKAN & ASRAMA' : 'RINCIAN TAGIHAN BIAYA PENDIDIKAN (DSP & SPP)') }}
+    </div>
     <div class="doc-number">Nomor Tagihan: <strong>{{ $tagihan->nomor_tagihan }}</strong></div>
 
     <table class="info-table">
@@ -93,7 +97,7 @@
     <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; padding: 10px 12px; margin-top: 10px; font-size: 9pt;">
         <strong>Informasi Rekening Resmi Pembayaran:</strong>
         <p style="margin: 4px 0 0 0;">
-            Bank BJB: <strong>0123-4567-8900-1</strong> a.n. <strong>SMK WIKRAMA 1 GARUT</strong><br>
+            Bank BNI: <strong>082-0083-086</strong> a.n. <strong>SMK WIKRAMA 1 GARUT</strong><br>
             <em>Cantumkan berita transfer: "{{ $calonSiswa->nomor_pendaftaran }} - Daftar Ulang". Setelah transfer, unggah bukti bayar melalui portal SPMB Nampi.</em>
         </p>
     </div>
@@ -110,7 +114,7 @@
                     Garut, {{ now()->translatedFormat('d F Y') }}<br>
                     Bendahara Penerimaan SPMB,
                     <div class="signature-space"></div>
-                    <strong>( Bendahara SMK Wikrama 1 Garut )</strong>
+                    <strong>( Fitria Amalia, S.Pd. )</strong>
                 </td>
             </tr>
         </table>

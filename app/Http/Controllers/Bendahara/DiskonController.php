@@ -96,10 +96,12 @@ class DiskonController extends Controller
             ->orderBy('nama_lengkap')
             ->get();
 
+        $masterDiskonList = \App\Models\MasterDiskon::where('is_active', true)->get();
+
         return view('bendahara.diskon.index', compact(
             'diskonList', 'stats', 'search',
             'jenisDiskon', 'jurusanId', 'tanggalDari', 'tanggalSampai',
-            'jurusanList', 'jenisDiskonList', 'siswaWithTagihan'
+            'jurusanList', 'jenisDiskonList', 'siswaWithTagihan', 'masterDiskonList'
         ));
     }
 
@@ -184,7 +186,7 @@ class DiskonController extends Controller
 
         if ($tagihan) {
             if ($tagihan->status === Tagihan::STATUS_LUNAS) {
-                return redirect()->route('bendahara.diskon.index')
+                return redirect()->back()
                     ->with('error', "Diskon tidak dapat dicabut karena tagihan #{$tagihan->nomor_tagihan} sudah LUNAS.");
             }
 
@@ -193,8 +195,9 @@ class DiskonController extends Controller
                 'diskon_id'    => null,
                 'total_diskon' => 0,
                 'total_netto'  => $tagihan->total_bruto,
-                'status'       => Tagihan::STATUS_BELUM_LUNAS,
             ]);
+
+            app(\App\Services\InvoiceService::class)->syncPaymentStatus($tagihan);
         }
 
         $namaDiskon   = $diskon->jenis_diskon;
@@ -202,7 +205,7 @@ class DiskonController extends Controller
 
         $diskon->delete();
 
-        return redirect()->route('bendahara.diskon.index')
+        return redirect()->back()
             ->with('success', "Diskon {$namaDiskon} untuk {$namaSiswa} berhasil dicabut.");
     }
 

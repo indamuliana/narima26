@@ -15,7 +15,10 @@ class KesepahamanEula extends Model
     protected $fillable = [
         'calon_siswa_id',
         'versi_dokumen',
+        'program_snapshot',
         'isi_dokumen_atau_referensi_dokumen',
+        'poin_disetujui',
+        'klausul_snapshot',
         'setuju',
         'agreed_at',
         'agreed_by',
@@ -28,6 +31,8 @@ class KesepahamanEula extends Model
         return [
             'setuju' => 'boolean',
             'agreed_at' => 'datetime',
+            'poin_disetujui' => 'array',
+            'klausul_snapshot' => 'array',
         ];
     }
 

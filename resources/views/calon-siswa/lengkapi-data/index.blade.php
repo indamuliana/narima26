@@ -2,45 +2,7 @@
     <x-slot name="title">Lengkapi Data & Dokumen Persyaratan</x-slot>
 
     <x-slot name="sidebar">
-        <a href="{{ route('calon-siswa.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-            </svg>
-            <span>Dashboard</span>
-        </a>
-        <a href="{{ route('calon-siswa.pembayaran-seleksi.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-            </svg>
-            <span>Pembayaran Seleksi</span>
-        </a>
-        <a href="{{ route('calon-siswa.lengkapi-data.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold bg-nampi-orange text-white shadow-xs">
-            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-            </svg>
-            <span>Lengkapi Data & Berkas</span>
-        </a>
-        <a href="{{ route('calon-siswa.kesepahaman.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-            </svg>
-            <span>Kesepahaman SPMB</span>
-        </a>
-        <a href="{{ route('calon-siswa.dokumen.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-            </svg>
-            <span>Dokumen & Cetak PDF</span>
-        </a>
-        <form method="POST" action="{{ route('logout') }}" class="pt-4 mt-4 border-t border-slate-800">
-            @csrf
-            <button type="submit" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors cursor-pointer">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                </svg>
-                <span>Keluar (Logout)</span>
-            </button>
-        </form>
+        @include('calon-siswa.partials.sidebar')
     </x-slot>
 
     <div class="space-y-6">
@@ -146,7 +108,7 @@
 
             <!-- Tombol Finalisasi Jika Sudah Lengkap -->
             @if($completion['is_all_complete'])
-                <div class="p-5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+                <div id="card-finalisasi" class="p-5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm scroll-mt-6">
                     <div class="space-y-1">
                         <div class="flex items-center font-black text-base gap-2">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -393,11 +355,16 @@
                         </div>
                     </div>
 
-                    <div class="pt-4 flex justify-end">
-                        <button type="submit"
-                            class="inline-flex items-center px-6 py-2.5 rounded-xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-sm transition text-xs cursor-pointer">
-                            <span>Simpan Biodata</span>
-                            <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <div class="pt-4 flex flex-col sm:flex-row items-center justify-end gap-3">
+                        <button type="submit" name="action" value="save"
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 shadow-xs transition text-xs cursor-pointer">
+                            <svg class="w-4 h-4 mr-1.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                            <span>Simpan Progress</span>
+                        </button>
+                        <button type="submit" name="action" value="next"
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-sm transition text-xs cursor-pointer">
+                            <span>Lanjutkan ke Tahap Berikutnya</span>
+                            <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </button>
                     </div>
                 </form>
@@ -427,8 +394,17 @@
                             <h4 class="text-sm font-bold text-slate-900">Data Ayah Kandung</h4>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                            <div class="sm:col-span-2">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4" x-data="{ statusAyah: '{{ old('status_ayah', $ortu?->status_ayah ?? 'MASIH_HIDUP') }}' }">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase">Status Ayah <span class="text-red-500">*</span></label>
+                                <select name="status_ayah" x-model="statusAyah" required
+                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none bg-white font-medium">
+                                    <option value="MASIH_HIDUP">Masih Hidup</option>
+                                    <option value="WAFAT">Wafat</option>
+                                </select>
+                            </div>
+
+                            <div class="sm:col-span-2 md:col-span-3">
                                 <label class="block text-xs font-bold text-slate-700 uppercase">Nama Ayah Kandung <span class="text-red-500">*</span></label>
                                 <input type="text" name="nama_ayah" value="{{ old('nama_ayah', $ortu?->nama_ayah) }}" required
                                     class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
@@ -502,8 +478,17 @@
                             <h4 class="text-sm font-bold text-slate-900">Data Ibu Kandung</h4>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                            <div class="sm:col-span-2">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4" x-data="{ statusIbu: '{{ old('status_ibu', $ortu?->status_ibu ?? 'MASIH_HIDUP') }}' }">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase">Status Ibu <span class="text-red-500">*</span></label>
+                                <select name="status_ibu" x-model="statusIbu" required
+                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none bg-white font-medium">
+                                    <option value="MASIH_HIDUP">Masih Hidup</option>
+                                    <option value="WAFAT">Wafat</option>
+                                </select>
+                            </div>
+
+                            <div class="sm:col-span-2 md:col-span-3">
                                 <label class="block text-xs font-bold text-slate-700 uppercase">Nama Ibu Kandung <span class="text-red-500">*</span></label>
                                 <input type="text" name="nama_ibu" value="{{ old('nama_ibu', $ortu?->nama_ibu) }}" required
                                     class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
@@ -617,11 +602,16 @@
                         </div>
                     </div>
 
-                    <div class="pt-4 flex justify-end">
-                        <button type="submit"
-                            class="inline-flex items-center px-6 py-2.5 rounded-xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-sm transition text-xs cursor-pointer">
-                            <span>Simpan Data Orang Tua</span>
-                            <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <div class="pt-4 flex flex-col sm:flex-row items-center justify-end gap-3">
+                        <button type="submit" name="action" value="save"
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 shadow-xs transition text-xs cursor-pointer">
+                            <svg class="w-4 h-4 mr-1.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                            <span>Simpan Progress</span>
+                        </button>
+                        <button type="submit" name="action" value="next"
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-sm transition text-xs cursor-pointer">
+                            <span>Lanjutkan ke Tahap Berikutnya</span>
+                            <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </button>
                     </div>
                 </form>
@@ -634,19 +624,20 @@
         @php
             $akademik = $calonSiswa->dataAkademik;
             $prestasiList = $calonSiswa->prestasi;
+            $nilaiRapor = $calonSiswa->nilaiRapor;
         @endphp
         <div id="tabContent-akademik" class="tab-pane {{ $currentTab === 'akademik' ? '' : 'hidden' }}">
             <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
                 <div>
                     <h3 class="text-lg font-black text-slate-900">Formulir Data Akademik & Prestasi</h3>
-                    <p class="text-xs text-slate-500">Masukkan nilai rata-rata rapor semester terakhir (skala 0 - 100) dan prestasi perlombaan jika ada.</p>
+                    <p class="text-xs text-slate-500">Masukkan nilai rapor semester 1 sampai 5 serta prestasi perlombaan jika ada.</p>
                 </div>
 
                 <form action="{{ route('calon-siswa.lengkapi-data.akademik') }}" method="POST" class="space-y-6">
                     @csrf
 
-                    <!-- Asal Sekolah & Nilai -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <!-- Asal Sekolah -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="sm:col-span-2">
                             <label class="block text-xs font-bold text-slate-700 uppercase">Nama Asal SMP / MTs</label>
                             <input type="text" name="nama_sekolah" value="{{ old('nama_sekolah', $akademik?->nama_sekolah ?? $calonSiswa->asalSekolah?->nama_sekolah ?? $calonSiswa->asal_sekolah_lainnya) }}"
@@ -658,39 +649,145 @@
                             <input type="text" name="npsn" value="{{ old('npsn', $akademik?->npsn ?? $calonSiswa->asalSekolah?->npsn) }}" placeholder="8 digit NPSN"
                                 class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-mono focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
                         </div>
+                    </div>
+
+                    <!-- MATRIX NILAI RAPOR (SEMESTER 1 - 5) -->
+                    <div class="space-y-3 pt-2">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-900">Matrix Nilai Rapor Semester 1 - 5</h4>
+                                <p class="text-xs text-slate-500">Isikan nilai rapor skala 0 - 100 untuk tiap mata pelajaran dari Semester 1 sampai Semester 5.</p>
+                            </div>
+                            <div class="inline-flex items-center gap-2 bg-orange-50 border border-orange-200 px-3 py-1.5 rounded-xl self-start sm:self-auto">
+                                <span class="text-xs font-bold text-orange-800">Rata-rata Rapor:</span>
+                                <span id="display_overall_avg" class="text-xs font-black text-orange-600 font-mono">{{ old('nilai_rata_rata', $akademik?->nilai_rata_rata ?? '-') }}</span>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto rounded-2xl border border-slate-200 shadow-2xs">
+                            <table class="w-full text-left text-xs border-collapse bg-white">
+                                <thead class="bg-slate-50 text-slate-700 font-bold uppercase border-b border-slate-200">
+                                    <tr>
+                                        <th scope="col" class="py-3 px-4 w-44">Mata Pelajaran</th>
+                                        <th scope="col" class="py-3 px-2 text-center w-24">Semester 1</th>
+                                        <th scope="col" class="py-3 px-2 text-center w-24">Semester 2</th>
+                                        <th scope="col" class="py-3 px-2 text-center w-24">Semester 3</th>
+                                        <th scope="col" class="py-3 px-2 text-center w-24">Semester 4</th>
+                                        <th scope="col" class="py-3 px-2 text-center w-24">Semester 5</th>
+                                        <th scope="col" class="py-3 px-3 text-center w-28 bg-orange-50/50 text-orange-800">Rata-rata</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    <!-- 1. Matematika -->
+                                    <tr class="hover:bg-slate-50/60 transition-colors">
+                                        <td class="py-3 px-4 font-bold text-slate-800 whitespace-nowrap">
+                                            <div class="flex items-center gap-2">
+                                                <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                                                <span>Matematika</span>
+                                            </div>
+                                        </td>
+                                        @for($sem = 1; $sem <= 5; $sem++)
+                                            <td class="py-2 px-1.5">
+                                                <input type="number" step="0.01" min="0" max="100" name="mtk_sem{{ $sem }}" id="mtk_sem{{ $sem }}"
+                                                    value="{{ old('mtk_sem'.$sem, $nilaiRapor?->{'mtk_sem'.$sem}) }}" placeholder="0 - 100"
+                                                    oninput="calculateMatrixRow('mtk')"
+                                                    class="w-full text-center rounded-lg border border-slate-300 px-1 py-1.5 text-xs font-mono font-bold focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                                            </td>
+                                        @endfor
+                                        <td class="py-2 px-3 text-center font-mono font-bold text-slate-700 bg-orange-50/30" id="avg_mtk">
+                                            {{ old('nilai_matematika', $akademik?->nilai_matematika ?? '-') }}
+                                        </td>
+                                    </tr>
+
+                                    <!-- 2. Indonesia -->
+                                    <tr class="hover:bg-slate-50/60 transition-colors">
+                                        <td class="py-3 px-4 font-bold text-slate-800 whitespace-nowrap">
+                                            <div class="flex items-center gap-2">
+                                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                                <span>Indonesia</span>
+                                            </div>
+                                        </td>
+                                        @for($sem = 1; $sem <= 5; $sem++)
+                                            <td class="py-2 px-1.5">
+                                                <input type="number" step="0.01" min="0" max="100" name="ind_sem{{ $sem }}" id="ind_sem{{ $sem }}"
+                                                    value="{{ old('ind_sem'.$sem, $nilaiRapor?->{'ind_sem'.$sem}) }}" placeholder="0 - 100"
+                                                    oninput="calculateMatrixRow('ind')"
+                                                    class="w-full text-center rounded-lg border border-slate-300 px-1 py-1.5 text-xs font-mono font-bold focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                                            </td>
+                                        @endfor
+                                        <td class="py-2 px-3 text-center font-mono font-bold text-slate-700 bg-orange-50/30" id="avg_ind">
+                                            {{ old('nilai_bahasa_indonesia', $akademik?->nilai_bahasa_indonesia ?? '-') }}
+                                        </td>
+                                    </tr>
+
+                                    <!-- 3. Bahasa Inggris -->
+                                    <tr class="hover:bg-slate-50/60 transition-colors">
+                                        <td class="py-3 px-4 font-bold text-slate-800 whitespace-nowrap">
+                                            <div class="flex items-center gap-2">
+                                                <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                                                <span>Bahasa Inggris</span>
+                                            </div>
+                                        </td>
+                                        @for($sem = 1; $sem <= 5; $sem++)
+                                            <td class="py-2 px-1.5">
+                                                <input type="number" step="0.01" min="0" max="100" name="eng_sem{{ $sem }}" id="eng_sem{{ $sem }}"
+                                                    value="{{ old('eng_sem'.$sem, $nilaiRapor?->{'eng_sem'.$sem}) }}" placeholder="0 - 100"
+                                                    oninput="calculateMatrixRow('eng')"
+                                                    class="w-full text-center rounded-lg border border-slate-300 px-1 py-1.5 text-xs font-mono font-bold focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                                            </td>
+                                        @endfor
+                                        <td class="py-2 px-3 text-center font-mono font-bold text-slate-700 bg-orange-50/30" id="avg_eng">
+                                            {{ old('nilai_bahasa_inggris', $akademik?->nilai_bahasa_inggris ?? '-') }}
+                                        </td>
+                                    </tr>
+
+                                    <!-- 4. Pendidikan Agama -->
+                                    <tr class="hover:bg-slate-50/60 transition-colors">
+                                        <td class="py-3 px-4 font-bold text-slate-800 whitespace-nowrap">
+                                            <div class="flex items-center gap-2">
+                                                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                                                <span>Pendidikan Agama</span>
+                                            </div>
+                                        </td>
+                                        @for($sem = 1; $sem <= 5; $sem++)
+                                            <td class="py-2 px-1.5">
+                                                <input type="number" step="0.01" min="0" max="100" name="pai_sem{{ $sem }}" id="pai_sem{{ $sem }}"
+                                                    value="{{ old('pai_sem'.$sem, $nilaiRapor?->{'pai_sem'.$sem}) }}" placeholder="0 - 100"
+                                                    oninput="calculateMatrixRow('pai')"
+                                                    class="w-full text-center rounded-lg border border-slate-300 px-1 py-1.5 text-xs font-mono font-bold focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                                            </td>
+                                        @endfor
+                                        <td class="py-2 px-3 text-center font-mono font-bold text-slate-700 bg-orange-50/30" id="avg_pai">
+                                            -
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- NILAI SUMMARY & TAMBAHAN -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pt-2">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase">Nilai Rata-Rata Rapor Akhir <span class="text-red-500">*</span></label>
+                            <input type="number" step="0.01" name="nilai_rata_rata" id="input_nilai_rata_rata" value="{{ old('nilai_rata_rata', $akademik?->nilai_rata_rata) }}" min="0" max="100" placeholder="0 - 100" required
+                                class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-mono font-bold focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none bg-slate-50">
+                            <p class="text-[11px] text-slate-400 mt-1">Terhitung otomatis saat matrix nilai diisi.</p>
+                        </div>
+
+                        <!-- Hidden synced values for data_akademik backward compatibility -->
+                        <input type="hidden" name="nilai_matematika" id="input_nilai_matematika" value="{{ old('nilai_matematika', $akademik?->nilai_matematika) }}">
+                        <input type="hidden" name="nilai_bahasa_indonesia" id="input_nilai_bahasa_indonesia" value="{{ old('nilai_bahasa_indonesia', $akademik?->nilai_bahasa_indonesia) }}">
+                        <input type="hidden" name="nilai_bahasa_inggris" id="input_nilai_bahasa_inggris" value="{{ old('nilai_bahasa_inggris', $akademik?->nilai_bahasa_inggris) }}">
 
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase">Nilai Rata-Rata Rapor <span class="text-red-500">*</span></label>
-                            <input type="number" step="0.01" name="nilai_rata_rata" value="{{ old('nilai_rata_rata', $akademik?->nilai_rata_rata) }}" min="0" max="100" placeholder="Contoh: 85.50" required
+                            <label class="block text-xs font-bold text-slate-700 uppercase">Nilai IPA (Opsional)</label>
+                            <input type="number" step="0.01" name="nilai_ipa" id="input_nilai_ipa" value="{{ old('nilai_ipa', $akademik?->nilai_ipa) }}" min="0" max="100" placeholder="0 - 100"
                                 class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-mono focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase">Nilai Bahasa Indonesia <span class="text-red-500">*</span></label>
-                            <input type="number" step="0.01" name="nilai_bahasa_indonesia" value="{{ old('nilai_bahasa_indonesia', $akademik?->nilai_bahasa_indonesia) }}" min="0" max="100" placeholder="0 - 100" required
-                                class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-mono focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase">Nilai Matematika <span class="text-red-500">*</span></label>
-                            <input type="number" step="0.01" name="nilai_matematika" value="{{ old('nilai_matematika', $akademik?->nilai_matematika) }}" min="0" max="100" placeholder="0 - 100" required
-                                class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-mono focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase">Nilai Bahasa Inggris <span class="text-red-500">*</span></label>
-                            <input type="number" step="0.01" name="nilai_bahasa_inggris" value="{{ old('nilai_bahasa_inggris', $akademik?->nilai_bahasa_inggris) }}" min="0" max="100" placeholder="0 - 100" required
-                                class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-mono focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase">Nilai IPA <span class="text-red-500">*</span></label>
-                            <input type="number" step="0.01" name="nilai_ipa" value="{{ old('nilai_ipa', $akademik?->nilai_ipa) }}" min="0" max="100" placeholder="0 - 100" required
-                                class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-mono focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase">Nilai Mata Pelajaran Lainnya</label>
+                            <label class="block text-xs font-bold text-slate-700 uppercase">Nilai Lainnya (Opsional)</label>
                             <input type="number" step="0.01" name="nilai_lainnya" value="{{ old('nilai_lainnya', $akademik?->nilai_lainnya) }}" min="0" max="100" placeholder="Opsional"
                                 class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-mono focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
                         </div>
@@ -755,11 +852,16 @@
                         </div>
                     </div>
 
-                    <div class="pt-4 flex justify-end">
-                        <button type="submit"
-                            class="inline-flex items-center px-6 py-2.5 rounded-xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-sm transition text-xs cursor-pointer">
-                            <span>Simpan Nilai & Prestasi</span>
-                            <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <div class="pt-4 flex flex-col sm:flex-row items-center justify-end gap-3">
+                        <button type="submit" name="action" value="save"
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 shadow-xs transition text-xs cursor-pointer">
+                            <svg class="w-4 h-4 mr-1.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                            <span>Simpan Progress</span>
+                        </button>
+                        <button type="submit" name="action" value="next"
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-sm transition text-xs cursor-pointer">
+                            <span>Lanjutkan ke Tahap Berikutnya</span>
+                            <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </button>
                     </div>
                 </form>
@@ -767,84 +869,326 @@
         </div>
 
         <!-- ========================================== -->
-        <!-- TAB 4: UKURAN SERAGAM                      -->
+        <!-- TAB 4: UKURAN & PEMILIHAN SERAGAM          -->
         <!-- ========================================== -->
         <div id="tabContent-seragam" class="tab-pane {{ $currentTab === 'seragam' ? '' : 'hidden' }}">
             <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
-                <div>
-                    <h3 class="text-lg font-black text-slate-900">Formulir Pilihan Ukuran Seragam</h3>
-                    <p class="text-xs text-slate-500">Pilih ukuran seragam sekolah yang pas untuk Anda. Seragam akan didistribusikan saat kegiatan MPLS.</p>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h3 class="text-lg font-black text-slate-900">Formulir Pemilihan & Ukuran Seragam</h3>
+                        <p class="text-xs text-slate-500">Pilih ukuran dan waktu pemesanan untuk setiap seragam sekolah. Anda dapat mencicil dengan memesan sebagian seragam sekarang (misal: klaster MPLS) dan memesan sisa seragam nanti.</p>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-teal-50 text-teal-800 border border-teal-200 shrink-0 self-start sm:self-auto">
+                        👕 Pengadaan Fleksibel
+                    </span>
                 </div>
 
                 <!-- Panduan Ukuran Singkat -->
                 <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-3">
                     <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <div>
+                    <div class="space-y-1">
                         <span class="font-bold">Panduan Ukuran (Standar SMK Wikrama):</span>
-                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 mt-1.5 font-mono text-[11px] text-amber-800">
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 font-mono text-[11px] text-amber-800">
                             <div><strong>S:</strong> LD 92cm &bull; PB 68cm</div>
                             <div><strong>M:</strong> LD 98cm &bull; PB 70cm</div>
                             <div><strong>L:</strong> LD 104cm &bull; PB 72cm</div>
                             <div><strong>XL:</strong> LD 110cm &bull; PB 74cm</div>
                             <div><strong>XXL:</strong> LD 116cm &bull; PB 76cm</div>
                         </div>
+                        <p class="text-[11px] text-amber-700 italic pt-1">
+                            * Seluruh ukuran seragam tetap wajib dipilih untuk keperluan arsip konveksi sekolah, meskipun Anda memilih "Pesan Nanti".
+                        </p>
                     </div>
                 </div>
 
-                <form action="{{ route('calon-siswa.lengkapi-data.seragam') }}" method="POST" class="space-y-6">
+                @php
+                    $getItemPrice = function($nama) use ($biayaSeragamList) {
+                        $found = $biayaSeragamList->first(function($b) use ($nama) {
+                            return stripos($b->nama_biaya, $nama) !== false || stripos($nama, $b->nama_biaya) !== false;
+                        });
+                        return $found ? (float)$found->nominal : 0;
+                    };
+
+                    $klasterConfig = [
+                        'MPLS' => [
+                            'nama' => 'Klaster 1: Perlengkapan Masuk Sekolah & MPLS',
+                            'badge' => 'Prioritas 1: Digunakan Saat MPLS',
+                            'badge_color' => 'bg-orange-100 text-orange-800 border-orange-200',
+                            'desc' => 'Perlengkapan esensial yang digunakan saat hari pertama masuk sekolah dan rangkaian kegiatan MPLS.',
+                            'border' => 'border-orange-200 bg-orange-50/20',
+                        ],
+                        'KBM' => [
+                            'nama' => 'Klaster 2: Seragam Harian KBM Reguler',
+                            'badge' => 'Prioritas 2: Boleh Dicicil / Pesan Nanti',
+                            'badge_color' => 'bg-blue-100 text-blue-800 border-blue-200',
+                            'desc' => 'Seragam pembelajaran reguler di kelas. Dapat dipesan sekarang atau dicicil / dipesan nanti sebelum KBM efektif dimulai.',
+                            'border' => 'border-blue-200 bg-blue-50/20',
+                        ],
+                        'OPSIONAL' => [
+                            'nama' => 'Klaster 3: Perlengkapan Tambahan (Opsional)',
+                            'badge' => 'Opsional: Boleh Beli Mandiri di Luar',
+                            'badge_color' => 'bg-amber-100 text-amber-800 border-amber-200',
+                            'desc' => 'Perlengkapan pelengkap standar sekolah. Calon siswa diperbolehkan membeli sendiri di luar.',
+                            'border' => 'border-slate-200 bg-slate-50/50',
+                        ],
+                    ];
+
+                    // Urutkan klaster: MPLS, KBM, OPSIONAL
+                    $orderedKlasters = ['MPLS', 'KBM', 'OPSIONAL'];
+                    $groupedItems = [];
+                    foreach ($orderedKlasters as $kKey) {
+                        $groupedItems[$kKey] = [];
+                    }
+
+                    foreach ($seragamTypes as $namaJenis => $items) {
+                        $first = $items->first();
+                        $kKey = $first->klaster ?? ($first->wajib ? 'KBM' : 'OPSIONAL');
+                        if (!isset($groupedItems[$kKey])) {
+                            $groupedItems[$kKey] = [];
+                        }
+                        $groupedItems[$kKey][$namaJenis] = $items;
+                    }
+                @endphp
+
+                <form action="{{ route('calon-siswa.lengkapi-data.seragam') }}" method="POST" class="space-y-8"
+                      x-data="{
+                          items: {},
+                          register(idx, status, price) {
+                              this.items[idx] = { status: status, price: price };
+                          },
+                          setStatus(idx, status) {
+                              if (this.items[idx]) {
+                                  this.items[idx].status = status;
+                              }
+                          },
+                          setGroup(indices, status) {
+                              indices.forEach(idx => {
+                                  if (this.items[idx]) {
+                                      this.items[idx].status = status;
+                                  }
+                              });
+                          },
+                          totalSekarang() {
+                              return Object.values(this.items)
+                                  .filter(i => i.status === 'PESAN_SEKARANG')
+                                  .reduce((acc, curr) => acc + curr.price, 0);
+                          },
+                          countSekarang() {
+                              return Object.values(this.items)
+                                  .filter(i => i.status === 'PESAN_SEKARANG').length;
+                          },
+                          totalNanti() {
+                              return Object.values(this.items)
+                                  .filter(i => i.status === 'PESAN_NANTI')
+                                  .reduce((acc, curr) => acc + curr.price, 0);
+                          },
+                          countNanti() {
+                              return Object.values(this.items)
+                                  .filter(i => i.status === 'PESAN_NANTI').length;
+                          },
+                          formatRupiah(val) {
+                              return 'Rp ' + Number(val).toLocaleString('id-ID');
+                          }
+                      }">
                     @csrf
 
-                    <div class="space-y-4">
-                        @php
-                            $loopIndex = 0;
-                        @endphp
-                        @foreach($seragamTypes as $namaJenis => $items)
+                    @php
+                        $loopIndex = 0;
+                    @endphp
+
+                    @foreach($orderedKlasters as $kKey)
+                        @if(!empty($groupedItems[$kKey]))
                             @php
-                                $firstItem = $items->first();
-                                // Cek apakah calon siswa sudah punya pilihan untuk salah satu jenis_seragam_id di grup ini
-                                $selectedSize = null;
-                                $selectedItemId = $firstItem->id;
-                                foreach($items as $it) {
-                                    if(isset($chosenSeragam[$it->id])) {
-                                        $selectedSize = $chosenSeragam[$it->id]->ukuran;
-                                        $selectedItemId = $it->id;
-                                        break;
-                                    }
-                                }
+                                $cfg = $klasterConfig[$kKey] ?? [
+                                    'nama' => 'Klaster Seragam',
+                                    'badge' => 'Seragam Sekolah',
+                                    'badge_color' => 'bg-slate-100 text-slate-700 border-slate-200',
+                                    'desc' => '',
+                                    'border' => 'border-slate-200 bg-slate-50',
+                                ];
+                                $groupIndices = [];
                             @endphp
-                            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                <div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-2 h-2 rounded-full bg-orange-500"></span>
-                                        <h4 class="text-sm font-bold text-slate-900">{{ $namaJenis }}</h4>
+
+                            <div class="rounded-3xl border {{ $cfg['border'] }} p-5 sm:p-6 space-y-4">
+                                <!-- Klaster Header -->
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/80">
+                                    <div>
+                                        <div class="flex items-center gap-2 flex-wrap">
+                                            <h4 class="text-sm font-black text-slate-900">{{ $cfg['nama'] }}</h4>
+                                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border {{ $cfg['badge_color'] }}">
+                                                {{ $cfg['badge'] }}
+                                            </span>
+                                        </div>
+                                        <p class="text-xs text-slate-500 mt-0.5">{{ $cfg['desc'] }}</p>
                                     </div>
-                                    <p class="text-xs text-slate-500 mt-0.5">Pilih salah satu ukuran yang sesuai untuk paket seragam ini.</p>
-                                    <input type="hidden" name="seragam[{{ $loopIndex }}][jenis_seragam_id]" value="{{ $selectedItemId }}">
                                 </div>
 
-                                <div class="flex items-center gap-3">
-                                    <label class="text-xs font-bold text-slate-600">Ukuran:</label>
-                                    <div class="flex items-center gap-2">
-                                        @foreach(['S', 'M', 'L', 'XL', 'XXL'] as $size)
-                                            <label class="cursor-pointer">
-                                                <input type="radio" name="seragam[{{ $loopIndex }}][ukuran]" value="{{ $size }}" {{ ($selectedSize ?? 'M') === $size ? 'checked' : '' }} required class="peer sr-only">
-                                                <div class="px-3.5 py-1.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 peer-checked:bg-orange-500 peer-checked:text-white peer-checked:border-orange-500 peer-checked:shadow-xs transition">
-                                                    {{ $size }}
+                                <!-- Klaster Items -->
+                                <div class="space-y-4">
+                                    @foreach($groupedItems[$kKey] as $namaJenis => $items)
+                                        @php
+                                            $firstItem = $items->first();
+                                            $availableSizes = $items->pluck('ukuran')->unique();
+                                            $itemPrice = $getItemPrice($namaJenis);
+
+                                            // Ambil entri tersimpan jika ada
+                                            $existingEntry = null;
+                                            foreach($items as $it) {
+                                                if(isset($chosenSeragam[$it->id])) {
+                                                    $existingEntry = $chosenSeragam[$it->id];
+                                                    break;
+                                                }
+                                            }
+
+                                            if ($existingEntry) {
+                                                $selectedSize = $existingEntry->ukuran;
+                                                $selectedItemId = $existingEntry->jenis_seragam_id;
+                                                $initialStatus = $existingEntry->status_pemesanan ?? ($existingEntry->beli_di_sekolah ? 'PESAN_SEKARANG' : 'PESAN_NANTI');
+                                            } else {
+                                                $selectedSize = $availableSizes->first() ?? 'M';
+                                                $selectedItemId = $firstItem->id;
+                                                $initialStatus = ($kKey === 'OPSIONAL') ? 'PESAN_NANTI' : 'PESAN_SEKARANG';
+                                            }
+
+                                            $currentIndex = $loopIndex;
+                                            $groupIndices[] = $currentIndex;
+                                            $loopIndex++;
+                                        @endphp
+
+                                        <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-3.5 transition-all hover:border-slate-300"
+                                             x-data="{
+                                                 status: '{{ $initialStatus }}',
+                                                 idx: {{ $currentIndex }},
+                                                 price: {{ $itemPrice }}
+                                             }"
+                                             x-init="register(idx, status, price)">
+                                            
+                                            <!-- Top Line: Item Name & Price & Status Pills -->
+                                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                                <div>
+                                                    <div class="flex items-center gap-2">
+                                                        <h5 class="text-sm font-bold text-slate-900">{{ $namaJenis }}</h5>
+                                                        @if($itemPrice > 0)
+                                                            <span class="px-2 py-0.5 rounded-lg text-[11px] font-mono font-bold bg-slate-100 text-slate-700">
+                                                                Rp {{ number_format($itemPrice, 0, ',', '.') }}
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                    <p class="text-[11px] text-slate-400 mt-0.5">
+                                                        {{ $firstItem->keterangan ?? 'Standar seragam resmi SMK Wikrama 1 Garut' }}
+                                                    </p>
                                                 </div>
-                                            </label>
-                                        @endforeach
-                                    </div>
+
+                                                <!-- Status Pemesanan Pills -->
+                                                <div class="flex items-center gap-2 shrink-0">
+                                                    <label class="cursor-pointer">
+                                                        <input type="radio" 
+                                                               name="seragam[{{ $currentIndex }}][status_pemesanan]" 
+                                                               value="PESAN_SEKARANG" 
+                                                               x-model="status" 
+                                                               @change="setStatus({{ $currentIndex }}, 'PESAN_SEKARANG')"
+                                                               class="sr-only">
+                                                        <div :class="status === 'PESAN_SEKARANG' ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
+                                                             class="px-3.5 py-1.5 rounded-xl border text-xs font-bold transition flex items-center gap-1.5">
+                                                            <span x-show="status === 'PESAN_SEKARANG'">✓</span>
+                                                            <span>Pesan Sekarang</span>
+                                                        </div>
+                                                    </label>
+
+                                                    <label class="cursor-pointer">
+                                                        <input type="radio" 
+                                                               name="seragam[{{ $currentIndex }}][status_pemesanan]" 
+                                                               value="PESAN_NANTI" 
+                                                               x-model="status" 
+                                                               @change="setStatus({{ $currentIndex }}, 'PESAN_NANTI')"
+                                                               class="sr-only">
+                                                        <div :class="status === 'PESAN_NANTI' ? 'bg-amber-500 text-white border-amber-500 shadow-xs' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
+                                                             class="px-3.5 py-1.5 rounded-xl border text-xs font-bold transition flex items-center gap-1.5">
+                                                            <span x-show="status === 'PESAN_NANTI'">⏳</span>
+                                                            <span>Pesan Nanti</span>
+                                                        </div>
+                                                    </label>
+
+                                                    <!-- Hidden compatibility field -->
+                                                    <input type="hidden" name="seragam[{{ $currentIndex }}][beli_di_sekolah]" :value="status === 'PESAN_SEKARANG' ? '1' : '0'">
+                                                    <input type="hidden" name="seragam[{{ $currentIndex }}][jenis_seragam_id]" value="{{ $selectedItemId }}">
+                                                </div>
+                                            </div>
+
+                                            <!-- Size Picker (Selalu Tampil agar ukuran terarsip) -->
+                                            <div class="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+                                                <div class="flex flex-wrap items-center gap-2">
+                                                    <span class="text-xs font-bold text-slate-600 mr-1">Pilih Ukuran:</span>
+                                                    @foreach($availableSizes as $size)
+                                                        <label class="cursor-pointer">
+                                                            <input type="radio" name="seragam[{{ $currentIndex }}][ukuran]" value="{{ $size }}" {{ ($selectedSize === $size) ? 'checked' : '' }} class="peer sr-only" required>
+                                                            <div class="px-3.5 py-1.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 peer-checked:bg-orange-500 peer-checked:text-white peer-checked:border-orange-500 peer-checked:shadow-xs transition">
+                                                                {{ $size }}
+                                                            </div>
+                                                        </label>
+                                                    @endforeach
+                                                </div>
+
+                                                <div class="text-[11px] font-medium" :class="status === 'PESAN_SEKARANG' ? 'text-emerald-700' : 'text-amber-700'">
+                                                    <span x-show="status === 'PESAN_SEKARANG'">
+                                                        &bull; Masuk ke Tagihan Seragam Tahap 1
+                                                    </span>
+                                                    <span x-show="status === 'PESAN_NANTI'">
+                                                        &bull; Ukuran dicatat, pembayaran ditunda (bisa diaktifkan nanti)
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
                                 </div>
                             </div>
-                            @php $loopIndex++; @endphp
-                        @endforeach
+                        @endif
+                    @endforeach
+
+                    <!-- Live Summary Estimasi Biaya Seragam -->
+                    <div class="p-5 sm:p-6 rounded-3xl bg-slate-900 text-white shadow-md space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">📊</span>
+                                <div>
+                                    <h4 class="text-sm font-black text-white">Ringkasan Estimasi Biaya Seragam</h4>
+                                    <p class="text-xs text-slate-400">Total di bawah ini menyesuaikan secara langsung dengan pilihan Anda di atas.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                            <div class="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-1">
+                                <span class="text-slate-400 block text-[11px] uppercase tracking-wider font-bold">1. Pesan Sekarang (Masuk Tagihan Daftar Ulang):</span>
+                                <div class="flex items-baseline gap-2">
+                                    <span class="text-xl sm:text-2xl font-black text-emerald-400" x-text="formatRupiah(totalSekarang())"></span>
+                                    <span class="text-xs text-slate-400" x-text="'(' + countSekarang() + ' item)'"></span>
+                                </div>
+                                <p class="text-[10px] text-slate-400 mt-1">Item ini akan diterbitkan dalam tagihan seragam awal Anda.</p>
+                            </div>
+
+                            <div class="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-1">
+                                <span class="text-slate-400 block text-[11px] uppercase tracking-wider font-bold">2. Pesan Nanti (Ditunda Pembayarannya):</span>
+                                <div class="flex items-baseline gap-2">
+                                    <span class="text-xl sm:text-2xl font-black text-amber-400" x-text="formatRupiah(totalNanti())"></span>
+                                    <span class="text-xs text-slate-400" x-text="'(' + countNanti() + ' item)'"></span>
+                                </div>
+                                <p class="text-[10px] text-slate-400 mt-1">Dapat Anda aktifkan dan pesan sewaktu-waktu melalui portal siswa sebelum KBM dimulai.</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="pt-4 flex justify-end">
-                        <button type="submit"
-                            class="inline-flex items-center px-6 py-2.5 rounded-xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-sm transition text-xs cursor-pointer">
-                            <span>Simpan Pilihan Ukuran Seragam</span>
-                            <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <!-- Action Buttons -->
+                    <div class="pt-4 flex flex-col sm:flex-row items-center justify-end gap-3">
+                        <button type="submit" name="action" value="save"
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 shadow-xs transition text-xs cursor-pointer">
+                            <svg class="w-4 h-4 mr-1.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                            <span>Simpan Pilihan Seragam</span>
+                        </button>
+                        <button type="submit" name="action" value="next"
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-sm transition text-xs cursor-pointer">
+                            <span>Lanjutkan ke Tahap Berikutnya</span>
+                            <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </button>
                     </div>
                 </form>
@@ -1026,10 +1370,15 @@
 
                     </div>
 
-                    <div class="pt-4 flex justify-end">
-                        <button type="submit"
-                            class="inline-flex items-center px-6 py-2.5 rounded-xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-sm transition text-xs cursor-pointer">
-                            <span>Unggah Berkas Persyaratan</span>
+                    <div class="pt-4 flex flex-col sm:flex-row items-center justify-end gap-3">
+                        <button type="submit" name="action" value="save"
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 shadow-xs transition text-xs cursor-pointer">
+                            <svg class="w-4 h-4 mr-1.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                            <span>Simpan Progress</span>
+                        </button>
+                        <button type="submit" name="action" value="next"
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-sm transition text-xs cursor-pointer">
+                            <span>Simpan & Unggah Berkas</span>
                             <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
                         </button>
                     </div>
@@ -1208,5 +1557,67 @@
             `;
             container.appendChild(row);
         }
+
+        // Matrix Nilai Rapor calculation
+        function calculateMatrixRow(prefix) {
+            let sum = 0;
+            let count = 0;
+            for (let sem = 1; sem <= 5; sem++) {
+                const el = document.getElementById(prefix + '_sem' + sem);
+                if (el && el.value !== '' && !isNaN(el.value)) {
+                    sum += parseFloat(el.value);
+                    count++;
+                }
+            }
+
+            const avgEl = document.getElementById('avg_' + prefix);
+            const avg = count > 0 ? (sum / count).toFixed(2) : '-';
+            if (avgEl) avgEl.textContent = avg;
+
+            // Sync hidden inputs for backward compatibility
+            if (prefix === 'mtk') {
+                const hiddenInput = document.getElementById('input_nilai_matematika');
+                if (hiddenInput && count > 0) hiddenInput.value = avg;
+            } else if (prefix === 'ind') {
+                const hiddenInput = document.getElementById('input_nilai_bahasa_indonesia');
+                if (hiddenInput && count > 0) hiddenInput.value = avg;
+            } else if (prefix === 'eng') {
+                const hiddenInput = document.getElementById('input_nilai_bahasa_inggris');
+                if (hiddenInput && count > 0) hiddenInput.value = avg;
+            }
+
+            calculateOverallAverage();
+        }
+
+        function calculateOverallAverage() {
+            const prefixes = ['mtk', 'ind', 'eng', 'pai'];
+            let totalSum = 0;
+            let totalCount = 0;
+
+            prefixes.forEach(p => {
+                for (let sem = 1; sem <= 5; sem++) {
+                    const el = document.getElementById(p + '_sem' + sem);
+                    if (el && el.value !== '' && !isNaN(el.value)) {
+                        totalSum += parseFloat(el.value);
+                        totalCount++;
+                    }
+                }
+            });
+
+            if (totalCount > 0) {
+                const overallAvg = (totalSum / totalCount).toFixed(2);
+                const displayEl = document.getElementById('display_overall_avg');
+                const inputAvg = document.getElementById('input_nilai_rata_rata');
+                if (displayEl) displayEl.textContent = overallAvg;
+                if (inputAvg) {
+                    inputAvg.value = overallAvg;
+                }
+            }
+        }
+
+        // Initialize calculations on DOM ready
+        document.addEventListener('DOMContentLoaded', function() {
+            ['mtk', 'ind', 'eng', 'pai'].forEach(p => calculateMatrixRow(p));
+        });
     </script>
 </x-layouts.app>

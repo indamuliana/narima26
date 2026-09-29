@@ -30,12 +30,12 @@ class WawancaraService
         int $perPage = 15
     ): LengthAwarePaginator {
         $query = CalonSiswa::query()
-            ->with(['user', 'jurusan', 'programBelajar', 'sekolahAsal', 'wawancara.pewawancara', 'dokumenPendaftaran'])
+            ->with(['user', 'jurusan', 'programBelajar', 'sekolahAsal', 'wawancaraSiswa.pewawancara', 'wawancaraOrangTua.pewawancara', 'dokumenPendaftaran'])
             ->where(function (Builder $q) {
-                // Calon siswa who are in MENUNGGU_WAWANCARA or have existing wawancara records
                 $q->where('status_spmb', SpmbStatus::MENUNGGU_WAWANCARA->value)
                   ->orWhere('status_spmb', SpmbStatus::SUDAH_DIWAWANCARA->value)
-                  ->orWhereHas('wawancara');
+                  ->orWhereHas('wawancaraSiswa')
+                  ->orWhereHas('wawancaraOrangTua');
             });
 
         // Filter by keyword search (Nama, No Pendaftaran, NISN, Asal Sekolah)
@@ -59,17 +59,15 @@ class WawancaraService
         // Filter by interview status
         if (! empty($statusWawancara)) {
             if ($statusWawancara === 'BELUM') {
-                $query->whereDoesntHave('wawancara', function (Builder $wq) {
-                    $wq->whereIn('status', [Wawancara::STATUS_PROSES, Wawancara::STATUS_SELESAI]);
-                })->where('status_spmb', SpmbStatus::MENUNGGU_WAWANCARA->value);
-            } elseif ($statusWawancara === Wawancara::STATUS_PROSES) {
-                $query->whereHas('wawancara', function (Builder $wq) {
-                    $wq->where('status', Wawancara::STATUS_PROSES);
+                $query->whereDoesntHave('wawancaraSiswa')->whereDoesntHave('wawancaraOrangTua')->where('status_spmb', SpmbStatus::MENUNGGU_WAWANCARA->value);
+            } elseif ($statusWawancara === 'PROSES') {
+                $query->where(function ($q) {
+                    $q->whereHas('wawancaraSiswa', function ($wq) { $wq->where('status', 'DRAFT'); })
+                      ->orWhereHas('wawancaraOrangTua', function ($wq) { $wq->where('status', 'DRAFT'); });
                 });
-            } elseif ($statusWawancara === Wawancara::STATUS_SELESAI) {
-                $query->whereHas('wawancara', function (Builder $wq) {
-                    $wq->where('status', Wawancara::STATUS_SELESAI);
-                });
+            } elseif ($statusWawancara === 'SELESAI') {
+                $query->whereHas('wawancaraSiswa', function ($wq) { $wq->where('status', 'SELESAI'); })
+                      ->whereHas('wawancaraOrangTua', function ($wq) { $wq->where('status', 'SELESAI'); });
             }
         }
 
@@ -84,12 +82,17 @@ class WawancaraService
         ?int $jurusanId = null,
         int $perPage = 15
     ): LengthAwarePaginator {
-        $query = Wawancara::query()
-            ->with(['calonSiswa.jurusan', 'calonSiswa.programBelajar', 'calonSiswa.sekolahAsal', 'pewawancara', 'details.kriteria'])
-            ->where('status', Wawancara::STATUS_SELESAI);
+        $query = CalonSiswa::query()
+            ->with(['jurusan', 'programBelajar', 'sekolahAsal', 'wawancaraSiswa.pewawancara', 'wawancaraOrangTua.pewawancara'])
+            ->where(function (Builder $q) {
+                $q->where('status_spmb', SpmbStatus::SUDAH_DIWAWANCARA->value)
+                  ->orWhereHas('wawancaraSiswa', function (Builder $wq) {
+                      $wq->where('status', 'SELESAI');
+                  });
+            });
 
         if (! empty($search)) {
-            $query->whereHas('calonSiswa', function (Builder $q) use ($search) {
+            $query->where(function (Builder $q) use ($search) {
                 $q->where('nama_lengkap', 'like', "%{$search}%")
                   ->orWhere('nomor_pendaftaran', 'like', "%{$search}%")
                   ->orWhere('nisn', 'like', "%{$search}%");
@@ -97,12 +100,10 @@ class WawancaraService
         }
 
         if (! empty($jurusanId)) {
-            $query->whereHas('calonSiswa', function (Builder $q) use ($jurusanId) {
-                $q->where('jurusan_id', $jurusanId);
-            });
+            $query->where('jurusan_id', $jurusanId);
         }
 
-        return $query->latest('tanggal_wawancara')->latest('id')->paginate($perPage)->withQueryString();
+        return $query->latest('id')->paginate($perPage)->withQueryString();
     }
 
     /**
@@ -219,6 +220,76 @@ class WawancaraService
         });
     }
 
+    public function saveWawancaraSiswa(CalonSiswa $calonSiswa, array $data, User $pewawancara, bool $isDraft): \App\Models\WawancaraSiswa
+    {
+        return DB::transaction(function () use ($calonSiswa, $data, $pewawancara, $isDraft) {
+            $wawancara = \App\Models\WawancaraSiswa::firstOrNew(['calon_siswa_id' => $calonSiswa->id]);
+
+            $wawancara->fill($data);
+            $wawancara->pewawancara_id = $pewawancara->id;
+            $wawancara->status = $isDraft ? 'DRAFT' : 'SELESAI';
+            if (empty($wawancara->tanggal_wawancara)) {
+                $wawancara->tanggal_wawancara = now()->toDateString();
+            }
+            if (empty($wawancara->nama_petugas)) {
+                $wawancara->nama_petugas = $pewawancara->name;
+            }
+            $wawancara->save();
+
+            if (!$isDraft) {
+                $this->checkAllWawancaraSelesai($calonSiswa, $pewawancara);
+            }
+
+            return $wawancara;
+        });
+    }
+
+    public function saveWawancaraOrangTua(CalonSiswa $calonSiswa, array $data, User $pewawancara, bool $isDraft): \App\Models\WawancaraOrangTua
+    {
+        return DB::transaction(function () use ($calonSiswa, $data, $pewawancara, $isDraft) {
+            $wawancara = \App\Models\WawancaraOrangTua::firstOrNew(['calon_siswa_id' => $calonSiswa->id]);
+
+            $wawancara->fill($data);
+            $wawancara->pewawancara_id = $pewawancara->id;
+            $wawancara->status = $isDraft ? 'DRAFT' : 'SELESAI';
+            if (empty($wawancara->tanggal_wawancara)) {
+                $wawancara->tanggal_wawancara = now()->toDateString();
+            }
+            if (empty($wawancara->nama_petugas)) {
+                $wawancara->nama_petugas = $pewawancara->name;
+            }
+            $wawancara->save();
+
+            if (!$isDraft) {
+                $this->checkAllWawancaraSelesai($calonSiswa, $pewawancara);
+            }
+
+            return $wawancara;
+        });
+    }
+
+    protected function checkAllWawancaraSelesai(CalonSiswa $calonSiswa, User $pewawancara): void
+    {
+        $siswa = \App\Models\WawancaraSiswa::where('calon_siswa_id', $calonSiswa->id)->first();
+        $ortu = \App\Models\WawancaraOrangTua::where('calon_siswa_id', $calonSiswa->id)->first();
+
+        if ($siswa && $siswa->status === 'SELESAI' && $ortu && $ortu->status === 'SELESAI') {
+            $currentStatus = is_string($calonSiswa->status_spmb)
+                ? SpmbStatus::from($calonSiswa->status_spmb)
+                : $calonSiswa->status_spmb;
+
+            if ($currentStatus === SpmbStatus::MENUNGGU_WAWANCARA) {
+                $this->spmbStatusService->changeStatus(
+                    calonSiswa: $calonSiswa,
+                    targetStatus: SpmbStatus::SUDAH_DIWAWANCARA,
+                    alasan: 'Wawancara seleksi (Siswa & Orang Tua) selesai dilaksanakan',
+                    catatan: 'Penilaian wawancara lengkap diinput.',
+                    changedBy: $pewawancara
+                );
+            }
+        }
+    }
+
     /**
      * Sync criteria evaluation rows into wawancara_detail.
      */
@@ -291,28 +362,25 @@ class WawancaraService
      */
     public function getStatistics(?User $pewawancara = null): array
     {
-        // 1. Antrian Menunggu: Calon Siswa with MENUNGGU_WAWANCARA status without finished/in-progress interview
+        // 1. Antrian Menunggu: Calon Siswa with MENUNGGU_WAWANCARA status
         $antrianMenunggu = CalonSiswa::where('status_spmb', SpmbStatus::MENUNGGU_WAWANCARA->value)
-            ->whereDoesntHave('wawancara', function (Builder $q) {
-                $q->whereIn('status', [Wawancara::STATUS_PROSES, Wawancara::STATUS_SELESAI]);
-            })
             ->count();
 
         // 2. Sedang Diwawancara / Draft
-        $sedangProsesQuery = Wawancara::where('status', Wawancara::STATUS_PROSES);
+        $sedangProsesQuery = \App\Models\WawancaraSiswa::where('status', 'DRAFT');
         if ($pewawancara && ! $pewawancara->isAdmin()) {
             $sedangProsesQuery->where('pewawancara_id', $pewawancara->id);
         }
         $sedangProses = $sedangProsesQuery->count();
 
         // 3. Selesai Wawancara
-        $selesaiQuery = Wawancara::where('status', Wawancara::STATUS_SELESAI);
+        $selesaiQuery = \App\Models\WawancaraSiswa::where('status', 'SELESAI');
         if ($pewawancara && ! $pewawancara->isAdmin()) {
             $selesaiQuery->where('pewawancara_id', $pewawancara->id);
         }
         $selesai = $selesaiQuery->count();
 
-        // 4. Kriteria Aktif
+        // 4. Kriteria Aktif (deprecated, just return 0 or maintain for UI)
         $kriteriaAktif = MasterKriteriaWawancara::aktif()->count();
 
         return [

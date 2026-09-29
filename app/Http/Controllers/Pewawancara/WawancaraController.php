@@ -47,12 +47,8 @@ class WawancaraController extends Controller
         return view('pewawancara.antrian', compact('calonSiswaList', 'jurusanList', 'search', 'jurusanId', 'statusWawancara'));
     }
 
-    /**
-     * Open the 2-column Interview Assessment Room.
-     */
-    public function form(CalonSiswa $calonSiswa): View|RedirectResponse
+    public function hub(CalonSiswa $calonSiswa): View|RedirectResponse
     {
-        // Guard: candidate must be at least in MENUNGGU_WAWANCARA or have existing interview
         $validStatuses = [
             SpmbStatus::DATA_LENGKAP->value,
             SpmbStatus::MENUNGGU_WAWANCARA->value,
@@ -65,63 +61,89 @@ class WawancaraController extends Controller
             ? $calonSiswa->status_spmb->value
             : (string) $calonSiswa->status_spmb;
 
-        if (! in_array($statusVal, $validStatuses, true) && ! $calonSiswa->wawancara()->exists()) {
+        if (! in_array($statusVal, $validStatuses, true) && ! $calonSiswa->wawancaraSiswa()->exists() && ! $calonSiswa->wawancaraOrangTua()->exists()) {
             return redirect()->route('pewawancara.antrian')
                 ->with('error', 'Calon siswa belum menyelesaikan kelengkapan data & kesepahaman, belum dapat diwawancara.');
         }
 
-        $wawancara = $this->wawancaraService->getOrCreateWawancara($calonSiswa, auth()->user());
-        $wawancara->load(['details.kriteria', 'pewawancara']);
-
-        // Group active criteria into siswa and orang_tua
-        $allKriteria = $this->wawancaraService->getRubrikKriteria();
-        $kriteriaSiswa = $allKriteria->where('jenis_penilaian', 'siswa');
-        $kriteriaOrangTua = $allKriteria->where('jenis_penilaian', 'orang_tua');
-
-        // Map existing detail scores by kriteria_id
-        $existingDetails = $wawancara->details->keyBy('kriteria_id');
-
         $calonSiswa->load([
-            'user',
+            'wawancaraSiswa.pewawancara',
+            'wawancaraOrangTua.pewawancara',
+        ]);
+
+        return view('pewawancara.hub', compact('calonSiswa'));
+    }
+
+    public function formSiswa(CalonSiswa $calonSiswa): View
+    {
+        $calonSiswa->load([
+            'wawancaraSiswa',
             'jurusan',
             'programBelajar',
             'sekolahAsal',
-            'dataOrangtua',
+            'dataOrangtua.pekerjaanAyah',
+            'dataOrangtua.pekerjaanIbu',
+            'dataOrangtua.pekerjaanWali',
             'dataAkademik',
+            'nilaiRapor',
             'prestasi',
-            'ukuranSeragam.seragam',
             'dokumenPendaftaran',
+            'provinsi',
+            'kabupaten',
+            'kecamatan',
+            'desa',
         ]);
+        
+        $wawancara = $calonSiswa->wawancaraSiswa ?? new \App\Models\WawancaraSiswa();
 
-        return view('pewawancara.form', compact(
-            'calonSiswa',
-            'wawancara',
-            'kriteriaSiswa',
-            'kriteriaOrangTua',
-            'existingDetails'
-        ));
+        return view('pewawancara.wawancara-siswa', compact('calonSiswa', 'wawancara'));
     }
 
-    /**
-     * Store interview scores (draft or completed).
-     */
-    public function store(SimpanWawancaraRequest $request, CalonSiswa $calonSiswa): RedirectResponse
+    public function saveSiswa(Request $request, CalonSiswa $calonSiswa): RedirectResponse
     {
-        $validated = $request->validated();
-        $action = $validated['action'];
+        $data = $request->except(['_token', 'action']);
+        $isDraft = $request->input('action') === 'draft';
 
-        if ($action === 'draft') {
-            $wawancara = $this->wawancaraService->saveDraft($calonSiswa, $validated, auth()->user());
+        $this->wawancaraService->saveWawancaraSiswa($calonSiswa, $data, auth()->user(), $isDraft);
 
-            return redirect()->route('pewawancara.wawancara.form', $calonSiswa)
-                ->with('success', 'Draft penilaian wawancara berhasil disimpan.');
-        }
+        return redirect()->route('pewawancara.wawancara.hub', $calonSiswa)
+            ->with('success', 'Wawancara siswa berhasil disimpan.');
+    }
 
-        // Finalize interview
-        $wawancara = $this->wawancaraService->selesaiWawancara($calonSiswa, $validated, auth()->user());
+    public function formOrangTua(CalonSiswa $calonSiswa): View
+    {
+        $calonSiswa->load([
+            'wawancaraOrangTua',
+            'jurusan',
+            'programBelajar',
+            'sekolahAsal',
+            'dataOrangtua.pekerjaanAyah',
+            'dataOrangtua.pekerjaanIbu',
+            'dataOrangtua.pekerjaanWali',
+            'dataAkademik',
+            'nilaiRapor',
+            'prestasi',
+            'dokumenPendaftaran',
+            'provinsi',
+            'kabupaten',
+            'kecamatan',
+            'desa',
+        ]);
+        
+        $wawancara = $calonSiswa->wawancaraOrangTua ?? new \App\Models\WawancaraOrangTua();
 
-        return redirect()->route('pewawancara.wawancara.show', $calonSiswa)
-            ->with('success', 'Wawancara seleksi berhasil diselesaikan. Status calon siswa kini SUDAH_DIWAWANCARA.');
+        return view('pewawancara.wawancara-orang-tua', compact('calonSiswa', 'wawancara'));
+    }
+
+    public function saveOrangTua(Request $request, CalonSiswa $calonSiswa): RedirectResponse
+    {
+        $data = $request->except(['_token', 'action']);
+        $isDraft = $request->input('action') === 'draft';
+
+        $this->wawancaraService->saveWawancaraOrangTua($calonSiswa, $data, auth()->user(), $isDraft);
+
+        return redirect()->route('pewawancara.wawancara.hub', $calonSiswa)
+            ->with('success', 'Wawancara orang tua berhasil disimpan.');
     }
 
     /**
@@ -139,13 +161,14 @@ class WawancaraController extends Controller
             'prestasi',
             'ukuranSeragam.seragam',
             'dokumenPendaftaran',
-            'wawancara.pewawancara',
-            'wawancara.details.kriteria',
+            'wawancaraSiswa.pewawancara',
+            'wawancaraOrangTua.pewawancara',
         ]);
 
-        $wawancara = $calonSiswa->wawancara()->latest('id')->first();
+        $wawancaraSiswa = $calonSiswa->wawancaraSiswa;
+        $wawancaraOrangTua = $calonSiswa->wawancaraOrangTua;
 
-        return view('pewawancara.detail', compact('calonSiswa', 'wawancara'));
+        return view('pewawancara.detail', compact('calonSiswa', 'wawancaraSiswa', 'wawancaraOrangTua'));
     }
 
     /**

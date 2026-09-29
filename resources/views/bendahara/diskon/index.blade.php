@@ -5,32 +5,7 @@
         @include('bendahara.partials.sidebar')
     </x-slot>
 
-    <div class="space-y-6"
-         x-data="{
-             /* Modal berikan diskon — dua step */
-             modalBeriDiskon: false,
-             step: 1,
-             filterSiswa: '',
-             selectedSiswa: null,
-
-             pilihSiswa(siswa) {
-                 this.selectedSiswa = siswa;
-                 this.step = 2;
-             },
-             kembali() {
-                 this.step = 1;
-                 this.selectedSiswa = null;
-             },
-             tutupModal() {
-                 this.modalBeriDiskon = false;
-                 this.step = 1;
-                 this.selectedSiswa = null;
-                 this.filterSiswa = '';
-             },
-
-             /* Modal konfirmasi cabut diskon */
-             confirmHapus: null,
-         }">
+    <div class="space-y-6" x-data="diskonPageHandler()">
 
         {{-- Header --}}
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -221,12 +196,12 @@
                                 </td>
                                 <td class="px-4 py-4 text-center">
                                     @if (! $tagihanLunas)
-                                        <button @click="confirmHapus = {
-                                                    id: {{ $d->id }},
-                                                    jenis_diskon: '{{ addslashes($d->jenis_diskon) }}',
-                                                    nama_siswa: '{{ addslashes($d->calonSiswa?->nama_lengkap ?? '—') }}',
-                                                    nomor_tagihan: '{{ $tagihanTerkait?->nomor_tagihan ?? '' }}'
-                                                }"
+                                        <button @click="confirmHapus = {{ json_encode([
+                                                    'id' => $d->id,
+                                                    'jenis_diskon' => $d->jenis_diskon,
+                                                    'nama_siswa' => $d->calonSiswa?->nama_lengkap ?? '—',
+                                                    'nomor_tagihan' => $tagihanTerkait?->nomor_tagihan ?? ''
+                                                ]) }}"
                                                 type="button"
                                                 class="px-2.5 py-1 rounded-lg border border-rose-200 text-rose-600 text-xs font-semibold hover:bg-rose-50 transition-colors cursor-pointer">
                                             Cabut
@@ -305,8 +280,8 @@
                                             @php $tg = $cs->tagihan->first(); @endphp
                                             <tr class="hover:bg-slate-50 transition-colors"
                                                 x-show="filterSiswa === '' ||
-                                                         '{{ strtolower($cs->nama_lengkap) }}'.includes(filterSiswa.toLowerCase()) ||
-                                                         '{{ $cs->nomor_pendaftaran }}'.includes(filterSiswa)">
+                                                         {{ json_encode(strtolower($cs->nama_lengkap)) }}.includes(filterSiswa.toLowerCase()) ||
+                                                         {{ json_encode((string)$cs->nomor_pendaftaran) }}.includes(filterSiswa)">
                                                 <td class="py-3 pr-4">
                                                     <p class="font-bold text-slate-900">{{ $cs->nama_lengkap }}</p>
                                                     <p class="text-[11px] text-slate-400 font-mono">{{ $cs->nomor_pendaftaran }}</p>
@@ -331,14 +306,14 @@
                                                 </td>
                                                 <td class="py-3 text-center">
                                                     <button type="button"
-                                                            @click="pilihSiswa({
-                                                                id: {{ $cs->id }},
-                                                                nama_lengkap: '{{ addslashes($cs->nama_lengkap) }}',
-                                                                nomor_pendaftaran: '{{ $cs->nomor_pendaftaran }}',
-                                                                jurusan: '{{ addslashes($cs->jurusan?->nama ?? '—') }}',
-                                                                nomor_tagihan: '{{ $tg?->nomor_tagihan ?? '—' }}',
-                                                                total_bruto: '{{ $tg ? number_format($tg->total_bruto, 0, ',', '.') : '—' }}'
-                                                            })"
+                                                            @click="pilihSiswa({{ json_encode([
+                                                                'id' => $cs->id,
+                                                                'nama_lengkap' => $cs->nama_lengkap,
+                                                                'nomor_pendaftaran' => $cs->nomor_pendaftaran,
+                                                                'jurusan' => $cs->jurusan?->nama ?? '—',
+                                                                'nomor_tagihan' => $tg?->nomor_tagihan ?? '—',
+                                                                'total_bruto' => $tg ? number_format($tg->total_bruto, 0, ',', '.') : '—'
+                                                            ]) }})"
                                                             class="px-3 py-1.5 rounded-lg bg-nampi-orange text-white text-xs font-bold hover:bg-orange-600 transition-colors cursor-pointer">
                                                         Pilih
                                                     </button>
@@ -394,26 +369,40 @@
                                 <input type="hidden" name="calon_siswa_id" :value="selectedSiswa?.id ?? ''">
 
                                 <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Program Diskon <span class="text-rose-500">*</span></label>
+                                    <select x-model="presetDiskon" @change="pilihPreset($event.target.value)" class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30 bg-white">
+                                        <option value="">-- Pilih Program Baku --</option>
+                                        @foreach($masterDiskonList as $md)
+                                            <option value="{{ $md->id }}">{{ $md->nama_diskon }} ({{ $md->metode_diskon === 'persentase' ? $md->nilai_diskon.'%' : 'Rp '.number_format($md->nilai_diskon,0,',','.') }})</option>
+                                        @endforeach
+                                        <option value="custom">Lainnya / Input Manual</option>
+                                    </select>
+                                </div>
+
+                                <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1">Jenis Diskon <span class="text-rose-500">*</span></label>
-                                    <input type="text" name="jenis_diskon" required
+                                    <input type="text" name="jenis_diskon" x-model="jenisDiskon" required :readonly="presetDiskon !== 'custom'"
                                            placeholder="Contoh: Diskon Prestasi, Beasiswa Yatim, Diskon Saudara Kandung"
-                                           class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30">
+                                           class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30"
+                                           :class="presetDiskon !== 'custom' ? 'bg-slate-50' : 'bg-white'">
                                 </div>
 
                                 <div class="grid grid-cols-2 gap-3">
                                     <div>
                                         <label class="block text-xs font-bold text-slate-700 mb-1">Metode <span class="text-rose-500">*</span></label>
-                                        <select name="metode_diskon" required
-                                                class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30 bg-white">
+                                        <select name="metode_diskon" x-model="metodeDiskon" required
+                                                :class="presetDiskon !== 'custom' ? 'bg-slate-50 pointer-events-none' : 'bg-white'"
+                                                class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30">
                                             <option value="nominal">Nominal Tetap (Rp)</option>
                                             <option value="persentase">Persentase (%)</option>
                                         </select>
                                     </div>
                                     <div>
                                         <label class="block text-xs font-bold text-slate-700 mb-1">Nilai <span class="text-rose-500">*</span></label>
-                                        <input type="number" name="nilai_diskon" required min="1" step="1000"
+                                        <input type="number" name="nilai_diskon" x-model="nilaiDiskon" required min="1" :readonly="presetDiskon !== 'custom'"
                                                placeholder="Contoh: 500000 atau 10"
-                                               class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30 font-bold">
+                                               class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30 font-bold"
+                                               :class="presetDiskon !== 'custom' ? 'bg-slate-50' : 'bg-white'">
                                     </div>
                                 </div>
 
@@ -496,7 +485,60 @@
                     </div>
                 </div>
             </div>
-        </div>
-
     </div>
+
+    <script>
+        function diskonPageHandler() {
+            const masterList = {!! json_encode($masterDiskonList) !!};
+            return {
+                modalBeriDiskon: false,
+                step: 1,
+                filterSiswa: '',
+                selectedSiswa: null,
+
+                pilihSiswa(siswa) {
+                    this.selectedSiswa = siswa;
+                    this.step = 2;
+                },
+                kembali() {
+                    this.step = 1;
+                    this.selectedSiswa = null;
+                },
+                confirmHapus: null,
+
+                presetDiskon: 'custom',
+                jenisDiskon: '',
+                metodeDiskon: 'nominal',
+                nilaiDiskon: '',
+
+                pilihPreset(value) {
+                    this.presetDiskon = value;
+                    if (value === 'custom' || !value) {
+                        this.jenisDiskon = '';
+                        this.metodeDiskon = 'nominal';
+                        this.nilaiDiskon = '';
+                        return;
+                    }
+                    let diskon = masterList.find(item => item.id == value);
+                    if (diskon) {
+                        this.jenisDiskon = diskon.nama_diskon;
+                        this.metodeDiskon = diskon.metode_diskon;
+                        this.nilaiDiskon = diskon.nilai_diskon;
+                    } else {
+                        this.jenisDiskon = '';
+                        this.metodeDiskon = 'nominal';
+                        this.nilaiDiskon = '';
+                    }
+                },
+
+                tutupModal() {
+                    this.modalBeriDiskon = false;
+                    this.step = 1;
+                    this.selectedSiswa = null;
+                    this.filterSiswa = '';
+                    this.pilihPreset('custom');
+                }
+            };
+        }
+    </script>
 </x-layouts.app>

@@ -17,7 +17,9 @@ class UpdateSeragamRequest extends FormRequest
             'seragam' => ['required', 'array', 'min:1'],
             'seragam.*.jenis_seragam_id' => ['required', 'exists:master_seragam,id'],
             'seragam.*.ukuran' => ['required', 'string', 'max:10'],
+            'seragam.*.status_pemesanan' => ['nullable', 'in:PESAN_SEKARANG,PESAN_NANTI'],
             'seragam.*.jumlah' => ['nullable', 'integer', 'min:1'],
+            'seragam.*.beli_di_sekolah' => ['nullable'],
             'seragam.*.keterangan' => ['nullable', 'string', 'max:255'],
         ];
     }

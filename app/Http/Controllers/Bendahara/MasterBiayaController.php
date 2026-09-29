@@ -22,7 +22,9 @@ class MasterBiayaController extends Controller
         $status   = $request->input('status');
 
         $query = MasterBiaya::with(['program', 'gelombang'])
-            ->orderBy('kategori')
+            ->orderByRaw("CASE kategori WHEN 'DSP' THEN 1 WHEN 'SPP' THEN 2 WHEN 'ASRAMA' THEN 3 WHEN 'SERAGAM' THEN 4 WHEN 'KEGIATAN' THEN 5 WHEN 'PRAKTIK' THEN 6 ELSE 7 END")
+            ->orderBy('program_id')
+            ->orderBy('gelombang_id')
             ->orderBy('id');
 
         if (! empty($q)) {
@@ -60,6 +62,7 @@ class MasterBiayaController extends Controller
             'kategori'     => ['required', 'string', 'max:50'],
             'program_id'   => ['nullable', 'exists:master_program,id'],
             'gelombang_id' => ['nullable', 'exists:master_gelombang,id'],
+            'jenis_kelamin'=> ['nullable', 'in:L,P'],
             'nominal'      => ['required', 'numeric', 'min:0'],
             'wajib'        => ['nullable', 'boolean'],
             'keterangan'   => ['nullable', 'string', 'max:500'],
@@ -75,7 +78,7 @@ class MasterBiayaController extends Controller
     }
 
     /**
-     * Update existing master fee (including kategori, program, gelombang).
+     * Update existing master fee (including kategori, program, gelombang, gender, wajib).
      */
     public function update(Request $request, MasterBiaya $masterBiaya): RedirectResponse
     {
@@ -84,9 +87,13 @@ class MasterBiayaController extends Controller
             'kategori'     => ['sometimes', 'string', 'max:50'],
             'program_id'   => ['nullable', 'exists:master_program,id'],
             'gelombang_id' => ['nullable', 'exists:master_gelombang,id'],
+            'jenis_kelamin'=> ['nullable', 'in:L,P'],
             'nominal'      => ['required', 'numeric', 'min:0'],
+            'wajib'        => ['nullable', 'boolean'],
             'keterangan'   => ['nullable', 'string', 'max:500'],
         ]);
+
+        $validated['wajib'] = $request->has('wajib');
 
         $masterBiaya->update($validated);
 

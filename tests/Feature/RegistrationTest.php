@@ -86,7 +86,7 @@ class RegistrationTest extends TestCase
         // 1. Pastikan Calon Siswa terdaftar
         $calonSiswa = CalonSiswa::where('nisn', '0098765432')->first();
         $this->assertNotNull($calonSiswa);
-        $this->assertEquals('26AAY0001', $calonSiswa->nomor_pendaftaran);
+        $this->assertEquals('A16260001', $calonSiswa->nomor_pendaftaran);
         $this->assertEquals('Ahmad Fathir Al-Faruq', $calonSiswa->nama_lengkap);
 
         // 2. Status SPMB transisi ke MENUNGGU_PEMBAYARAN_SELEKSI
@@ -138,6 +138,8 @@ class RegistrationTest extends TestCase
             'tempat_lahir' => 'Bandung',
             'tanggal_lahir' => '2009-05-10',
             'no_hp_siswa' => '082199887766',
+            'no_hp_ayah' => '081398765432',
+            'email' => 'nama.lain@example.com',
             'program_id' => $program->id,
             'jurusan_id' => $jurusan->id,
         ];
@@ -161,6 +163,8 @@ class RegistrationTest extends TestCase
             'tempat_lahir' => 'Garut',
             'tanggal_lahir' => '2009-01-01',
             'no_hp_siswa' => '021555123', // Nomor PSTN bukan seluler
+            'no_hp_ayah' => '081398765432',
+            'email' => 'hp.salah@example.com',
             'program_id' => $program->id,
             'jurusan_id' => $jurusan->id,
         ];
@@ -175,13 +179,13 @@ class RegistrationTest extends TestCase
     public function test_registration_success_page_renders(): void
     {
         $calonSiswa = CalonSiswa::factory()->create([
-            'nomor_pendaftaran' => '26AAY0055',
+            'nomor_pendaftaran' => 'A16260055',
             'nama_lengkap' => 'Bintang Ramadhan',
         ]);
 
         $response = $this->get(route('pendaftaran.sukses', $calonSiswa->nomor_pendaftaran));
         $response->assertStatus(200);
-        $response->assertSee('26AAY0055');
+        $response->assertSee('A16260055');
         $response->assertSee('Bintang Ramadhan');
         $response->assertSee('Unduh Kartu Registrasi (PDF)');
     }
@@ -192,7 +196,7 @@ class RegistrationTest extends TestCase
     public function test_download_registration_pdf_succeeds(): void
     {
         $calonSiswa = CalonSiswa::factory()->create([
-            'nomor_pendaftaran' => '26AAY0077',
+            'nomor_pendaftaran' => 'A16260077',
         ]);
 
         $response = $this->get(route('pendaftaran.cetak-akun', $calonSiswa->nomor_pendaftaran));
@@ -212,11 +216,80 @@ class RegistrationTest extends TestCase
 
         $calonSiswa = CalonSiswa::factory()->create([
             'user_id' => $user->id,
-            'nomor_pendaftaran' => '26AAY0088',
+            'nomor_pendaftaran' => 'A16260088',
         ]);
 
         $response = $this->get(route('pendaftaran.login-direct', $calonSiswa->nomor_pendaftaran));
         $response->assertRedirect(route('calon-siswa.dashboard'));
         $this->assertAuthenticatedAs($user);
     }
+
+    /**
+     * Test 9: Registrasi dengan nomor HP Ayah & Ibu serta referensi promotor berhasil disimpan.
+     */
+    public function test_registration_with_parent_phones_and_referensi_succeeds(): void
+    {
+        $program = MasterProgram::first();
+        $jurusan = MasterJurusan::first();
+        $gelombang = MasterGelombang::first();
+
+        $postData = [
+            'nisn' => '0088991122',
+            'nama_lengkap' => 'Putra Mahardika',
+            'jenis_kelamin' => 'L',
+            'tempat_lahir' => 'Garut',
+            'tanggal_lahir' => '2009-04-12',
+            'no_hp_siswa' => '081223344111',
+            'no_hp_ayah' => '081223344556',
+            'no_hp_ibu' => '081334455667',
+            'email' => 'putra.m@example.com',
+            'program_id' => $program->id,
+            'jurusan_id' => $jurusan->id,
+            'gelombang_id' => $gelombang->id,
+            'referensi_jenis' => 'GURU_WIKRAMA_GARUT',
+            'referensi_nama' => 'Pak Budi Santoso',
+        ];
+
+        $response = $this->post('/daftar', $postData);
+        $response->assertSessionHasNoErrors();
+
+        $calonSiswa = CalonSiswa::where('nisn', '0088991122')->first();
+        $this->assertNotNull($calonSiswa);
+        $this->assertEquals('GURU_WIKRAMA_GARUT', $calonSiswa->referensi_jenis);
+        $this->assertEquals('Pak Budi Santoso', $calonSiswa->referensi_nama);
+        $this->assertEquals('6281223344111', $calonSiswa->no_hp_siswa);
+        $this->assertEquals('6281223344556', $calonSiswa->no_hp_ayah);
+        $this->assertEquals('6281334455667', $calonSiswa->no_hp_ibu);
+
+        $user = User::where('username', '0088991122')->first();
+        $this->assertNotNull($user);
+        $this->assertEquals('putra.m@example.com', $user->email);
+        $this->assertEquals('6281223344111', $user->phone);
+    }
+
+    /**
+     * Test 10: Email wajib diisi pada formulir pendaftaran.
+     */
+    public function test_registration_requires_email(): void
+    {
+        $program = MasterProgram::first();
+        $jurusan = MasterJurusan::first();
+
+        $postData = [
+            'nisn' => '0012345679',
+            'nama_lengkap' => 'Calon Siswa Tanpa Email',
+            'jenis_kelamin' => 'P',
+            'tempat_lahir' => 'Garut',
+            'tanggal_lahir' => '2009-02-14',
+            'no_hp_siswa' => '081223344112',
+            'no_hp_ayah' => '081223344999',
+            'email' => '', // kosong
+            'program_id' => $program->id,
+            'jurusan_id' => $jurusan->id,
+        ];
+
+        $response = $this->post('/daftar', $postData);
+        $response->assertSessionHasErrors(['email']);
+    }
 }
+

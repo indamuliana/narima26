@@ -62,7 +62,7 @@
         <strong style="color: #92400e; text-transform: uppercase;">Langkah Berikutnya:</strong>
         <ol style="margin: 6px 0 0 16px; padding: 0; line-height: 1.6; color: #78350f;">
             <li>Masuk ke portal login calon siswa menggunakan <strong>NISN</strong> dan password Anda.</li>
-            <li>Selesaikan pembayaran biaya seleksi sebesar <strong>Rp 250.000</strong> ke rekening resmi Bank BJB <code>0123-4567-8900-1</code> a.n. <strong>SMK WIKRAMA 1 GARUT</strong>.</li>
+            <li>Selesaikan pembayaran biaya seleksi sebesar <strong>Rp 200.000</strong> ke rekening resmi Bank BNI <code>082-0083-086</code> a.n. <strong>SMK WIKRAMA 1 GARUT</strong>.</li>
             <li>Unggah bukti transfer dan tunggu verifikasi Bendahara sekolah.</li>
             <li>Lengkapi data diri, orang tua, nilai rapor, ukuran seragam, dan unggah berkas persyaratan.</li>
             <li>Setujui lembar kesepahaman dan cetak Kartu Tanda Peserta SPMB untuk pelaksanaan wawancara.</li>

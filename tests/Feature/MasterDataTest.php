@@ -73,7 +73,7 @@ class MasterDataTest extends TestCase
      */
     public function test_master_biaya_is_seeded_with_expected_categories(): void
     {
-        $this->assertDatabaseHas('master_biaya', ['kode_biaya' => 'BIAYA-SEL', 'kategori' => 'seleksi', 'nominal' => 250000]);
+        $this->assertDatabaseHas('master_biaya', ['kode_biaya' => 'BIAYA-SEL', 'kategori' => 'seleksi', 'nominal' => 200000]);
         $this->assertDatabaseHas('master_biaya', ['kode_biaya' => 'BIAYA-DSP', 'kategori' => 'daftar_ulang', 'nominal' => 3000000]);
         $this->assertDatabaseHas('master_biaya', ['kode_biaya' => 'BIAYA-SPP', 'kategori' => 'daftar_ulang', 'nominal' => 450000]);
     }

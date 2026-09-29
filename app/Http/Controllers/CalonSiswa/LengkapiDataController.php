@@ -64,7 +64,8 @@ class LengkapiDataController extends Controller
         $calonSiswa->load([
             'provinsi', 'kabupaten', 'kecamatan', 'desa',
             'dataOrangtua', 'dataAkademik', 'prestasi',
-            'ukuranSeragam.jenisSeragam', 'dokumenPendaftaran'
+            'ukuranSeragam.jenisSeragam', 'dokumenPendaftaran',
+            'nilaiRapor'
         ]);
 
         $completion = $this->lengkapiDataService->calculateCompletion($calonSiswa);
@@ -84,9 +85,28 @@ class LengkapiDataController extends Controller
         // Master Pekerjaan & Seragam
         $pekerjaanList = MasterPekerjaan::where('aktif', true)->orderBy('nama')->get();
 
-        // Distinct Master Seragam items by nama_jenis
-        $seragamList = MasterSeragam::aktif()->orderBy('id')->get();
+        // Distinct Master Seragam items by nama_jenis (difilter sesuai jenis kelamin siswa jika ada)
+        $seragamQuery = MasterSeragam::aktif();
+        if ($calonSiswa->jenis_kelamin) {
+            $seragamQuery->where(function ($q) use ($calonSiswa) {
+                $q->whereNull('jenis_kelamin')
+                  ->orWhere('jenis_kelamin', $calonSiswa->jenis_kelamin);
+            });
+        }
+        $seragamList = $seragamQuery->orderBy('urutan_klaster')->orderBy('id')->get();
         $seragamTypes = $seragamList->groupBy('nama_jenis');
+        $seragamByKlaster = $seragamList->groupBy('klaster');
+
+        // Master Biaya seragam untuk preview harga real-time
+        $biayaSeragamList = \App\Models\MasterBiaya::aktif()
+            ->where('kategori', 'SERAGAM')
+            ->when($calonSiswa->jenis_kelamin, function ($q) use ($calonSiswa) {
+                $q->where(function ($sub) use ($calonSiswa) {
+                    $sub->whereNull('jenis_kelamin')
+                        ->orWhere('jenis_kelamin', $calonSiswa->jenis_kelamin);
+                });
+            })
+            ->get();
 
         // Existing chosen uniforms mapped by jenis_seragam_id or nama_jenis
         $chosenSeragam = $calonSiswa->ukuranSeragam->keyBy('jenis_seragam_id');
@@ -100,6 +120,8 @@ class LengkapiDataController extends Controller
             'desa',
             'pekerjaanList',
             'seragamTypes',
+            'seragamByKlaster',
+            'biayaSeragamList',
             'chosenSeragam'
         ));
     }
@@ -112,7 +134,9 @@ class LengkapiDataController extends Controller
         $calonSiswa = auth()->user()->calonSiswa;
         $this->lengkapiDataService->saveBiodata($calonSiswa, $request->validated());
 
-        return redirect()->route('calon-siswa.lengkapi-data.index', ['tab' => 'biodata'])
+        $tab = $request->input('action') === 'next' ? 'orang_tua' : 'biodata';
+
+        return redirect()->route('calon-siswa.lengkapi-data.index', ['tab' => $tab])
             ->with('success', 'Biodata dan informasi tempat tinggal berhasil disimpan!');
     }
 
@@ -124,7 +148,9 @@ class LengkapiDataController extends Controller
         $calonSiswa = auth()->user()->calonSiswa;
         $this->lengkapiDataService->saveOrangTua($calonSiswa, $request->validated());
 
-        return redirect()->route('calon-siswa.lengkapi-data.index', ['tab' => 'orang_tua'])
+        $tab = $request->input('action') === 'next' ? 'akademik' : 'orang_tua';
+
+        return redirect()->route('calon-siswa.lengkapi-data.index', ['tab' => $tab])
             ->with('success', 'Data orang tua dan wali berhasil disimpan!');
     }
 
@@ -140,7 +166,9 @@ class LengkapiDataController extends Controller
             $request->input('prestasi', [])
         );
 
-        return redirect()->route('calon-siswa.lengkapi-data.index', ['tab' => 'akademik'])
+        $tab = $request->input('action') === 'next' ? 'seragam' : 'akademik';
+
+        return redirect()->route('calon-siswa.lengkapi-data.index', ['tab' => $tab])
             ->with('success', 'Data akademik rapor dan prestasi berhasil disimpan!');
     }
 
@@ -152,7 +180,9 @@ class LengkapiDataController extends Controller
         $calonSiswa = auth()->user()->calonSiswa;
         $this->lengkapiDataService->saveSeragam($calonSiswa, $request->input('seragam', []));
 
-        return redirect()->route('calon-siswa.lengkapi-data.index', ['tab' => 'seragam'])
+        $tab = $request->input('action') === 'next' ? 'dokumen' : 'seragam';
+
+        return redirect()->route('calon-siswa.lengkapi-data.index', ['tab' => $tab])
             ->with('success', 'Pilihan ukuran seragam berhasil disimpan!');
     }
 

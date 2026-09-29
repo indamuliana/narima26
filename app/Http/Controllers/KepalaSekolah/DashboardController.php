@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CalonSiswa;
 use App\Models\MasterJurusan;
 use App\Models\MasterProgram;
+use App\Services\DashboardMetricsService;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -14,9 +15,13 @@ class DashboardController extends Controller
     /**
      * Display Kepala Sekolah executive dashboard.
      */
-    public function index(): View
+    public function index(DashboardMetricsService $metricsService): View
     {
         $totalPendaftar = CalonSiswa::count();
+        $timeline       = $metricsService->getTimelinePendaftar();
+        $funnel         = $metricsService->getFunnelKonversi();
+        $demografi      = $metricsService->getDemografiData();
+        $topSekolah     = $metricsService->getTopAsalSekolah(5);
 
         $stats = [
             'total_pendaftar' => $totalPendaftar,
@@ -33,6 +38,8 @@ class DashboardController extends Controller
             'ditolak' => CalonSiswa::where('status_spmb', SpmbStatus::DITOLAK->value)->count(),
             'mengundurkan_diri' => CalonSiswa::where('status_spmb', SpmbStatus::MENGUNDURKAN_DIRI->value)->count(),
             'resmi_terdaftar' => CalonSiswa::where('status_spmb', SpmbStatus::RESMI_TERDAFTAR->value)->count(),
+            'total_diskon' => \App\Models\Diskon::count(),
+            'nominal_diskon' => (float) \App\Models\Diskon::sum('nominal_potongan'),
         ];
 
         // Distribution by Department
@@ -58,6 +65,14 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        return view('kepala-sekolah.dashboard', compact('stats', 'jurusanStats', 'antrianSidang'));
+        return view('kepala-sekolah.dashboard', compact(
+            'stats',
+            'jurusanStats',
+            'antrianSidang',
+            'timeline',
+            'funnel',
+            'demografi',
+            'topSekolah'
+        ));
     }
 }

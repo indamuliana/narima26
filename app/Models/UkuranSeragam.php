@@ -12,11 +12,18 @@ class UkuranSeragam extends Model
 
     protected $table = 'ukuran_seragam';
 
+    public const STATUS_PESAN_SEKARANG = 'PESAN_SEKARANG';
+    public const STATUS_PESAN_NANTI = 'PESAN_NANTI';
+
     protected $fillable = [
         'calon_siswa_id',
         'jenis_seragam_id',
         'ukuran',
         'jumlah',
+        'beli_di_sekolah',
+        'status_pemesanan',
+        'tahap_pemesanan',
+        'tagihan_id',
         'keterangan',
     ];
 
@@ -24,6 +31,8 @@ class UkuranSeragam extends Model
     {
         return [
             'jumlah' => 'integer',
+            'beli_di_sekolah' => 'boolean',
+            'tahap_pemesanan' => 'integer',
         ];
     }
 
@@ -40,5 +49,29 @@ class UkuranSeragam extends Model
     public function seragam(): BelongsTo
     {
         return $this->belongsTo(MasterSeragam::class, 'jenis_seragam_id');
+    }
+
+    public function tagihan(): BelongsTo
+    {
+        return $this->belongsTo(Tagihan::class, 'tagihan_id');
+    }
+
+    public function isPesanSekarang(): bool
+    {
+        return $this->status_pemesanan === self::STATUS_PESAN_SEKARANG;
+    }
+
+    public function isPesanNanti(): bool
+    {
+        return $this->status_pemesanan === self::STATUS_PESAN_NANTI;
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return match ($this->status_pemesanan) {
+            self::STATUS_PESAN_SEKARANG => 'Pesan Sekarang',
+            self::STATUS_PESAN_NANTI => 'Pesan Nanti',
+            default => 'Pesan Nanti',
+        };
     }
 }

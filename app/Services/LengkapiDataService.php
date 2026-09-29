@@ -45,9 +45,16 @@ class LengkapiDataService
         // 2. Data Orang Tua
         $orangTua = $calonSiswa->dataOrangtua;
         $ortuFields = [
-            'nama_ayah', 'pekerjaan_ayah_id', 'no_hp_ayah',
-            'nama_ibu', 'pekerjaan_ibu_id', 'no_hp_ibu'
+            'status_ayah', 'nama_ayah',
+            'status_ibu', 'nama_ibu'
         ];
+        if (!$orangTua || $orangTua->status_ayah === 'MASIH_HIDUP') {
+            $ortuFields[] = 'pekerjaan_ayah_id';
+            $ortuFields[] = 'no_hp_ayah';
+        }
+        if (!$orangTua || $orangTua->status_ibu === 'MASIH_HIDUP') {
+            $ortuFields[] = 'pekerjaan_ibu_id';
+        }
         $filledOrtu = 0;
         if ($orangTua) {
             foreach ($ortuFields as $f) {
@@ -62,8 +69,11 @@ class LengkapiDataService
         $akademik = $calonSiswa->dataAkademik;
         $akademikFields = [
             'nilai_rata_rata', 'nilai_bahasa_indonesia', 'nilai_matematika',
-            'nilai_bahasa_inggris', 'nilai_ipa'
+            'nilai_bahasa_inggris'
         ];
+        if ($akademik && $akademik->nilai_ipa !== null && $akademik->nilai_ipa !== '') {
+            $akademikFields[] = 'nilai_ipa';
+        }
         $filledAkademik = 0;
         if ($akademik) {
             foreach ($akademikFields as $f) {
@@ -74,12 +84,21 @@ class LengkapiDataService
         }
         $akademikPercent = (int) round(($filledAkademik / count($akademikFields)) * 100);
 
-        // 4. Ukuran Seragam
-        $distinctSeragamCount = MasterSeragam::aktif()->distinct('nama_jenis')->count('nama_jenis');
+        // 4. Ukuran Seragam (Syarat kelengkapan dihitung dari seragam WAJIB sesuai gender)
+        $seragamWajibQuery = MasterSeragam::aktif()->where('wajib', true);
+        if ($calonSiswa->jenis_kelamin) {
+            $seragamWajibQuery->where(function($q) use ($calonSiswa) {
+                $q->whereNull('jenis_kelamin')->orWhere('jenis_kelamin', $calonSiswa->jenis_kelamin);
+            });
+        }
+        $distinctSeragamCount = $seragamWajibQuery->distinct('nama_jenis')->count('nama_jenis');
         if ($distinctSeragamCount === 0) {
             $distinctSeragamCount = 1;
         }
-        $chosenSeragamCount = $calonSiswa->ukuranSeragam()->count();
+
+        $chosenSeragamCount = $calonSiswa->ukuranSeragam()
+            ->whereHas('jenisSeragam', fn($q) => $q->where('wajib', true))
+            ->count();
         $seragamPercent = min(100, (int) round(($chosenSeragamCount / $distinctSeragamCount) * 100));
 
         // 5. Dokumen Persyaratan
@@ -175,8 +194,10 @@ class LengkapiDataService
     public function saveOrangTua(CalonSiswa $calonSiswa, array $data): DataOrangtua
     {
         $allowedFields = [
+            'status_ayah',
             'nama_ayah', 'nik_ayah', 'tahun_lahir_ayah', 'pekerjaan_ayah_id', 'penghasilan_ayah',
             'pendidikan_ayah', 'no_hp_ayah', 'alamat_ayah',
+            'status_ibu',
             'nama_ibu', 'nik_ibu', 'tahun_lahir_ibu', 'pekerjaan_ibu_id', 'penghasilan_ibu',
             'pendidikan_ibu', 'no_hp_ibu', 'alamat_ibu',
             'nama_wali', 'hubungan_wali', 'pekerjaan_wali_id', 'penghasilan_wali',
@@ -184,6 +205,12 @@ class LengkapiDataService
         ];
 
         $payload = array_intersect_key($data, array_flip($allowedFields));
+        if (empty($payload['status_ayah'])) {
+            $payload['status_ayah'] = 'MASIH_HIDUP';
+        }
+        if (empty($payload['status_ibu'])) {
+            $payload['status_ibu'] = 'MASIH_HIDUP';
+        }
 
         $ortu = DataOrangtua::updateOrCreate(
             ['calon_siswa_id' => $calonSiswa->id],
@@ -226,6 +253,22 @@ class LengkapiDataService
 
         $payload = array_intersect_key($data, array_flip($allowedAkademik));
 
+        // Simpan matrix nilai rapor jika ada
+        $matrixFields = [
+            'mtk_sem1', 'mtk_sem2', 'mtk_sem3', 'mtk_sem4', 'mtk_sem5',
+            'ind_sem1', 'ind_sem2', 'ind_sem3', 'ind_sem4', 'ind_sem5',
+            'eng_sem1', 'eng_sem2', 'eng_sem3', 'eng_sem4', 'eng_sem5',
+            'pai_sem1', 'pai_sem2', 'pai_sem3', 'pai_sem4', 'pai_sem5',
+        ];
+        $matrixData = array_intersect_key($data, array_flip($matrixFields));
+
+        if (!empty($matrixData)) {
+            \App\Models\NilaiRapor::updateOrCreate(
+                ['calon_siswa_id' => $calonSiswa->id],
+                $matrixData
+            );
+        }
+
         $akademik = DataAkademik::updateOrCreate(
             ['calon_siswa_id' => $calonSiswa->id],
             $payload
@@ -267,17 +310,37 @@ class LengkapiDataService
     public function saveSeragam(CalonSiswa $calonSiswa, array $seragamEntries): void
     {
         DB::transaction(function () use ($calonSiswa, $seragamEntries) {
-            $calonSiswa->ukuranSeragam()->delete();
-
             foreach ($seragamEntries as $entry) {
                 if (!empty($entry['jenis_seragam_id']) && !empty($entry['ukuran'])) {
-                    UkuranSeragam::create([
-                        'calon_siswa_id' => $calonSiswa->id,
-                        'jenis_seragam_id' => $entry['jenis_seragam_id'],
-                        'ukuran' => $entry['ukuran'],
-                        'jumlah' => $entry['jumlah'] ?? 1,
-                        'keterangan' => $entry['keterangan'] ?? null,
-                    ]);
+                    $statusPemesanan = $entry['status_pemesanan'] ?? UkuranSeragam::STATUS_PESAN_SEKARANG;
+                    if (!in_array($statusPemesanan, [UkuranSeragam::STATUS_PESAN_SEKARANG, UkuranSeragam::STATUS_PESAN_NANTI], true)) {
+                        $statusPemesanan = UkuranSeragam::STATUS_PESAN_SEKARANG;
+                    }
+                    $beliDiSekolah = ($statusPemesanan === UkuranSeragam::STATUS_PESAN_SEKARANG);
+
+                    $existing = $calonSiswa->ukuranSeragam()->where('jenis_seragam_id', $entry['jenis_seragam_id'])->first();
+
+                    if ($existing && $existing->tagihan_id) {
+                        $existing->update([
+                            'ukuran' => $entry['ukuran'],
+                            'keterangan' => $entry['keterangan'] ?? $existing->keterangan,
+                        ]);
+                    } else {
+                        UkuranSeragam::updateOrCreate(
+                            [
+                                'calon_siswa_id' => $calonSiswa->id,
+                                'jenis_seragam_id' => $entry['jenis_seragam_id'],
+                            ],
+                            [
+                                'ukuran' => $entry['ukuran'],
+                                'jumlah' => $entry['jumlah'] ?? 1,
+                                'beli_di_sekolah' => $beliDiSekolah,
+                                'status_pemesanan' => $statusPemesanan,
+                                'tahap_pemesanan' => 1,
+                                'keterangan' => $entry['keterangan'] ?? null,
+                            ]
+                        );
+                    }
                 }
             }
 

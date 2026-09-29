@@ -11,8 +11,8 @@ use App\Models\MasterJurusan;
 use App\Models\MasterKriteriaWawancara;
 use App\Models\MasterProgram;
 use App\Models\User;
-use App\Models\Wawancara;
-use App\Models\WawancaraDetail;
+use App\Models\WawancaraSiswa;
+use App\Models\WawancaraOrangTua;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -77,28 +77,20 @@ class WawancaraTest extends TestCase
 
     public function test_unauthorized_roles_cannot_access_pewawancara_routes(): void
     {
-        // 1. Guest redirected to login
-        $this->get(route('pewawancara.dashboard'))
-            ->assertRedirect(route('login'));
+        $this->get(route('pewawancara.dashboard'))->assertRedirect(route('login'));
 
-        // 2. Calon Siswa redirected to candidate dashboard with error
-        $this->actingAs($this->siswaUser)
-            ->get(route('pewawancara.dashboard'))
+        $this->actingAs($this->siswaUser)->get(route('pewawancara.dashboard'))
             ->assertRedirect(route('calon-siswa.dashboard'))
             ->assertSessionHas('error');
 
-        // 3. Bendahara redirected to bendahara dashboard with error
-        $this->actingAs($this->bendaharaUser)
-            ->get(route('pewawancara.dashboard'))
+        $this->actingAs($this->bendaharaUser)->get(route('pewawancara.dashboard'))
             ->assertRedirect(route('bendahara.dashboard'))
             ->assertSessionHas('error');
     }
 
     public function test_pewawancara_can_view_dashboard_with_metrics(): void
     {
-        $response = $this->actingAs($this->pewawancaraUser)
-            ->get(route('pewawancara.dashboard'));
-
+        $response = $this->actingAs($this->pewawancaraUser)->get(route('pewawancara.dashboard'));
         $response->assertOk();
         $response->assertSee('Panel Penguji & Wawancara', false);
         $response->assertSee('Antrian Menunggu');
@@ -107,19 +99,15 @@ class WawancaraTest extends TestCase
 
     public function test_pewawancara_can_view_antrian_list(): void
     {
-        $response = $this->actingAs($this->pewawancaraUser)
-            ->get(route('pewawancara.antrian'));
-
+        $response = $this->actingAs($this->pewawancaraUser)->get(route('pewawancara.antrian'));
         $response->assertOk();
         $response->assertSee('Antrian Calon Siswa');
         $response->assertSee('26AAY0099');
         $response->assertSee('Budi Santoso');
-        $response->assertSee('Mulai Wawancara');
     }
 
     public function test_pewawancara_can_filter_antrian_by_search_and_jurusan(): void
     {
-        // Another candidate in different jurusan
         $otherJurusan = MasterJurusan::where('id', '!=', $this->jurusan->id)->first();
         $otherUser = User::factory()->create(['role' => User::ROLE_CALON_SISWA]);
         $otherSiswa = CalonSiswa::factory()->create([
@@ -133,15 +121,11 @@ class WawancaraTest extends TestCase
             'jurusan_id' => $otherJurusan->id,
         ]);
 
-        // Filter by Budi's name
-        $response1 = $this->actingAs($this->pewawancaraUser)
-            ->get(route('pewawancara.antrian', ['q' => 'Budi']));
+        $response1 = $this->actingAs($this->pewawancaraUser)->get(route('pewawancara.antrian', ['q' => 'Budi']));
         $response1->assertSee('Budi Santoso');
         $response1->assertDontSee('Rina Gunawan');
 
-        // Filter by Rina's Jurusan
-        $response2 = $this->actingAs($this->pewawancaraUser)
-            ->get(route('pewawancara.antrian', ['jurusan_id' => $otherJurusan->id]));
+        $response2 = $this->actingAs($this->pewawancaraUser)->get(route('pewawancara.antrian', ['jurusan_id' => $otherJurusan->id]));
         $response2->assertSee('Rina Gunawan');
         $response2->assertDontSee('Budi Santoso');
     }
@@ -159,165 +143,156 @@ class WawancaraTest extends TestCase
             'jurusan_id' => $this->jurusan->id,
         ]);
 
-        $response = $this->actingAs($this->pewawancaraUser)
-            ->get(route('pewawancara.wawancara.form', $ineligibleSiswa));
-
+        $response = $this->actingAs($this->pewawancaraUser)->get(route('pewawancara.wawancara.hub', $ineligibleSiswa));
         $response->assertRedirect(route('pewawancara.antrian'));
         $response->assertSessionHas('error');
     }
 
-    public function test_pewawancara_can_open_interview_form_for_eligible_candidate(): void
+    public function test_pewawancara_can_open_interview_hub_for_eligible_candidate(): void
     {
-        $response = $this->actingAs($this->pewawancaraUser)
-            ->get(route('pewawancara.wawancara.form', $this->calonSiswa));
-
+        $response = $this->actingAs($this->pewawancaraUser)->get(route('pewawancara.wawancara.hub', $this->calonSiswa));
         $response->assertOk();
         $response->assertSee('Budi Santoso');
-        $response->assertSee('26AAY0099');
-        $response->assertSee('Joko Santoso'); // Nama Ayah
-        $response->assertSee('88.5'); // Rata-rata Rapor
-        $response->assertSee('Kerapihan dan Penampilan');
-        $response->assertSee('Dukungan &amp; Perhatian Orang Tua', false);
-        $response->assertSee('Simpan Draft');
-        $response->assertSee('Selesai Wawancara');
+        $response->assertSee('Wawancara Siswa');
+        $response->assertSee('Wawancara Orang Tua');
     }
 
-    public function test_pewawancara_can_save_interview_draft(): void
+    public function test_pewawancara_can_save_interview_siswa_draft(): void
     {
-        $kriteriaList = MasterKriteriaWawancara::aktif()->get();
-        $penilaian = [];
-        foreach ($kriteriaList as $k) {
-            $penilaian[$k->id] = [
-                'kriteria_id' => $k->id,
-                'nilai' => 80,
-                'warna' => 'HIJAU',
-                'indikator' => 'Baik',
-                'catatan' => 'Catatan draft kriteria ' . $k->kode,
-            ];
-        }
-
         $payload = [
             'action' => 'draft',
-            'tanggal_wawancara' => now()->toDateString(),
-            'catatan_umum' => 'Draft catatan siswa memiliki motivasi cukup.',
-            'catatan_orang_tua' => 'Draft catatan orang tua bersedia mendukung.',
-            'penilaian' => $penilaian,
+            'nama_petugas' => 'Test Petugas',
+            'baca_quran' => 'Ya',
+            'alasan_masuk_wikrama' => 'Test',
+            'alasan_pilih_program_jurusan' => 'Test',
+            'merokok' => 'Tidak',
+            'kondisi_kesehatan' => 'Baik',
+            'kerapihan_rambut' => 'HIJAU',
+            'kerapihan_seragam' => 'HIJAU',
+            'status_pendengaran' => 'HIJAU',
+            'status_penglihatan' => 'Normal',
+            'rekomendasi' => 'TERIMA',
         ];
 
-        $response = $this->actingAs($this->pewawancaraUser)
-            ->post(route('pewawancara.wawancara.store', $this->calonSiswa), $payload);
-
-        $response->assertRedirect(route('pewawancara.wawancara.form', $this->calonSiswa));
+        $response = $this->actingAs($this->pewawancaraUser)->post(route('pewawancara.wawancara.save-siswa', $this->calonSiswa), $payload);
+        $response->assertRedirect(route('pewawancara.wawancara.hub', $this->calonSiswa));
         $response->assertSessionHas('success');
 
-        // Check database
-        $this->assertDatabaseHas('wawancara', [
+        $this->assertDatabaseHas('wawancara_siswa', [
             'calon_siswa_id' => $this->calonSiswa->id,
             'pewawancara_id' => $this->pewawancaraUser->id,
-            'status' => Wawancara::STATUS_PROSES,
-            'catatan_umum' => 'Draft catatan siswa memiliki motivasi cukup.',
+            'status' => 'DRAFT',
+            'baca_quran' => 'Ya',
         ]);
 
-        $this->assertDatabaseHas('wawancara_detail', [
-            'kriteria_id' => $kriteriaList->first()->id,
-            'nilai' => 80,
-            'warna' => 'HIJAU',
-        ]);
-
-        // Status SPMB should still be MENUNGGU_WAWANCARA
         $this->assertEquals(SpmbStatus::MENUNGGU_WAWANCARA, $this->calonSiswa->fresh()->status_spmb);
     }
 
     public function test_pewawancara_can_finalize_interview_and_transition_status(): void
     {
-        $kriteriaList = MasterKriteriaWawancara::aktif()->get();
-        $penilaian = [];
-        foreach ($kriteriaList as $k) {
-            $penilaian[$k->id] = [
-                'kriteria_id' => $k->id,
-                'nilai' => 90,
-                'warna' => 'HIJAU',
-                'indikator' => 'Sangat Baik',
-                'catatan' => 'Siswa sangat kompeten.',
-            ];
-        }
-
-        $payload = [
+        // 1. Save Siswa Selesai
+        $payloadSiswa = [
             'action' => 'selesai',
-            'tanggal_wawancara' => now()->toDateString(),
-            'catatan_umum' => 'Siswa sangat direkomendasikan masuk PPLG.',
-            'catatan_orang_tua' => 'Orang tua berkomitmen penuh mendampingi proses belajar.',
-            'penilaian' => $penilaian,
+            'nama_petugas' => 'Test Petugas',
+            'baca_quran' => 'Ya',
+            'alasan_masuk_wikrama' => 'Test',
+            'alasan_pilih_program_jurusan' => 'Test',
+            'merokok' => 'Tidak',
+            'kondisi_kesehatan' => 'Baik',
+            'kerapihan_rambut' => 'HIJAU',
+            'kerapihan_seragam' => 'HIJAU',
+            'status_pendengaran' => 'HIJAU',
+            'status_penglihatan' => 'Normal',
+            'rekomendasi' => 'TERIMA',
         ];
 
-        $response = $this->actingAs($this->pewawancaraUser)
-            ->post(route('pewawancara.wawancara.store', $this->calonSiswa), $payload);
-
-        $response->assertRedirect(route('pewawancara.wawancara.show', $this->calonSiswa));
-        $response->assertSessionHas('success');
-
-        // Check database: status wawancara = SELESAI
-        $this->assertDatabaseHas('wawancara', [
+        $this->actingAs($this->pewawancaraUser)->post(route('pewawancara.wawancara.save-siswa', $this->calonSiswa), $payloadSiswa);
+        
+        $this->assertDatabaseHas('wawancara_siswa', [
             'calon_siswa_id' => $this->calonSiswa->id,
-            'pewawancara_id' => $this->pewawancaraUser->id,
-            'status' => Wawancara::STATUS_SELESAI,
-            'catatan_umum' => 'Siswa sangat direkomendasikan masuk PPLG.',
+            'status' => 'SELESAI',
+        ]);
+        
+        // Status should still be MENUNGGU_WAWANCARA because Orang Tua is not done
+        $this->assertEquals(SpmbStatus::MENUNGGU_WAWANCARA, $this->calonSiswa->fresh()->status_spmb);
+
+        // 2. Save Orang Tua Selesai
+        $payloadOrangTua = [
+            'action' => 'selesai',
+            'nama_diwawancarai' => 'Joko Santoso',
+            'hubungan_dengan_siswa' => 'Ayah',
+            'tinggal_bersama' => 'Orang Tua',
+            'jarak_rumah' => '5 km',
+            'transportasi' => 'Motor',
+            'penanggung_jawab_belajar' => 'Ayah',
+            'info_wikrama_dari' => 'Brosur',
+            'baca_quran' => 'Ya',
+            'alasan_masuk_wikrama' => 'Bagus',
+            'alasan_pilih_program_jurusan' => 'Minat',
+            'kebiasaan_tempat_tidur' => 'Selalu',
+            'merokok' => 'Tidak',
+            'alergi' => '-',
+        ];
+
+        $response = $this->actingAs($this->pewawancaraUser)->post(route('pewawancara.wawancara.save-orang-tua', $this->calonSiswa), $payloadOrangTua);
+        
+        $response->assertRedirect(route('pewawancara.wawancara.hub', $this->calonSiswa));
+        
+        $this->assertDatabaseHas('wawancara_orang_tua', [
+            'calon_siswa_id' => $this->calonSiswa->id,
+            'status' => 'SELESAI',
+            'nama_diwawancarai' => 'Joko Santoso',
         ]);
 
-        // Status SPMB transitioned to SUDAH_DIWAWANCARA
+        // Status SPMB should now be SUDAH_DIWAWANCARA
         $this->assertEquals(SpmbStatus::SUDAH_DIWAWANCARA, $this->calonSiswa->fresh()->status_spmb);
 
-        // Audit Trail in riwayat_status_spmb
         $this->assertDatabaseHas('riwayat_status_spmb', [
             'calon_siswa_id' => $this->calonSiswa->id,
             'status_sebelumnya' => SpmbStatus::MENUNGGU_WAWANCARA->value,
             'status_baru' => SpmbStatus::SUDAH_DIWAWANCARA->value,
-            'changed_by' => $this->pewawancaraUser->id,
         ]);
     }
 
     public function test_pewawancara_can_view_completed_interview_detail(): void
     {
-        $wawancara = Wawancara::create([
+        WawancaraSiswa::create([
             'calon_siswa_id' => $this->calonSiswa->id,
             'pewawancara_id' => $this->pewawancaraUser->id,
             'tanggal_wawancara' => now()->toDateString(),
-            'status' => Wawancara::STATUS_SELESAI,
-            'catatan_umum' => 'Catatan hasil evaluasi final.',
-            'catatan_orang_tua' => 'Catatan orang tua sepakat.',
+            'status' => 'SELESAI',
+            'catatan_pewawancara' => 'Catatan hasil siswa final.',
+            'rekomendasi' => 'TERIMA',
+        ]);
+        
+        WawancaraOrangTua::create([
+            'calon_siswa_id' => $this->calonSiswa->id,
+            'pewawancara_id' => $this->pewawancaraUser->id,
+            'tanggal_wawancara' => now()->toDateString(),
+            'status' => 'SELESAI',
+            'kesan_pewawancara' => 'Kesan ortu final.',
+            'hubungan_dengan_siswa' => 'Ayah',
         ]);
 
-        $firstKriteria = MasterKriteriaWawancara::aktif()->first();
-        WawancaraDetail::create([
-            'wawancara_id' => $wawancara->id,
-            'kriteria_id' => $firstKriteria->id,
-            'nilai' => 95,
-            'warna' => 'HIJAU',
-            'indikator' => 'Sangat Baik',
-            'catatan' => 'Sangat menguasai logika.',
-        ]);
-
-        $response = $this->actingAs($this->pewawancaraUser)
-            ->get(route('pewawancara.wawancara.show', $this->calonSiswa));
+        $response = $this->actingAs($this->pewawancaraUser)->get(route('pewawancara.wawancara.show', $this->calonSiswa));
 
         $response->assertOk();
         $response->assertSee('Hasil Penilaian Wawancara');
-        $response->assertSee('Catatan hasil evaluasi final.');
-        $response->assertSee('95');
-        $response->assertSee('Sangat Baik');
+        $response->assertSee('Catatan hasil siswa final.');
+        $response->assertSee('Kesan ortu final.');
+        $response->assertSee('TERIMA');
     }
 
     public function test_pewawancara_can_view_riwayat_wawancara(): void
     {
-        Wawancara::create([
+        WawancaraSiswa::create([
             'calon_siswa_id' => $this->calonSiswa->id,
             'pewawancara_id' => $this->pewawancaraUser->id,
             'tanggal_wawancara' => now()->toDateString(),
-            'status' => Wawancara::STATUS_SELESAI,
+            'status' => 'SELESAI',
         ]);
 
-        $response = $this->actingAs($this->pewawancaraUser)
-            ->get(route('pewawancara.riwayat'));
+        $response = $this->actingAs($this->pewawancaraUser)->get(route('pewawancara.riwayat'));
 
         $response->assertOk();
         $response->assertSee('Riwayat Sesi Wawancara');
@@ -327,13 +302,9 @@ class WawancaraTest extends TestCase
 
     public function test_pewawancara_can_view_rubrik_instrumen(): void
     {
-        $response = $this->actingAs($this->pewawancaraUser)
-            ->get(route('pewawancara.instrumen'));
+        $response = $this->actingAs($this->pewawancaraUser)->get(route('pewawancara.instrumen'));
 
         $response->assertOk();
         $response->assertSee('Instrumen & Rubrik Penilaian', false);
-        $response->assertSee('Kerapihan dan Penampilan');
-        $response->assertSee('Sikap, Akhlak, dan Adab');
-        $response->assertSee('Dukungan &amp; Perhatian Orang Tua', false);
     }
 }

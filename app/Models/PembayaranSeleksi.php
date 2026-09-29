@@ -67,6 +67,11 @@ class PembayaranSeleksi extends Model
         return $this->status === self::STATUS_DIVERIFIKASI;
     }
 
+    public function isVerified(): bool
+    {
+        return $this->isDiverifikasi();
+    }
+
     public function isDitolak(): bool
     {
         return $this->status === self::STATUS_DITOLAK;

@@ -17,6 +17,7 @@ class User extends Authenticatable
     public const ROLE_BENDAHARA = 'bendahara';
     public const ROLE_PEWAWANCARA = 'pewawancara';
     public const ROLE_KEPALA_SEKOLAH = 'kepala_sekolah';
+    public const ROLE_GURU = 'guru';
     public const ROLE_CALON_SISWA = 'calon_siswa';
 
     /**
@@ -91,6 +92,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if user is Guru.
+     */
+     public function isGuru(): bool
+     {
+         return $this->role === self::ROLE_GURU;
+     }
+
+    /**
      * Check if user is Calon Siswa.
      */
     public function isCalonSiswa(): bool
@@ -118,7 +127,7 @@ class User extends Authenticatable
     public function getDashboardRoute(): string
     {
         return match ($this->role) {
-            self::ROLE_ADMIN => 'admin.dashboard',
+            self::ROLE_ADMIN, self::ROLE_GURU => 'admin.dashboard',
             self::ROLE_BENDAHARA => 'bendahara.dashboard',
             self::ROLE_PEWAWANCARA => 'pewawancara.dashboard',
             self::ROLE_KEPALA_SEKOLAH => 'kepala-sekolah.dashboard',
@@ -137,6 +146,7 @@ class User extends Authenticatable
             self::ROLE_BENDAHARA => 'Bendahara',
             self::ROLE_PEWAWANCARA => 'Pewawancara',
             self::ROLE_KEPALA_SEKOLAH => 'Kepala Sekolah',
+            self::ROLE_GURU => 'Guru',
             self::ROLE_CALON_SISWA => 'Calon Siswa',
             default => ucfirst(str_replace('_', ' ', (string) $this->role)),
         };

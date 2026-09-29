@@ -41,6 +41,10 @@ class CalonSiswa extends Model
         'email',
         'asal_sekolah_id',
         'asal_sekolah_lainnya',
+        'referensi_jenis',
+        'referensi_nama',
+        'referensi_rayon',
+        'referensi_nomor_seleksi',
         'program_id',
         'jurusan_id',
         'gelombang_id',
@@ -127,6 +131,11 @@ class CalonSiswa extends Model
         return $this->hasOne(DataAkademik::class, 'calon_siswa_id');
     }
 
+    public function nilaiRapor(): HasOne
+    {
+        return $this->hasOne(NilaiRapor::class, 'calon_siswa_id');
+    }
+
     public function dokumenPendaftaran(): HasOne
     {
         return $this->hasOne(DokumenPendaftaran::class, 'calon_siswa_id');
@@ -155,6 +164,16 @@ class CalonSiswa extends Model
     public function kesepahaman(): HasMany
     {
         return $this->hasMany(KesepahamanEula::class, 'calon_siswa_id');
+    }
+
+    public function wawancaraSiswa(): HasOne
+    {
+        return $this->hasOne(WawancaraSiswa::class, 'calon_siswa_id');
+    }
+
+    public function wawancaraOrangTua(): HasOne
+    {
+        return $this->hasOne(WawancaraOrangTua::class, 'calon_siswa_id');
     }
 
     public function wawancara(): HasMany

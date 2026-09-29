@@ -17,9 +17,14 @@ class Tagihan extends Model
     public const STATUS_CICILAN = 'CICILAN';
     public const STATUS_LUNAS = 'LUNAS';
 
+    public const JENIS_DAFTAR_ULANG = 'DAFTAR_ULANG';
+    public const JENIS_SERAGAM = 'SERAGAM';
+
     protected $fillable = [
         'calon_siswa_id',
         'nomor_tagihan',
+        'jenis_tagihan',
+        'tahap_seragam',
         'program_snapshot',
         'gelombang_snapshot',
         'total_bruto',
@@ -32,6 +37,7 @@ class Tagihan extends Model
     protected function casts(): array
     {
         return [
+            'tahap_seragam' => 'integer',
             'total_bruto' => 'decimal:2',
             'total_diskon' => 'decimal:2',
             'total_netto' => 'decimal:2',
@@ -56,5 +62,20 @@ class Tagihan extends Model
     public function pembayaran(): HasMany
     {
         return $this->hasMany(PembayaranDaftarUlang::class, 'tagihan_id');
+    }
+
+    public function isLunas(): bool
+    {
+        return $this->status === self::STATUS_LUNAS;
+    }
+
+    public function isCicilan(): bool
+    {
+        return $this->status === self::STATUS_CICILAN;
+    }
+
+    public function isBelumLunas(): bool
+    {
+        return $this->status === self::STATUS_BELUM_LUNAS;
     }
 }

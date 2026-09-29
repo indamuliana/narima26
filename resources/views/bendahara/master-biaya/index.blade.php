@@ -7,12 +7,13 @@
 
     @php
         $kategoriMeta = [
-            'DSP'      => ['label' => 'DSP / Uang Pangkal',  'color' => 'bg-blue-50 text-blue-700 border-blue-200'],
-            'SPP'      => ['label' => 'SPP Bulanan',          'color' => 'bg-purple-50 text-purple-700 border-purple-200'],
-            'SERAGAM'  => ['label' => 'Seragam & Atribut',   'color' => 'bg-teal-50 text-teal-700 border-teal-200'],
-            'KEGIATAN' => ['label' => 'Kegiatan & MPLS',     'color' => 'bg-amber-50 text-amber-700 border-amber-200'],
-            'PRAKTIK'  => ['label' => 'Praktik Jurusan',     'color' => 'bg-rose-50 text-rose-700 border-rose-200'],
-            'LAINNYA'  => ['label' => 'Lain-lain',           'color' => 'bg-slate-100 text-slate-600 border-slate-200'],
+            'DSP'      => ['label' => 'DSP / Uang Pangkal',    'color' => 'bg-blue-50 text-blue-700 border-blue-200'],
+            'SPP'      => ['label' => 'SPP Bulanan',            'color' => 'bg-purple-50 text-purple-700 border-purple-200'],
+            'ASRAMA'   => ['label' => 'Biaya Asrama / Pondok',  'color' => 'bg-indigo-50 text-indigo-700 border-indigo-200'],
+            'SERAGAM'  => ['label' => 'Seragam & Atribut',     'color' => 'bg-teal-50 text-teal-700 border-teal-200'],
+            'KEGIATAN' => ['label' => 'Kegiatan & MPLS',       'color' => 'bg-amber-50 text-amber-700 border-amber-200'],
+            'PRAKTIK'  => ['label' => 'Praktik Jurusan',       'color' => 'bg-rose-50 text-rose-700 border-rose-200'],
+            'LAINNYA'  => ['label' => 'Lain-lain',             'color' => 'bg-slate-100 text-slate-600 border-slate-200'],
         ];
     @endphp
 
@@ -20,7 +21,7 @@
          x-data="{
              modalTambah: false,
              editItem: null,
-             confirmToggle: null,
+             confirmToggle: null
          }">
 
         {{-- Header --}}
@@ -131,7 +132,14 @@
                                     {{ $b->kode_biaya }}
                                 </td>
                                 <td class="px-4 py-4">
-                                    <p class="font-bold text-slate-900">{{ $b->nama_biaya }}</p>
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <p class="font-bold text-slate-900">{{ $b->nama_biaya }}</p>
+                                        @if ($b->jenis_kelamin === 'L')
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-700">Putra</span>
+                                        @elseif ($b->jenis_kelamin === 'P')
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-pink-100 text-pink-700">Putri</span>
+                                        @endif
+                                    </div>
                                     @if ($b->keterangan)
                                         <p class="text-[11px] text-slate-400 mt-0.5">{{ $b->keterangan }}</p>
                                     @endif
@@ -153,6 +161,8 @@
                                         @endif
                                         @if ($b->gelombang)
                                             <p class="text-[11px] text-slate-400">{{ $b->gelombang->nama }}</p>
+                                        @else
+                                            <p class="text-[10px] text-slate-400 font-medium">Semua Gelombang</p>
                                         @endif
                                     </div>
                                 </td>
@@ -186,7 +196,7 @@
                                 </td>
                                 <td class="px-5 py-4 text-right">
                                     <div class="flex items-center justify-end gap-2">
-                                        <button @click="editItem = {{ json_encode(['id' => $b->id, 'kode_biaya' => $b->kode_biaya, 'nama_biaya' => $b->nama_biaya, 'kategori' => $b->kategori, 'program_id' => $b->program_id, 'gelombang_id' => $b->gelombang_id, 'nominal' => $b->nominal, 'keterangan' => $b->keterangan]) }}"
+                                        <button @click="editItem = {{ json_encode(['id' => $b->id, 'kode_biaya' => $b->kode_biaya, 'nama_biaya' => $b->nama_biaya, 'kategori' => $b->kategori, 'program_id' => $b->program_id, 'gelombang_id' => $b->gelombang_id, 'jenis_kelamin' => $b->jenis_kelamin, 'nominal' => (float)$b->nominal, 'wajib' => (bool)$b->wajib, 'keterangan' => $b->keterangan]) }}"
                                                 type="button"
                                                 class="px-2.5 py-1 rounded-lg border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition-colors cursor-pointer">
                                             Ubah
@@ -244,6 +254,7 @@
                                 <select name="kategori" required class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30">
                                     <option value="DSP">DSP / Uang Pangkal</option>
                                     <option value="SPP">SPP Bulanan</option>
+                                    <option value="ASRAMA">Biaya Asrama / Pondok</option>
                                     <option value="SERAGAM">Seragam & Atribut</option>
                                     <option value="KEGIATAN">Kegiatan & MPLS</option>
                                     <option value="PRAKTIK">Praktik Jurusan</option>
@@ -257,23 +268,31 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-3 gap-3">
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Program (Opsional)</label>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Program</label>
                                 <select name="program_id" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30 bg-white">
-                                    <option value="">— Semua Program —</option>
+                                    <option value="">— Semua —</option>
                                     @foreach ($programList as $prog)
                                         <option value="{{ $prog->id }}">{{ $prog->nama }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Gelombang (Opsional)</label>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Gelombang</label>
                                 <select name="gelombang_id" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30 bg-white">
-                                    <option value="">— Semua Gelombang —</option>
+                                    <option value="">— Semua —</option>
                                     @foreach ($gelombangList as $gel)
                                         <option value="{{ $gel->id }}">{{ $gel->nama }}</option>
                                     @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Peruntukan</label>
+                                <select name="jenis_kelamin" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30 bg-white">
+                                    <option value="">Semua Siswa</option>
+                                    <option value="L">Putra (L)</option>
+                                    <option value="P">Putri (P)</option>
                                 </select>
                             </div>
                         </div>
@@ -337,6 +356,7 @@
                                         x-init="$watch('editItem', v => { if (v) $el.value = v.kategori ?? '' })">
                                     <option value="DSP">DSP / Uang Pangkal</option>
                                     <option value="SPP">SPP Bulanan</option>
+                                    <option value="ASRAMA">Biaya Asrama / Pondok</option>
                                     <option value="SERAGAM">Seragam & Atribut</option>
                                     <option value="KEGIATAN">Kegiatan & MPLS</option>
                                     <option value="PRAKTIK">Praktik Jurusan</option>
@@ -350,29 +370,46 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-3 gap-3">
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Program (Opsional)</label>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Program</label>
                                 <select name="program_id"
                                         class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30 bg-white"
                                         x-init="$watch('editItem', v => { if (v) $el.value = v.program_id ?? '' })">
-                                    <option value="">— Semua Program —</option>
+                                    <option value="">— Semua —</option>
                                     @foreach ($programList as $prog)
                                         <option value="{{ $prog->id }}">{{ $prog->nama }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Gelombang (Opsional)</label>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Gelombang</label>
                                 <select name="gelombang_id"
                                         class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30 bg-white"
                                         x-init="$watch('editItem', v => { if (v) $el.value = v.gelombang_id ?? '' })">
-                                    <option value="">— Semua Gelombang —</option>
+                                    <option value="">— Semua —</option>
                                     @foreach ($gelombangList as $gel)
                                         <option value="{{ $gel->id }}">{{ $gel->nama }}</option>
                                     @endforeach
                                 </select>
                             </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Peruntukan</label>
+                                <select name="jenis_kelamin"
+                                        class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30 bg-white"
+                                        x-init="$watch('editItem', v => { if (v) $el.value = v.jenis_kelamin ?? '' })">
+                                    <option value="">Semua Siswa</option>
+                                    <option value="L">Putra (L)</option>
+                                    <option value="P">Putri (P)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-1">
+                            <input type="checkbox" id="wajib_edit" name="wajib" value="1"
+                                   x-init="$watch('editItem', v => { if (v) $el.checked = !!v.wajib })"
+                                   class="rounded text-nampi-orange focus:ring-nampi-orange">
+                            <label for="wajib_edit" class="text-xs font-semibold text-slate-700 cursor-pointer">Komponen Wajib (Otomatis masuk tagihan baku)</label>
                         </div>
 
                         <div>

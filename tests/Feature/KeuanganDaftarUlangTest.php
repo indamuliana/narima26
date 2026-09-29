@@ -158,6 +158,16 @@ class KeuanganDaftarUlangTest extends TestCase
         $tagihan = Tagihan::where('calon_siswa_id', $this->calonSiswa->id)->first();
         $initialBruto = (float) $tagihan->total_bruto;
 
+        // Verify show page renders clean optional discount section
+        $showResponse = $this->actingAs($this->bendaharaUser)
+            ->get(route('bendahara.tagihan.show', $tagihan));
+        $showResponse->assertOk();
+        $showResponse->assertSee('Diskon & Keringanan Biaya', false);
+        $showResponse->assertSee('Opsional');
+        $showResponse->assertSee('Tidak Ada Diskon (Tarif Standar Penuh)');
+        $showResponse->assertDontSee('Section 24');
+        $showResponse->assertDontSeeText('d.id == value');
+
         // Apply 10% discount
         $response = $this->actingAs($this->bendaharaUser)
             ->post(route('bendahara.diskon.store', $tagihan), [

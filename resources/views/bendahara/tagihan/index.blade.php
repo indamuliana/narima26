@@ -38,18 +38,26 @@
         <!-- Filter Card -->
         <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
             <form method="GET" action="{{ route('bendahara.tagihan.index') }}" class="grid grid-cols-1 sm:grid-cols-12 gap-3">
-                <div class="sm:col-span-7">
+                <div class="sm:col-span-5">
                     <input type="text" name="q" value="{{ $search }}"
                            placeholder="Cari nomor tagihan, nama siswa, NISN, atau no pendaftaran..."
                            class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30 focus:border-nampi-orange">
                 </div>
 
                 <div class="sm:col-span-3">
-                    <select name="status" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30 focus:border-nampi-orange">
-                        <option value="">Semua Status Tagihan</option>
+                    <select name="jenis_tagihan" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30 focus:border-nampi-orange bg-white">
+                        <option value="">Semua Jenis Tagihan</option>
+                        <option value="DAFTAR_ULANG" {{ ($jenisTagihan ?? '') === 'DAFTAR_ULANG' ? 'selected' : '' }}>Daftar Ulang (DSP & SPP)</option>
+                        <option value="SERAGAM" {{ ($jenisTagihan ?? '') === 'SERAGAM' ? 'selected' : '' }}>Paket Seragam & Atribut</option>
+                    </select>
+                </div>
+
+                <div class="sm:col-span-2">
+                    <select name="status" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30 focus:border-nampi-orange bg-white">
+                        <option value="">Semua Status</option>
                         <option value="BELUM_LUNAS" {{ $status === 'BELUM_LUNAS' ? 'selected' : '' }}>Belum Lunas</option>
-                        <option value="CICILAN" {{ $status === 'CICILAN' ? 'selected' : '' }}>Cicilan / Sebagian</option>
-                        <option value="LUNAS" {{ $status === 'LUNAS' ? 'selected' : '' }}>Lunas 100%</option>
+                        <option value="CICILAN" {{ $status === 'CICILAN' ? 'selected' : '' }}>Cicilan</option>
+                        <option value="LUNAS" {{ $status === 'LUNAS' ? 'selected' : '' }}>Lunas</option>
                     </select>
                 </div>
 
@@ -57,7 +65,7 @@
                     <button type="submit" class="w-full px-4 py-2 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-colors cursor-pointer">
                         Filter
                     </button>
-                    @if ($search || $status)
+                    @if ($search || $status || !empty($jenisTagihan))
                         <a href="{{ route('bendahara.tagihan.index') }}" class="px-3 py-2 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 text-sm flex items-center justify-center">
                             ✕
                         </a>
@@ -74,6 +82,7 @@
                         <tr>
                             <th class="px-5 py-3.5">Nomor Tagihan</th>
                             <th class="px-4 py-3.5">Calon Siswa</th>
+                            <th class="px-4 py-3.5">Jenis Tagihan</th>
                             <th class="px-4 py-3.5">Program / Gelombang</th>
                             <th class="px-4 py-3.5 text-right">Total Netto</th>
                             <th class="px-4 py-3.5 text-center">Status</th>
@@ -96,10 +105,26 @@
                                     <p class="text-xs text-slate-400 font-mono mt-0.5">
                                         {{ $t->calonSiswa?->nomor_pendaftaran }} • NISN: {{ $t->calonSiswa?->nisn }}
                                     </p>
+                                    <p class="text-[11px] text-slate-500 font-semibold mt-0.5">
+                                        {{ $t->calonSiswa?->jurusan?->nama ?? $t->calonSiswa?->jurusan?->nama_jurusan ?? '-' }}
+                                    </p>
                                 </td>
                                 <td class="px-4 py-4">
-                                    <span class="text-xs font-medium text-slate-700 block">{{ $t->program_snapshot }}</span>
-                                    <span class="text-[11px] text-slate-400">{{ $t->gelombang_snapshot }}</span>
+                                    @if($t->jenis_tagihan === 'SERAGAM')
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                                            Seragam & Atribut
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                            DSP & SPP Bulan-1
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-4">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold {{ str_contains(strtolower($t->program_snapshot ?? ''), 'unggul') ? 'bg-amber-100 text-amber-800' : 'bg-blue-50 text-blue-700' }}">
+                                        {{ $t->program_snapshot ?: 'Reguler' }}
+                                    </span>
+                                    <span class="text-[11px] text-slate-400 block mt-0.5">{{ $t->gelombang_snapshot }}</span>
                                 </td>
                                 <td class="px-4 py-4 text-right">
                                     <span class="font-black text-slate-900 block">
@@ -130,9 +155,12 @@
                                     @endif
                                 </td>
                                 <td class="px-5 py-4 text-right">
-                                    <div class="flex items-center justify-end gap-2">
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        @if($t->calonSiswa)
+                                            <x-whatsapp-contact-dropdown :calonSiswa="$t->calonSiswa" />
+                                        @endif
                                         <a href="{{ route('bendahara.tagihan.show', $t) }}"
-                                           class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition-colors">
+                                           class="px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition-colors">
                                             Rincian
                                         </a>
                                         <a href="{{ route('bendahara.tagihan.cetak', $t) }}" target="_blank"

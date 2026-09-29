@@ -52,8 +52,8 @@ class AdminDashboardTest extends TestCase
 
         PembayaranSeleksi::create([
             'calon_siswa_id' => $this->calonSiswa->id,
-            'nominal_tagihan' => 250000,
-            'nominal_dibayar' => 250000,
+            'nominal_tagihan' => 200000,
+            'nominal_dibayar' => 200000,
             'status' => 'DIVERIFIKASI',
             'metode_bayar' => 'transfer_bank',
         ]);
@@ -251,7 +251,7 @@ class AdminDashboardTest extends TestCase
 
             $verifyResponse = $this->actingAs($this->adminUser)
                 ->post(route('admin.pembayaran.seleksi.verify', $pembayaran), [
-                    'nominal_dibayar' => 250000,
+                    'nominal_dibayar' => 200000,
                 ]);
 
             $verifyResponse->assertRedirect();

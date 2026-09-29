@@ -65,62 +65,46 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
-                        @forelse ($riwayatList as $w)
-                            @php
-                                $avg = $w->details->count() > 0 ? $w->details->avg('nilai') : 0;
-                            @endphp
+                        @forelse ($riwayatList as $cs)
                             <tr class="hover:bg-slate-50/70 transition-colors">
                                 <td class="px-5 py-4">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0">
-                                            {{ strtoupper(substr($w->calonSiswa?->nama_lengkap ?? 'CS', 0, 2)) }}
+                                            {{ strtoupper(substr($cs->nama_lengkap ?? 'CS', 0, 2)) }}
                                         </div>
                                         <div>
-                                            <p class="font-bold text-slate-800">{{ $w->calonSiswa?->nama_lengkap }}</p>
+                                            <p class="font-bold text-slate-800">{{ $cs->nama_lengkap }}</p>
                                             <p class="text-xs text-slate-400 font-mono mt-0.5">
-                                                {{ $w->calonSiswa?->nomor_pendaftaran }} • NISN: {{ $w->calonSiswa?->nisn }}
+                                                {{ $cs->nomor_pendaftaran }} • NISN: {{ $cs->nisn }}
                                             </p>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-4 py-4">
                                     <span class="inline-block px-2.5 py-1 rounded-lg text-xs font-semibold bg-cyan-50 text-cyan-800 border border-cyan-200">
-                                        {{ $w->calonSiswa?->jurusan?->nama_jurusan ?? '-' }}
+                                        {{ $cs->jurusan?->nama_jurusan ?? '-' }}
                                     </span>
                                 </td>
                                 <td class="px-4 py-4">
                                     <span class="text-xs font-medium text-slate-700">
-                                        {{ $w->tanggal_wawancara?->format('d/m/Y') ?? '-' }}
+                                        {{ $cs->wawancaraSiswa?->tanggal_wawancara?->format('d/m/Y') ?? '-' }}
                                     </span>
                                 </td>
                                 <td class="px-4 py-4">
-                                    <p class="text-xs font-medium text-slate-700">{{ $w->pewawancara?->name ?? '-' }}</p>
+                                    <p class="text-xs font-medium text-slate-700">{{ $cs->wawancaraSiswa?->pewawancara?->name ?? $cs->wawancaraSiswa?->nama_petugas ?? '-' }}</p>
                                 </td>
                                 <td class="px-4 py-4 text-center">
-                                    @if ($avg >= 75)
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                            {{ number_format($avg, 1) }}
-                                        </span>
-                                    @elseif ($avg >= 60)
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                            {{ number_format($avg, 1) }}
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                                            {{ number_format($avg, 1) }}
-                                        </span>
-                                    @endif
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold {{ $cs->wawancaraSiswa?->rekomendasi == 'TERIMA' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : ($cs->wawancaraSiswa?->rekomendasi == 'PERTIMBANGKAN' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200') }}">
+                                        {{ $cs->wawancaraSiswa?->rekomendasi ?? '-' }}
+                                    </span>
                                 </td>
                                 <td class="px-5 py-4 text-right">
                                     <div class="flex items-center justify-end gap-2">
-                                        <a href="{{ route('pewawancara.wawancara.show', $w->calonSiswa) }}"
+                                        <a href="{{ route('pewawancara.wawancara.show', $cs) }}"
                                            class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition-colors">
                                             Detail
                                         </a>
-                                        <a href="{{ route('pewawancara.wawancara.form', $w->calonSiswa) }}"
+                                        <a href="{{ route('pewawancara.wawancara.hub', $cs) }}"
                                            class="px-2.5 py-1.5 rounded-lg border border-blue-200 text-blue-700 text-xs font-semibold hover:bg-blue-50 transition-colors">
                                             Edit
                                         </a>

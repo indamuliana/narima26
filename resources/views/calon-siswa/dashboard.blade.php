@@ -2,51 +2,7 @@
     <x-slot name="title">Portal Calon Siswa</x-slot>
 
     <x-slot name="sidebar">
-        <a href="{{ route('calon-siswa.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold bg-nampi-orange text-white shadow-xs">
-            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-            </svg>
-            <span>Dashboard</span>
-        </a>
-        <a href="{{ route('calon-siswa.pembayaran-seleksi.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-            </svg>
-            <span>Pembayaran Seleksi</span>
-        </a>
-        <a href="{{ route('calon-siswa.lengkapi-data.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-            </svg>
-            <span>Lengkapi Data & Berkas</span>
-        </a>
-        <a href="{{ route('calon-siswa.kesepahaman.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-            </svg>
-            <span>Kesepahaman SPMB</span>
-        </a>
-        <a href="{{ route('calon-siswa.dokumen.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-            </svg>
-            <span>Dokumen & Cetak PDF</span>
-        </a>
-        <a href="{{ route('calon-siswa.daftar-ulang.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium {{ request()->routeIs('calon-siswa.daftar-ulang.*') ? 'bg-nampi-orange text-white shadow-xs font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }} transition-colors">
-            <svg class="w-5 h-5 {{ request()->routeIs('calon-siswa.daftar-ulang.*') ? 'text-white' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
-            <span>Tagihan Daftar Ulang</span>
-        </a>
-        <form method="POST" action="{{ route('logout') }}" class="pt-4 mt-4 border-t border-slate-800">
-            @csrf
-            <button type="submit" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors cursor-pointer">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                </svg>
-                <span>Keluar (Logout)</span>
-            </button>
-        </form>
+        @include('calon-siswa.partials.sidebar')
     </x-slot>
 
     <div class="space-y-6">
@@ -60,7 +16,9 @@
                 </div>
                 <h1 class="text-2xl font-black">{{ $calonSiswa?->nama_lengkap ?? auth()->user()->name }}</h1>
                 <p class="text-xs text-amber-100">
-                    Pilihan Jurusan: <strong>{{ $calonSiswa?->jurusan?->nama ?? '-' }}</strong> &bull; Gelombang: <strong>{{ $calonSiswa?->gelombang?->nama ?? '-' }}</strong>
+                    Program: <strong>{{ $calonSiswa?->program?->nama ?? '-' }}</strong> &bull; 
+                    Jurusan: <strong>{{ $calonSiswa?->jurusan?->nama ?? '-' }}</strong> &bull; 
+                    Gelombang: <strong>{{ $calonSiswa?->gelombang?->nama ?? '-' }}</strong>
                 </p>
             </div>
             <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 text-right">
@@ -269,40 +227,40 @@
 
                 <!-- Step 2: Pembayaran Seleksi -->
                 @if($isPaymentDone)
-                    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800">
+                    <a href="{{ route('calon-siswa.pembayaran-seleksi.index') }}" class="block p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 hover:bg-emerald-100/70 hover:border-emerald-300 transition-all cursor-pointer">
                         <div class="flex items-center justify-between text-xs font-bold mb-1">
                             <span>2. Pembayaran Seleksi</span>
                             <span class="text-emerald-600">✓ Diverifikasi</span>
                         </div>
                         <p class="text-[11px] text-emerald-700">Biaya pendaftaran seleksi lunas.</p>
-                    </div>
+                    </a>
                 @else
-                    <div class="p-4 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 ring-2 ring-amber-400/30">
+                    <a href="{{ route('calon-siswa.pembayaran-seleksi.index') }}" class="block p-4 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 ring-2 ring-amber-400/30 hover:bg-amber-100/70 transition-all cursor-pointer">
                         <div class="flex items-center justify-between text-xs font-bold mb-1">
                             <span>2. Pembayaran Seleksi</span>
-                            <span class="text-amber-600">Tahap Aktif</span>
+                            <span class="text-amber-600 font-extrabold">Tahap Aktif &rarr;</span>
                         </div>
-                        <p class="text-[11px] text-amber-800">Upload bukti transfer biaya seleksi (Rp 250.000).</p>
-                    </div>
+                        <p class="text-[11px] text-amber-800">Upload bukti transfer biaya seleksi (Rp 200.000).</p>
+                    </a>
                 @endif
 
                 <!-- Step 3: Lengkapi Data & Kesepahaman -->
                 @if($isDataComplete)
-                    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800">
+                    <a href="{{ route('calon-siswa.lengkapi-data.index') }}" class="block p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 hover:bg-emerald-100/70 hover:border-emerald-300 transition-all cursor-pointer">
                         <div class="flex items-center justify-between text-xs font-bold mb-1">
                             <span>3. Lengkapi Data & EULA</span>
                             <span class="text-emerald-600">✓ Lengkap</span>
                         </div>
                         <p class="text-[11px] text-emerald-700">Data, berkas, & kesepahaman telah disetujui.</p>
-                    </div>
+                    </a>
                 @elseif($isDataActive)
-                    <div class="p-4 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 ring-2 ring-amber-400/30">
+                    <a href="{{ route('calon-siswa.lengkapi-data.index') }}" class="block p-4 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 ring-2 ring-amber-400/30 hover:bg-amber-100/70 transition-all cursor-pointer">
                         <div class="flex items-center justify-between text-xs font-bold mb-1">
                             <span>3. Lengkapi Data & EULA</span>
-                            <span class="text-amber-600">Tahap Aktif</span>
+                            <span class="text-amber-600 font-extrabold">Tahap Aktif &rarr;</span>
                         </div>
                         <p class="text-[11px] text-amber-800">Lengkapi formulir biodata & upload berkas.</p>
-                    </div>
+                    </a>
                 @else
                     <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-400">
                         <div class="flex items-center justify-between text-xs font-bold mb-1">
@@ -315,13 +273,13 @@
 
                 <!-- Step 4: Wawancara & Daftar Ulang -->
                 @if($statusVal === 'MENUNGGU_WAWANCARA')
-                    <div class="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 ring-2 ring-blue-400/30">
+                    <a href="{{ route('calon-siswa.dokumen.index') }}" class="block p-4 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 ring-2 ring-blue-400/30 hover:bg-blue-100/70 transition-all cursor-pointer">
                         <div class="flex items-center justify-between text-xs font-bold mb-1">
                             <span>4. Tes Wawancara</span>
-                            <span class="text-blue-600">Tahap Aktif</span>
+                            <span class="text-blue-600 font-extrabold">Tahap Aktif &rarr;</span>
                         </div>
                         <p class="text-[11px] text-blue-700">Cetak kartu peserta & ikuti wawancara seleksi.</p>
-                    </div>
+                    </a>
                 @elseif($statusVal === 'SUDAH_DIWAWANCARA')
                     <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-900 ring-2 ring-indigo-400/30">
                         <div class="flex items-center justify-between text-xs font-bold mb-1">
@@ -331,13 +289,13 @@
                         <p class="text-[11px] text-indigo-700">Menunggu keputusan sidang kelulusan panitia SPMB.</p>
                     </div>
                 @elseif(in_array($statusVal, ['DITERIMA', 'MENUNGGU_DAFTAR_ULANG', 'DAFTAR_ULANG_DIVERIFIKASI', 'RESMI_TERDAFTAR']))
-                    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800">
+                    <a href="{{ route('calon-siswa.daftar-ulang.index') }}" class="block p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 hover:bg-emerald-100/70 hover:border-emerald-300 transition-all cursor-pointer">
                         <div class="flex items-center justify-between text-xs font-bold mb-1">
                             <span>4. Hasil & Daftar Ulang</span>
-                            <span class="text-emerald-600">✓ Lulus Seleksi</span>
+                            <span class="text-emerald-600 font-extrabold">✓ Lulus Seleksi &rarr;</span>
                         </div>
                         <p class="text-[11px] text-emerald-700">Selamat! Anda dinyatakan diterima di SMK Wikrama.</p>
-                    </div>
+                    </a>
                 @else
                     <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-400">
                         <div class="flex items-center justify-between text-xs font-bold mb-1">

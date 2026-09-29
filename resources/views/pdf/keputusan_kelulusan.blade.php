@@ -68,7 +68,7 @@
                     Garut, {{ now()->translatedFormat('d F Y') }}<br>
                     Kepala SMK Wikrama 1 Garut,
                     <div class="signature-space"></div>
-                    <strong style="text-decoration: underline;">( Kepala SMK Wikrama 1 Garut )</strong><br>
+                    <strong style="text-decoration: underline;">( Kunedi, S.Si., Gr. )</strong><br>
                     <small>NIP / NUPTK. -</small>
                 </td>
             </tr>

@@ -11,22 +11,57 @@ class UpdateOrangTuaRequest extends FormRequest
         return auth()->check() && auth()->user()->hasRole('calon_siswa');
     }
 
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'status_ayah' => $this->input('status_ayah', 'MASIH_HIDUP') ?? 'MASIH_HIDUP',
+            'status_ibu' => $this->input('status_ibu', 'MASIH_HIDUP') ?? 'MASIH_HIDUP',
+        ]);
+    }
+
     public function rules(): array
     {
         return [
+            'status_ayah' => ['required', 'in:MASIH_HIDUP,WAFAT'],
             'nama_ayah' => ['required', 'string', 'max:150'],
             'nik_ayah' => ['nullable', 'string', 'digits:16'],
             'tahun_lahir_ayah' => ['nullable', 'string', 'max:10'],
-            'pekerjaan_ayah_id' => ['required', 'exists:master_pekerjaan,id'],
+            'pekerjaan_ayah_id' => [
+                function ($attribute, $value, $fail) {
+                    if ($this->input('status_ayah') === 'MASIH_HIDUP' && empty($value)) {
+                        $fail('Pekerjaan ayah wajib dipilih.');
+                    }
+                },
+                'nullable',
+                'exists:master_pekerjaan,id',
+            ],
             'penghasilan_ayah' => ['nullable', 'string', 'max:50'],
             'pendidikan_ayah' => ['nullable', 'string', 'max:50'],
-            'no_hp_ayah' => ['required', 'string', 'max:20'],
+            'no_hp_ayah' => [
+                function ($attribute, $value, $fail) {
+                    if ($this->input('status_ayah') === 'MASIH_HIDUP' && empty($value)) {
+                        $fail('Nomor HP/WhatsApp ayah wajib diisi.');
+                    }
+                },
+                'nullable',
+                'string',
+                'max:20',
+            ],
             'alamat_ayah' => ['nullable', 'string', 'max:500'],
 
+            'status_ibu' => ['required', 'in:MASIH_HIDUP,WAFAT'],
             'nama_ibu' => ['required', 'string', 'max:150'],
             'nik_ibu' => ['nullable', 'string', 'digits:16'],
             'tahun_lahir_ibu' => ['nullable', 'string', 'max:10'],
-            'pekerjaan_ibu_id' => ['required', 'exists:master_pekerjaan,id'],
+            'pekerjaan_ibu_id' => [
+                function ($attribute, $value, $fail) {
+                    if ($this->input('status_ibu') === 'MASIH_HIDUP' && empty($value)) {
+                        $fail('Pekerjaan ibu wajib dipilih.');
+                    }
+                },
+                'nullable',
+                'exists:master_pekerjaan,id',
+            ],
             'penghasilan_ibu' => ['nullable', 'string', 'max:50'],
             'pendidikan_ibu' => ['nullable', 'string', 'max:50'],
             'no_hp_ibu' => ['nullable', 'string', 'max:20'],
@@ -45,10 +80,9 @@ class UpdateOrangTuaRequest extends FormRequest
     {
         return [
             'nama_ayah.required' => 'Nama ayah kandung wajib diisi.',
-            'pekerjaan_ayah_id.required' => 'Pekerjaan ayah wajib dipilih.',
-            'no_hp_ayah.required' => 'Nomor HP/WhatsApp ayah wajib diisi.',
+            'status_ayah.required' => 'Status ayah wajib dipilih.',
             'nama_ibu.required' => 'Nama ibu kandung wajib diisi.',
-            'pekerjaan_ibu_id.required' => 'Pekerjaan ibu wajib dipilih.',
+            'status_ibu.required' => 'Status ibu wajib dipilih.',
         ];
     }
 }

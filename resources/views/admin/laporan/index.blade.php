@@ -9,10 +9,42 @@
         <!-- Header & Action Bar -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-black text-slate-800">Laporan & Analitik SPMB 2026/2027</h1>
+                <h1 class="text-2xl font-black text-slate-800">Laporan & Analitik SPMB 2027/2028</h1>
                 <p class="text-xs text-slate-400 mt-0.5">Ringkasan funnel konversi, rekapitulasi kuota kompetensi keahlian, dan arus kas penerimaan</p>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2" x-data="{ openExport: false }">
+                <div class="relative">
+                    <button type="button" @click="openExport = !openExport" @click.outside="openExport = false"
+                            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition-colors shadow-xs cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <span>Unduh CSV Data Siswa</span>
+                        <svg class="w-3 h-3 text-emerald-200 transition-transform duration-200" :class="{ 'rotate-180': openExport }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div x-show="openExport" x-cloak class="absolute right-0 mt-2 w-64 rounded-xl bg-white shadow-xl ring-1 ring-black/10 divide-y divide-slate-100 z-50 overflow-hidden" style="display: none;">
+                        <div class="p-2">
+                            <a href="{{ route('admin.calon-siswa.export.csv', ['mode' => 'full']) }}"
+                               class="flex items-start gap-2.5 p-2 rounded-lg hover:bg-emerald-50 text-slate-800 transition-colors group">
+                                <span class="p-1.5 rounded-md bg-emerald-100 text-emerald-700 text-xs">📊</span>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-800 group-hover:text-emerald-800">Ekspor Master Lengkap</p>
+                                    <p class="text-[10px] text-slate-500">65+ kolom komprehensif satu baris per calon siswa</p>
+                                </div>
+                            </a>
+                            <a href="{{ route('admin.calon-siswa.export.csv', ['mode' => 'simple']) }}"
+                               class="flex items-start gap-2.5 p-2 rounded-lg hover:bg-slate-50 text-slate-800 transition-colors group mt-1">
+                                <span class="p-1.5 rounded-md bg-slate-100 text-slate-700 text-xs">📄</span>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-800 group-hover:text-slate-900">Ekspor Ringkas</p>
+                                    <p class="text-[10px] text-slate-500">15 kolom data pendaftaran cepat</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
                 <a href="{{ route('admin.laporan.rekap.export.pdf') }}" target="_blank"
                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-colors shadow-xs">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

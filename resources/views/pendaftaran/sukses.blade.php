@@ -67,7 +67,7 @@
                         <div>
                             <strong class="font-bold text-amber-900">Langkah Berikutnya: Pembayaran Biaya Seleksi</strong>
                             <p class="mt-1 text-xs text-amber-800 leading-relaxed">
-                                Silakan lakukan pembayaran biaya seleksi sebesar <strong>Rp {{ number_format($calonSiswa->pembayaranSeleksi?->nominal_tagihan ?? 250000, 0, ',', '.') }}</strong> melalui transfer bank ke rekening resmi SMK Wikrama 1 Garut (Bank BJB: <strong>0123-4567-8900-1</strong>), kemudian unggah bukti transfer di dashboard calon siswa.
+                                Silakan lakukan pembayaran biaya seleksi sebesar <strong>Rp {{ number_format($calonSiswa->pembayaranSeleksi?->nominal_tagihan ?? 200000, 0, ',', '.') }}</strong> melalui transfer bank ke rekening resmi SMK Wikrama 1 Garut (Bank BNI: <strong>082-0083-086</strong>), kemudian unggah bukti transfer di dashboard calon siswa.
                             </p>
                         </div>
                     </div>

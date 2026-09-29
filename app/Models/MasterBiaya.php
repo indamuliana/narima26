@@ -19,6 +19,7 @@ class MasterBiaya extends Model
         'kategori',
         'program_id',
         'gelombang_id',
+        'jenis_kelamin',
         'nominal',
         'tipe_nominal',
         'wajib',

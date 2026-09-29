@@ -47,8 +47,8 @@ class PaymentVerificationService
             }
 
             $pembayaran->fill([
-                'nominal_tagihan' => $pembayaran->nominal_tagihan ?: 250000,
-                'nominal_dibayar' => $data['nominal_dibayar'] ?? 250000,
+                'nominal_tagihan' => $pembayaran->nominal_tagihan ?: 200000,
+                'nominal_dibayar' => $data['nominal_dibayar'] ?? 200000,
                 'tanggal_bayar' => $data['tanggal_bayar'] ?? now()->toDateString(),
                 'metode_bayar' => $data['metode_bayar'] ?? 'transfer_bank',
                 'bank_pengirim' => $data['bank_pengirim'],

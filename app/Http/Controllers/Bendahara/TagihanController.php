@@ -27,8 +27,9 @@ class TagihanController extends Controller
      */
     public function index(Request $request): View
     {
-        $search = $request->input('q');
-        $status = $request->input('status');
+        $search       = $request->input('q');
+        $status       = $request->input('status');
+        $jenisTagihan = $request->input('jenis_tagihan');
 
         $query = Tagihan::query()
             ->with(['calonSiswa.jurusan', 'calonSiswa.program', 'diskon', 'pembayaran']);
@@ -48,6 +49,10 @@ class TagihanController extends Controller
             $query->where('status', $status);
         }
 
+        if (! empty($jenisTagihan)) {
+            $query->where('jenis_tagihan', $jenisTagihan);
+        }
+
         $tagihanList = $query->latest('id')->paginate(15)->withQueryString();
 
         // Calculate aggregate statistics
@@ -59,7 +64,7 @@ class TagihanController extends Controller
             'total_belum_lunas' => Tagihan::where('status', Tagihan::STATUS_BELUM_LUNAS)->count(),
         ];
 
-        return view('bendahara.tagihan.index', compact('tagihanList', 'stats', 'search', 'status'));
+        return view('bendahara.tagihan.index', compact('tagihanList', 'stats', 'search', 'status', 'jenisTagihan'));
     }
 
     /**
@@ -67,7 +72,7 @@ class TagihanController extends Controller
      */
     public function create(): View
     {
-        // Candidates eligible for invoice: SUDAH_DIWAWANCARA, DITERIMA, MENUNGGU_DAFTAR_ULANG without active invoice
+        // Candidates eligible for invoice: SUDAH_DIWAWANCARA, DITERIMA, MENUNGGU_DAFTAR_ULANG without active DU invoice
         $eligibleCandidates = CalonSiswa::query()
             ->with(['jurusan', 'program', 'gelombang'])
             ->whereIn('status_spmb', [
@@ -75,7 +80,9 @@ class TagihanController extends Controller
                 SpmbStatus::DITERIMA->value,
                 SpmbStatus::MENUNGGU_DAFTAR_ULANG->value,
             ])
-            ->whereDoesntHave('tagihan')
+            ->whereDoesntHave('tagihan', function ($q) {
+                $q->where('jenis_tagihan', Tagihan::JENIS_DAFTAR_ULANG);
+            })
             ->orderBy('nama_lengkap')
             ->get();
 
@@ -93,12 +100,12 @@ class TagihanController extends Controller
 
         $calonSiswa = CalonSiswa::findOrFail($validated['calon_siswa_id']);
 
-        if ($calonSiswa->tagihan()->exists()) {
+        if ($calonSiswa->tagihan()->where('jenis_tagihan', Tagihan::JENIS_DAFTAR_ULANG)->exists()) {
             return redirect()->route('bendahara.tagihan.index')
-                ->with('error', 'Tagihan untuk calon siswa ini sudah pernah diterbitkan.');
+                ->with('error', 'Tagihan daftar ulang untuk calon siswa ini sudah pernah diterbitkan.');
         }
 
-        $tagihan = $this->invoiceService->generateInvoice($calonSiswa, actor: auth()->user());
+        $tagihanDU = $this->invoiceService->generateInvoice($calonSiswa, actor: auth()->user());
 
         // Advance candidate status to MENUNGGU_DAFTAR_ULANG if valid
         $currentStatus = is_string($calonSiswa->status_spmb)
@@ -109,14 +116,14 @@ class TagihanController extends Controller
             $this->spmbStatusService->changeStatus(
                 calonSiswa: $calonSiswa,
                 targetStatus: SpmbStatus::MENUNGGU_DAFTAR_ULANG,
-                alasan: 'Tagihan daftar ulang resmi telah diterbitkan oleh Bendahara',
-                catatan: "Nomor Tagihan: {$tagihan->nomor_tagihan}",
+                alasan: 'Tagihan daftar ulang dan tagihan seragam telah diterbitkan oleh Bendahara',
+                catatan: "Tagihan Pendidikan #{$tagihanDU->nomor_tagihan}",
                 changedBy: auth()->user()
             );
         }
 
-        return redirect()->route('bendahara.tagihan.show', $tagihan)
-            ->with('success', "Tagihan daftar ulang #{$tagihan->nomor_tagihan} berhasil diterbitkan.");
+        return redirect()->route('bendahara.tagihan.show', $tagihanDU)
+            ->with('success', "Tagihan daftar ulang #{$tagihanDU->nomor_tagihan} berhasil diterbitkan.");
     }
 
     /**
@@ -135,8 +142,9 @@ class TagihanController extends Controller
 
         $totalPaid = $this->invoiceService->getTotalPaidVerified($tagihan);
         $remainingBalance = $this->invoiceService->getRemainingBalance($tagihan);
+        $masterDiskonList = \App\Models\MasterDiskon::where('is_active', true)->get();
 
-        return view('bendahara.tagihan.show', compact('tagihan', 'totalPaid', 'remainingBalance'));
+        return view('bendahara.tagihan.show', compact('tagihan', 'totalPaid', 'remainingBalance', 'masterDiskonList'));
     }
 
     /**

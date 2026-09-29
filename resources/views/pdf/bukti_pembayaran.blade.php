@@ -89,7 +89,7 @@
                     Garut, {{ now()->translatedFormat('d F Y') }}<br>
                     Bendahara Penerimaan Sekolah,
                     <div class="signature-space"></div>
-                    <strong>( {{ $pembayaran->verifikator?->name ?? 'Bendahara SMK Wikrama' }} )</strong>
+                    <strong>( {{ $pembayaran->verifikator?->name ?? 'Fitria Amalia, S.Pd.' }} )</strong>
                 </td>
             </tr>
         </table>

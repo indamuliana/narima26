@@ -135,6 +135,11 @@
     </style>
 </head>
 <body>
+    @hasSection('custom_footer')
+        @yield('custom_footer')
+    @endif
+
+    @unless($hideKop ?? false)
     <div class="header-kop">
         @if (!empty($kopSuratBase64))
             <img src="{{ $kopSuratBase64 }}" class="kop-image" alt="Kop Surat SMK Wikrama 1 Garut">
@@ -143,16 +148,19 @@
             <p style="margin: 2px 0; font-size: 9pt;">Jl. Otto Iskandardinata, Kp. Tanjung Kidul, RT.003/RW.013, Pasawahan, Kec. Tarogong Kaler, Kabupaten Garut, Jawa Barat 44151</p>
         @endif
     </div>
+    @endunless
 
     @yield('content')
 
-    <div class="footer-note">
-        <table style="width: 100%;">
-            <tr>
-                <td style="text-align: left;">Sistem SPMB Nampi — SMK Wikrama 1 Garut</td>
-                <td style="text-align: right;">Dicetak otomatis pada: {{ now()->translatedFormat('d F Y H:i:s') }}</td>
-            </tr>
-        </table>
-    </div>
+    @unless(View::hasSection('custom_footer'))
+        <div class="footer-note">
+            <table style="width: 100%;">
+                <tr>
+                    <td style="text-align: left;">Sistem SPMB Nampi — SMK Wikrama 1 Garut</td>
+                    <td style="text-align: right;">Dicetak otomatis pada: {{ now()->translatedFormat('d F Y H:i:s') }}</td>
+                </tr>
+            </table>
+        </div>
+    @endunless
 </body>
 </html>

@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="doc-title" style="font-size: 13pt;">REKAPITULASI PENDAFTARAN CALON MURID BARU</div>
-    <div class="doc-number">Tahun Ajaran 2026/2027 &bull; Dicetak pada: {{ $printedAt->translatedFormat('d F Y H:i') }} WIB</div>
+    <div class="doc-number">Tahun Ajaran 2027/2028 &bull; Dicetak pada: {{ $printedAt->translatedFormat('d F Y H:i') }} WIB</div>
 
     @if (!empty($filters['jurusan_nama']) || !empty($filters['status_nama']) || !empty($filters['gelombang_nama']))
         <div style="font-size: 8.5pt; color: #475569; margin-bottom: 10px; background-color: #f8fafc; padding: 6px 10px; border-radius: 4px; border: 1px solid #e2e8f0;">
@@ -64,11 +64,11 @@
                     Mengetahui,<br>
                     <strong>Kepala SMK Wikrama 1 Garut</strong>
                     <div class="signature-space"></div>
-                    <strong>( Kepala Sekolah )</strong>
+                    <strong>( Kunedi, S.Si., Gr. )</strong>
                 </td>
                 <td style="width: 50%;">
                     Garut, {{ $printedAt->translatedFormat('d F Y') }}<br>
-                    <strong>Ketua Panitia SPMB 2026/2027</strong>
+                    <strong>Ketua Panitia SPMB 2027/2028</strong>
                     <div class="signature-space"></div>
                     <strong>( Panitia SPMB )</strong>
                 </td>

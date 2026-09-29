@@ -51,7 +51,7 @@ class PembayaranSeleksiTest extends TestCase
         // Tagihan Seleksi Awal
         PembayaranSeleksi::create([
             'calon_siswa_id' => $this->calonSiswa->id,
-            'nominal_tagihan' => 250000,
+            'nominal_tagihan' => 200000,
             'nominal_dibayar' => 0,
             'status' => 'PENDING',
         ]);
@@ -69,7 +69,7 @@ class PembayaranSeleksiTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Tagihan Biaya Pendaftaran Seleksi');
-        $response->assertSee('250.000');
+        $response->assertSee('200.000');
         $response->assertSee('Formulir Konfirmasi Bukti Transfer');
     }
 
@@ -87,7 +87,7 @@ class PembayaranSeleksiTest extends TestCase
             'nama_pengirim' => 'Ahmad Subagyo',
             'nomor_referensi' => 'MDR-998877',
             'tanggal_bayar' => now()->toDateString(),
-            'nominal_dibayar' => 250000,
+            'nominal_dibayar' => 200000,
             'bukti_transfer' => $file,
         ]);
 
@@ -121,7 +121,7 @@ class PembayaranSeleksiTest extends TestCase
             'bank_pengirim' => 'Bank BCA',
             'nama_pengirim' => 'Pengirim',
             'tanggal_bayar' => now()->toDateString(),
-            'nominal_dibayar' => 250000,
+            'nominal_dibayar' => 200000,
             'bukti_transfer' => $badFile,
         ]);
 
@@ -155,7 +155,7 @@ class PembayaranSeleksiTest extends TestCase
     {
         $pembayaran = PembayaranSeleksi::where('calon_siswa_id', $this->calonSiswa->id)->first();
         $pembayaran->update([
-            'nominal_dibayar' => 250000,
+            'nominal_dibayar' => 200000,
             'bank_pengirim' => 'BCA',
             'nama_pengirim' => 'Hendra',
             'bukti_transfer_path' => 'bukti-bayar-seleksi/dummy.jpg',
@@ -164,8 +164,8 @@ class PembayaranSeleksiTest extends TestCase
 
         $response = $this->actingAs($this->bendahara)
             ->post("/bendahara/pembayaran-seleksi/{$pembayaran->id}/verify", [
-                'nominal_diterima' => 250000,
-                'catatan' => 'Dana mutasi telah masuk di rekening BJB Wikrama.',
+                'nominal_diterima' => 200000,
+                'catatan' => 'Dana mutasi telah masuk di rekening BNI Wikrama.',
             ]);
 
         $response->assertRedirect('/bendahara/pembayaran-seleksi');
@@ -219,7 +219,7 @@ class PembayaranSeleksiTest extends TestCase
     {
         $pembayaran = PembayaranSeleksi::where('calon_siswa_id', $this->calonSiswa->id)->first();
         $pembayaran->update([
-            'nominal_dibayar' => 250000,
+            'nominal_dibayar' => 200000,
             'status' => PaymentStatus::DIVERIFIKASI->value,
             'verified_by' => $this->bendahara->id,
             'verified_at' => now(),
@@ -258,7 +258,7 @@ class PembayaranSeleksiTest extends TestCase
         // 1. Web request: Dialihkan ke dashboard sendiri dengan notifikasi error
         $response = $this->actingAs($this->pewawancara)
             ->post("/bendahara/pembayaran-seleksi/{$pembayaran->id}/verify", [
-                'nominal_diterima' => 250000,
+                'nominal_diterima' => 200000,
             ]);
 
         $response->assertRedirect(route('pewawancara.dashboard'));
@@ -267,7 +267,7 @@ class PembayaranSeleksiTest extends TestCase
         // 2. JSON request: Mendapat HTTP 403 Forbidden
         $responseJson = $this->actingAs($this->pewawancara)
             ->postJson("/bendahara/pembayaran-seleksi/{$pembayaran->id}/verify", [
-                'nominal_diterima' => 250000,
+                'nominal_diterima' => 200000,
             ]);
 
         $responseJson->assertStatus(403);

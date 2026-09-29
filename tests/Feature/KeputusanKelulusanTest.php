@@ -56,22 +56,23 @@ class KeputusanKelulusanTest extends TestCase
         $kriteria = \App\Models\MasterKriteriaWawancara::first();
 
         // Create completed interview for candidate
-        $wawancara = Wawancara::create([
+        \App\Models\WawancaraSiswa::create([
             'calon_siswa_id' => $this->calonSiswa->id,
             'pewawancara_id' => $this->pewawancaraUser->id,
             'tanggal_wawancara' => now()->toDateString(),
             'status' => 'SELESAI',
-            'catatan_umum' => 'Motivasi tinggi dan pemahaman jurusan baik',
-            'catatan_orang_tua' => 'Orang tua mendukung penuh',
+            'catatan_pewawancara' => 'Motivasi tinggi dan pemahaman jurusan baik',
+            'rekomendasi' => 'TERIMA',
         ]);
 
-        WawancaraDetail::create([
-            'wawancara_id' => $wawancara->id,
-            'kriteria_id' => $kriteria->id,
-            'indikator' => 'Sangat Baik',
-            'nilai' => 90,
-            'warna' => 'HIJAU',
-            'catatan' => 'Sopan dan ramah',
+        \App\Models\WawancaraOrangTua::create([
+            'calon_siswa_id' => $this->calonSiswa->id,
+            'pewawancara_id' => $this->pewawancaraUser->id,
+            'tanggal_wawancara' => now()->toDateString(),
+            'status' => 'SELESAI',
+            'kesan_pewawancara' => 'Orang tua mendukung penuh',
+            'nama_diwawancarai' => 'Bapak Budi',
+            'hubungan_dengan_siswa' => 'Ayah',
         ]);
     }
 
@@ -103,14 +104,27 @@ class KeputusanKelulusanTest extends TestCase
 
     public function test_kepala_sekolah_can_view_candidate_evaluation_room(): void
     {
+        \App\Models\Tagihan::create([
+            'calon_siswa_id' => $this->calonSiswa->id,
+            'nomor_tagihan' => 'TAG-DU260001',
+            'jenis_tagihan' => \App\Models\Tagihan::JENIS_DAFTAR_ULANG,
+            'program_snapshot' => 'Reguler',
+            'gelombang_snapshot' => 'Gelombang 1',
+            'total_bruto' => 3450000,
+            'total_diskon' => 0,
+            'total_netto' => 3450000,
+            'status' => \App\Models\Tagihan::STATUS_LUNAS,
+        ]);
+
         $response = $this->actingAs($this->kepalaSekolahUser)
             ->get(route('kepala-sekolah.sidang-kelulusan.show', $this->calonSiswa));
 
         $response->assertOk();
         $response->assertSee($this->calonSiswa->nama_lengkap);
-        $response->assertSee('Hasil Evaluasi Tes Wawancara');
-        $response->assertSee('Kerapihan dan Penampilan');
+        $response->assertSee('Hasil Evaluasi Wawancara');
+        $response->assertSee('Wawancara Siswa');
         $response->assertSee('Tetapkan / Perbarui Keputusan');
+        $response->assertSee('TAG-DU260001');
     }
 
     public function test_kepala_sekolah_can_decide_candidate_diterima(): void
@@ -130,6 +144,13 @@ class KeputusanKelulusanTest extends TestCase
             'calon_siswa_id' => $this->calonSiswa->id,
             'keputusan' => 'DITERIMA',
             'ditetapkan_oleh' => $this->kepalaSekolahUser->id,
+        ]);
+
+        // Assert Tagihan Daftar Ulang automatically generated and active
+        $this->assertDatabaseHas('tagihan', [
+            'calon_siswa_id' => $this->calonSiswa->id,
+            'jenis_tagihan' => \App\Models\Tagihan::JENIS_DAFTAR_ULANG,
+            'status' => \App\Models\Tagihan::STATUS_BELUM_LUNAS,
         ]);
     }
 
@@ -152,32 +173,7 @@ class KeputusanKelulusanTest extends TestCase
         ]);
     }
 
-    public function test_batch_pleno_decision_for_multiple_candidates(): void
-    {
-        $user2 = User::factory()->create(['role' => User::ROLE_CALON_SISWA, 'is_active' => true]);
-        $calonSiswa2 = CalonSiswa::factory()->create([
-            'user_id' => $user2->id,
-            'status_spmb' => SpmbStatus::SUDAH_DIWAWANCARA,
-            'program_id' => $this->program->id,
-            'jurusan_id' => $this->jurusan->id,
-            'gelombang_id' => $this->gelombang->id,
-        ]);
 
-        $response = $this->actingAs($this->kepalaSekolahUser)
-            ->post(route('kepala-sekolah.sidang-kelulusan.batch'), [
-                'calon_siswa_ids' => [$this->calonSiswa->id, $calonSiswa2->id],
-                'keputusan' => 'DITERIMA',
-                'catatan_sidang' => 'Dinyatakan diterima bersama dalam sidang pleno.',
-            ]);
-
-        $response->assertRedirect(route('kepala-sekolah.sidang-kelulusan.index'));
-
-        $this->calonSiswa->refresh();
-        $calonSiswa2->refresh();
-
-        $this->assertEquals(SpmbStatus::DITERIMA, $this->calonSiswa->status_spmb);
-        $this->assertEquals(SpmbStatus::DITERIMA, $calonSiswa2->status_spmb);
-    }
 
     public function test_candidate_can_download_surat_keputusan_pdf_when_diterima(): void
     {
@@ -281,6 +277,101 @@ class KeputusanKelulusanTest extends TestCase
         $this->assertEquals(SpmbStatus::SUDAH_DIWAWANCARA, $this->calonSiswa->status_spmb);
     }
 
+    public function test_kepala_sekolah_batch_decision_generates_invoices_for_all_accepted(): void
+    {
+        $candidate2 = CalonSiswa::factory()->create([
+            'status_spmb' => SpmbStatus::SUDAH_DIWAWANCARA,
+            'program_id' => $this->program->id,
+            'jurusan_id' => $this->jurusan->id,
+            'gelombang_id' => $this->gelombang->id,
+        ]);
+
+        $response = $this->actingAs($this->kepalaSekolahUser)
+            ->post(route('kepala-sekolah.sidang-kelulusan.batch'), [
+                'calon_siswa_ids' => [$this->calonSiswa->id, $candidate2->id],
+                'keputusan' => 'DITERIMA',
+                'alasan_catatan' => 'Lulus seleksi sidang pleno batch.',
+            ]);
+
+        $response->assertRedirect(route('kepala-sekolah.sidang-kelulusan.index'));
+
+        $this->calonSiswa->refresh();
+        $candidate2->refresh();
+        $this->assertEquals(SpmbStatus::DITERIMA, $this->calonSiswa->status_spmb);
+        $this->assertEquals(SpmbStatus::DITERIMA, $candidate2->status_spmb);
+
+        $this->assertDatabaseHas('tagihan', [
+            'calon_siswa_id' => $this->calonSiswa->id,
+            'jenis_tagihan' => \App\Models\Tagihan::JENIS_DAFTAR_ULANG,
+        ]);
+        $this->assertDatabaseHas('tagihan', [
+            'calon_siswa_id' => $candidate2->id,
+            'jenis_tagihan' => \App\Models\Tagihan::JENIS_DAFTAR_ULANG,
+        ]);
+    }
+
+    public function test_kepala_sekolah_can_view_calon_siswa_directory_and_360_profile(): void
+    {
+        // Create verified selection payment to test rendering of payment column
+        \App\Models\PembayaranSeleksi::create([
+            'calon_siswa_id' => $this->calonSiswa->id,
+            'nominal_tagihan' => 200000,
+            'nominal_dibayar' => 200000,
+            'tanggal_bayar' => now()->toDateString(),
+            'metode_bayar' => 'TRANSFER_BANK',
+            'bank_pengirim' => 'BCA',
+            'nama_pengirim' => 'Budi Santoso',
+            'status' => \App\Models\PembayaranSeleksi::STATUS_DIVERIFIKASI,
+            'verified_by' => $this->adminUser->id,
+            'verified_at' => now(),
+        ]);
+
+        $candidatePending = CalonSiswa::factory()->create([
+            'status_spmb' => SpmbStatus::MENUNGGU_PEMBAYARAN_SELEKSI,
+            'program_id' => $this->program->id,
+            'jurusan_id' => $this->jurusan->id,
+            'gelombang_id' => $this->gelombang->id,
+        ]);
+        \App\Models\PembayaranSeleksi::create([
+            'calon_siswa_id' => $candidatePending->id,
+            'nominal_tagihan' => 200000,
+            'nominal_dibayar' => 200000,
+            'tanggal_bayar' => now()->toDateString(),
+            'metode_bayar' => 'TRANSFER_BANK',
+            'status' => \App\Models\PembayaranSeleksi::STATUS_PENDING,
+        ]);
+
+        // Directory Index
+        $indexResponse = $this->actingAs($this->kepalaSekolahUser)
+            ->get(route('kepala-sekolah.calon-siswa.index'));
+
+        $indexResponse->assertOk();
+        $indexResponse->assertSee('Direktori Data Calon Siswa');
+        $indexResponse->assertSee($this->calonSiswa->nama_lengkap);
+        $indexResponse->assertSee('✓ Lunas');
+        $indexResponse->assertSee('⏳ Verifikasi');
+
+        // 360 Full Profile View
+        $showResponse = $this->actingAs($this->kepalaSekolahUser)
+            ->get(route('kepala-sekolah.calon-siswa.show', $this->calonSiswa));
+
+        $showResponse->assertOk();
+        $showResponse->assertSee($this->calonSiswa->nama_lengkap);
+        $showResponse->assertSee('Biodata Pribadi Calon Siswa');
+        $showResponse->assertSee('Hasil Wawancara Seleksi');
+        $showResponse->assertSee('Keuangan Daftar Ulang');
+        $showResponse->assertSee('Berkas & Dokumen Terunggah', false);
+    }
+
+    public function test_kepala_sekolah_can_download_calon_siswa_360_pdf(): void
+    {
+        $response = $this->actingAs($this->kepalaSekolahUser)
+            ->get(route('kepala-sekolah.calon-siswa.cetak-pdf', $this->calonSiswa));
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'application/pdf');
+    }
+
     public function test_unauthorized_roles_cannot_access_sidang_kelulusan_or_withdrawal(): void
     {
         $this->actingAs($this->pewawancaraUser)
@@ -294,3 +385,4 @@ class KeputusanKelulusanTest extends TestCase
             ->assertSessionHas('error');
     }
 }
+

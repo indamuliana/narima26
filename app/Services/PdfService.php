@@ -76,7 +76,7 @@ class PdfService
      */
     public function generateKartuPendaftaran(CalonSiswa $calonSiswa): DomPdfWrapper
     {
-        $calonSiswa->loadMissing(['program', 'jurusan', 'gelombang', 'sekolahAsal']);
+        $calonSiswa->loadMissing(['program', 'jurusan', 'gelombang', 'sekolahAsal', 'user']);
 
         return $this->renderPdf('pdf.kartu_pendaftaran', [
             'calonSiswa' => $calonSiswa,
@@ -150,13 +150,25 @@ class PdfService
      */
     public function generateEula(CalonSiswa $calonSiswa): DomPdfWrapper
     {
-        $calonSiswa->loadMissing(['program', 'jurusan', 'orangTua', 'sekolahAsal', 'kesepahaman']);
+        $calonSiswa->loadMissing(['program', 'jurusan', 'orangTua', 'dataOrangtua', 'sekolahAsal', 'kesepahaman']);
 
         $eula = $calonSiswa->kesepahaman()->where('setuju', true)->latest()->first();
+
+        $kesepahamanService = app(\App\Services\KesepahamanService::class);
+        $klausulData = $kesepahamanService->getKlausulByCalonSiswa($calonSiswa);
+
+        // Gunakan snapshot jika tersimpan, atau ambil dari klausul aktif
+        $kelompokList = (!empty($eula?->klausul_snapshot))
+            ? $eula->klausul_snapshot
+            : $klausulData['kelompok'];
 
         return $this->renderPdf('pdf.kesepahaman_eula', [
             'calonSiswa' => $calonSiswa,
             'eula' => $eula,
+            'programNama' => $klausulData['program_title'],
+            'tahunPelajaran' => $klausulData['tahun_pelajaran'],
+            'kelompokList' => $kelompokList,
+            'hideKop' => true,
         ]);
     }
 
@@ -192,5 +204,21 @@ class PdfService
             'printedAt' => now(),
         ], 'a4', 'landscape');
     }
+
+    /**
+     * Generate Dokumen Profil Lengkap Calon Siswa (Biodata, Nilai, Wawancara, Berkas, Keuangan).
+     *
+     * @param CalonSiswa $calonSiswa
+     * @param array $extraData
+     * @return DomPdfWrapper
+     */
+    public function generateProfilLengkap(CalonSiswa $calonSiswa, array $extraData = []): DomPdfWrapper
+    {
+        return $this->renderPdf('pdf.profil_lengkap_calon_siswa', array_merge([
+            'calonSiswa' => $calonSiswa,
+            'printedAt' => now(),
+        ], $extraData), 'a4', 'portrait');
+    }
 }
+
 

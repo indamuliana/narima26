@@ -113,13 +113,25 @@
                                 <td class="px-4 py-4">
                                     <p class="font-bold text-slate-800">{{ $p->calonSiswa?->nama_lengkap ?? '-' }}</p>
                                     <p class="text-xs text-slate-400 font-mono mt-0.5">
-                                        {{ $p->calonSiswa?->nomor_pendaftaran }} • {{ $p->calonSiswa?->jurusan?->kode }}
+                                        {{ $p->calonSiswa?->nomor_pendaftaran }} • {{ $p->calonSiswa?->jurusan?->nama ?? $p->calonSiswa?->jurusan?->nama_jurusan ?? $p->calonSiswa?->jurusan?->kode }}
                                     </p>
+                                    <div class="mt-1">
+                                        <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-bold {{ str_contains(strtolower($p->calonSiswa?->program?->nama ?? $p->calonSiswa?->program?->nama_program ?? ''), 'unggul') ? 'bg-amber-100 text-amber-800' : 'bg-blue-50 text-blue-700' }}">
+                                            {{ $p->calonSiswa?->program?->nama ?? $p->calonSiswa?->program?->nama_program ?? 'Reguler' }}
+                                        </span>
+                                    </div>
                                 </td>
                                 <td class="px-4 py-4">
-                                    <a href="{{ route('bendahara.tagihan.show', $p->tagihan_id) }}" class="font-mono text-xs font-bold text-nampi-orange hover:underline block">
-                                        {{ $p->tagihan?->nomor_tagihan }}
-                                    </a>
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <a href="{{ route('bendahara.tagihan.show', $p->tagihan_id) }}" class="font-mono text-xs font-bold text-nampi-orange hover:underline block">
+                                            {{ $p->tagihan?->nomor_tagihan }}
+                                        </a>
+                                        @if($p->tagihan?->jenis_tagihan === 'SERAGAM')
+                                            <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">Seragam</span>
+                                        @else
+                                            <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">DSP/SPP</span>
+                                        @endif
+                                    </div>
                                     <span class="text-[11px] text-slate-400">
                                         Status: {{ $p->tagihan?->status }}
                                     </span>
@@ -152,14 +164,17 @@
                                     @endif
                                 </td>
                                 <td class="px-5 py-4 text-right">
-                                    <div class="flex items-center justify-end gap-2">
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        @if($p->calonSiswa)
+                                            <x-whatsapp-contact-dropdown :calonSiswa="$p->calonSiswa" />
+                                        @endif
                                         <a href="{{ route('bendahara.pembayaran-daftar-ulang.show', $p) }}"
-                                           class="px-3 py-1.5 rounded-lg {{ $p->status === 'PENDING' ? 'bg-nampi-orange text-white hover:bg-orange-600' : 'border border-slate-200 text-slate-700 hover:bg-slate-100' }} text-xs font-semibold transition-colors">
+                                           class="px-2.5 py-1.5 rounded-lg {{ $p->status === 'PENDING' ? 'bg-nampi-orange text-white hover:bg-orange-600' : 'border border-slate-200 text-slate-700 hover:bg-slate-100' }} text-xs font-semibold transition-colors">
                                             {{ $p->status === 'PENDING' ? 'Verifikasi' : 'Detail' }}
                                         </a>
                                         @if ($p->status === 'DIVERIFIKASI')
                                             <a href="{{ route('bendahara.pembayaran-daftar-ulang.cetak-kwitansi', $p) }}" target="_blank"
-                                               class="px-2.5 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition-colors" title="Cetak Kwitansi">
+                                               class="px-2 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition-colors" title="Cetak Kwitansi">
                                                 Kwitansi
                                             </a>
                                         @endif

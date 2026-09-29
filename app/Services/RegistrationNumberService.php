@@ -12,7 +12,7 @@ class RegistrationNumberService
      * Default prefix format: 26AAY
      * Sesuai Section 13: 26AAYXXXX (Contoh: 26AAY0001, 26AAY0002)
      */
-    public const DEFAULT_PREFIX = '26AAY';
+    public const DEFAULT_PREFIX = '26';
 
     /**
      * Generate nomor pendaftaran baru secara terpusat, unik, dan aman terhadap konkurensi.

@@ -19,10 +19,21 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
+        [x-cloak] { display: none !important; }
     </style>
 
     <!-- Scripts and Styles via Vite -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!window.Alpine) {
+                const s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js';
+                s.defer = true;
+                document.head.appendChild(s);
+            }
+        });
+    </script>
 </head>
 <body class="flex flex-col min-h-screen text-slate-800 antialiased selection:bg-nampi-orange selection:text-white">
 
@@ -43,26 +54,40 @@
                 </a>
 
                 <!-- Desktop Menu -->
-                <nav class="hidden md:flex items-center gap-8">
+                <nav class="hidden lg:flex items-center gap-6">
                     <a href="{{ url('/') }}" class="text-sm font-medium text-slate-700 hover:text-nampi-orange transition-colors">Beranda</a>
-                    <a href="{{ url('/#program') }}" class="text-sm font-medium text-slate-600 hover:text-nampi-orange transition-colors">Program & Jurusan</a>
-                    <a href="{{ url('/#alur') }}" class="text-sm font-medium text-slate-600 hover:text-nampi-orange transition-colors">Alur Pendaftaran</a>
+                    <a href="{{ url('/#gelombang-highlight') }}" class="text-sm font-medium text-amber-600 hover:text-amber-700 transition-colors font-semibold">Gelombang Aktif</a>
+                    <a href="{{ url('/#fasilitas') }}" class="text-sm font-medium text-slate-600 hover:text-nampi-orange transition-colors">Fasilitas</a>
+                    <a href="{{ url('/#pembelajaran') }}" class="text-sm font-medium text-slate-600 hover:text-nampi-orange transition-colors">Pembelajaran</a>
+                    <a href="{{ url('/#testimoni') }}" class="text-sm font-medium text-slate-600 hover:text-nampi-orange transition-colors">Alumni & Testimoni</a>
                     <a href="{{ url('/#biaya') }}" class="text-sm font-medium text-slate-600 hover:text-nampi-orange transition-colors">Biaya</a>
-                    <a href="{{ url('/#faq') }}" class="text-sm font-medium text-slate-600 hover:text-nampi-orange transition-colors">FAQ</a>
                 </nav>
 
-                <!-- Auth Buttons -->
-                <div class="hidden sm:flex items-center gap-3">
-                    <a href="{{ url('/login') }}" class="px-4 py-2 text-sm font-medium text-slate-700 hover:text-nampi-orange hover:bg-slate-50 rounded-lg transition-colors">
+                <!-- Action & Auth Buttons -->
+                <div class="hidden sm:flex items-center gap-2.5">
+                    <a href="https://brosur.smkwikrama1garut.sch.id" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-amber-900 bg-amber-50 hover:bg-amber-100 border border-amber-300 rounded-lg shadow-2xs hover:shadow-xs transition-all">
+                        <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span>Download Brosur</span>
+                        <svg class="w-3 h-3 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                    </a>
+                    <a href="{{ url('/login') }}" class="px-3.5 py-2 text-xs font-semibold text-slate-700 hover:text-nampi-orange hover:bg-slate-50 rounded-lg transition-colors">
                         Masuk
                     </a>
-                    <a href="{{ url('/register') }}" class="px-4 py-2 text-sm font-semibold text-white bg-nampi-orange hover:bg-nampi-orange-hover rounded-lg shadow-sm hover:shadow transition-all">
+                    <a href="{{ url('/register') }}" class="px-4 py-2 text-xs font-bold text-white bg-nampi-orange hover:bg-nampi-orange-hover rounded-lg shadow-sm hover:shadow transition-all">
                         Daftar Sekarang
                     </a>
                 </div>
 
                 <!-- Mobile Menu Button -->
-                <div class="flex md:hidden items-center">
+                <div class="flex lg:hidden items-center gap-2">
+                    <a href="https://brosur.smkwikrama1garut.sch.id" target="_blank" rel="noopener noreferrer" class="sm:hidden inline-flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-bold text-amber-900 bg-amber-50 border border-amber-300 rounded-lg">
+                        <span>Brosur</span>
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                    </a>
                     <button type="button" onclick="toggleMobileMenu()" class="p-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -73,14 +98,19 @@
         </div>
 
         <!-- Mobile Menu Dropdown -->
-        <div id="mobile-menu" class="hidden md:hidden border-t border-slate-100 bg-white px-4 pt-2 pb-4 space-y-1">
+        <div id="mobile-menu" class="hidden lg:hidden border-t border-slate-100 bg-white px-4 pt-2 pb-4 space-y-1">
             <a href="{{ url('/') }}" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-700 hover:bg-slate-50">Beranda</a>
-            <a href="{{ url('/#program') }}" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-600 hover:bg-slate-50">Program & Jurusan</a>
-            <a href="{{ url('/#alur') }}" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-600 hover:bg-slate-50">Alur Pendaftaran</a>
-            <a href="{{ url('/#biaya') }}" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-600 hover:bg-slate-50">Biaya</a>
-            <a href="{{ url('/#faq') }}" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-600 hover:bg-slate-50">FAQ</a>
+            <a href="{{ url('/#gelombang-highlight') }}" class="block px-3 py-2 rounded-lg text-base font-semibold text-amber-600 hover:bg-amber-50">Gelombang Aktif</a>
+            <a href="{{ url('/#fasilitas') }}" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-600 hover:bg-slate-50">Fasilitas Sekolah</a>
+            <a href="{{ url('/#pembelajaran') }}" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-600 hover:bg-slate-50">Proses Pembelajaran</a>
+            <a href="{{ url('/#testimoni') }}" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-600 hover:bg-slate-50">Alumni & Testimoni</a>
+            <a href="{{ url('/#biaya') }}" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-600 hover:bg-slate-50">Biaya & Gelombang</a>
+            <a href="https://brosur.smkwikrama1garut.sch.id" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between px-3 py-2 rounded-lg text-base font-bold text-amber-900 bg-amber-50 border border-amber-200">
+                <span>Download Brosur SPMB (PDF)</span>
+                <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+            </a>
             <div class="pt-3 border-t border-slate-100 flex flex-col gap-2">
-                <a href="{{ url('/login') }}" class="w-full text-center px-4 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg">Masuk</a>
+                <a href="{{ url('/login') }}" class="w-full text-center px-4 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg">Masuk ke Akun</a>
                 <a href="{{ url('/register') }}" class="w-full text-center px-4 py-2.5 text-sm font-semibold text-white bg-nampi-orange hover:bg-nampi-orange-hover rounded-lg">Daftar Sekarang</a>
             </div>
         </div>
@@ -111,7 +141,7 @@
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-800 text-emerald-400 font-medium">
                             <span class="h-2 w-2 rounded-full bg-emerald-400"></span> Sistem Online Aktif
                         </span>
-                        <span>Tahun Ajaran 2026/2027</span>
+                        <span>Tahun Ajaran 2027/2028</span>
                     </div>
                 </div>
 

@@ -13,7 +13,7 @@ class CalonSiswaFactory extends Factory
     public function definition(): array
     {
         return [
-            'nomor_pendaftaran' => '26AAY' . fake()->unique()->numerify('####'),
+            'nomor_pendaftaran' => '26' . fake()->unique()->numerify('####'),
             'user_id' => User::factory(),
             'nisn' => fake()->unique()->numerify('00########'),
             'jenis_kelamin' => fake()->randomElement(['L', 'P']),

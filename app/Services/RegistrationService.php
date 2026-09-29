@@ -47,15 +47,15 @@ class RegistrationService
             $nomorPendaftaran = $this->numberService->generate();
 
             // 3. Normalisasi nomor telepon ke standar internasional 62xxx (Section 14)
-            $phoneSiswa = $this->phoneService->normalize($data['no_hp_siswa'] ?? null);
-            $phoneAyah = $this->phoneService->normalize($data['no_hp_ayah'] ?? null);
-            $phoneIbu = $this->phoneService->normalize($data['no_hp_ibu'] ?? null);
+            $phoneAyah = !empty($data['no_hp_ayah']) ? $this->phoneService->normalize($data['no_hp_ayah']) : null;
+            $phoneIbu = !empty($data['no_hp_ibu']) ? $this->phoneService->normalize($data['no_hp_ibu']) : null;
+            $phoneSiswa = !empty($data['no_hp_siswa']) ? $this->phoneService->normalize($data['no_hp_siswa']) : ($phoneAyah ?? $phoneIbu);
 
             // 4. Buat password awal = Nomor Pendaftaran (di-generate otomatis oleh sistem)
             $passwordPlain = $nomorPendaftaran;
 
             // Tentukan email akun
-            $email = !empty($data['email']) ? trim($data['email']) : ($data['nisn'] . '@siswa.wikrama.sch.id');
+            $email = trim($data['email']);
 
             // 5. Buat entitas User akun Calon Siswa (Section 3 & 4)
             $user = User::create([
@@ -63,7 +63,7 @@ class RegistrationService
                 'username' => $data['nisn'],
                 'email' => $email,
                 'password' => Hash::make($passwordPlain),
-                'phone' => $phoneSiswa,
+                'phone' => $phoneSiswa ?? $phoneAyah ?? $phoneIbu,
                 'role' => UserRole::CALON_SISWA->value,
                 'is_active' => true,
             ]);
@@ -84,6 +84,10 @@ class RegistrationService
                 'email' => $email,
                 'asal_sekolah_id' => $data['asal_sekolah_id'] ?? null,
                 'asal_sekolah_lainnya' => $data['asal_sekolah_lainnya'] ?? null,
+                'referensi_jenis' => $data['referensi_jenis'] ?? null,
+                'referensi_nama' => $data['referensi_nama'] ?? null,
+                'referensi_rayon' => $data['referensi_rayon'] ?? null,
+                'referensi_nomor_seleksi' => $data['referensi_nomor_seleksi'] ?? null,
                 'program_id' => $data['program_id'],
                 'jurusan_id' => $data['jurusan_id'],
                 'gelombang_id' => $gelombangId,
@@ -103,7 +107,7 @@ class RegistrationService
             $biayaSeleksiMaster = MasterBiaya::aktif()
                 ->where('kategori', 'seleksi')
                 ->first();
-            $nominalBiayaSeleksi = $biayaSeleksiMaster ? (float) $biayaSeleksiMaster->nominal : 250000;
+            $nominalBiayaSeleksi = $biayaSeleksiMaster ? (float) $biayaSeleksiMaster->nominal : 200000;
 
             // Buat record tagihan awal pembayaran seleksi
             $pembayaranSeleksi = PembayaranSeleksi::create([

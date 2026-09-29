@@ -8,6 +8,9 @@ use App\Models\CalonSiswa;
 use App\Models\KeputusanKelulusan;
 use App\Models\MasterGelombang;
 use App\Models\MasterJurusan;
+use App\Models\Tagihan;
+use App\Services\InvoiceService;
+use App\Services\InvoiceSnapshotService;
 use App\Services\PdfService;
 use App\Services\SpmbStatusService;
 use Illuminate\Http\RedirectResponse;
@@ -20,7 +23,9 @@ class SidangKelulusanController extends Controller
 {
     public function __construct(
         protected SpmbStatusService $spmbStatusService,
-        protected PdfService $pdfService
+        protected PdfService $pdfService,
+        protected InvoiceService $invoiceService,
+        protected InvoiceSnapshotService $snapshotService
     ) {}
 
     /**
@@ -38,8 +43,8 @@ class SidangKelulusanController extends Controller
                 'jurusan',
                 'program',
                 'gelombang',
-                'wawancara.details.kriteria',
-                'wawancara.pewawancara',
+                'wawancaraSiswa.pewawancara',
+                'wawancaraOrangTua.pewawancara',
                 'keputusanKelulusan.ditetapkanOleh',
                 'dataAkademik',
             ]);
@@ -144,19 +149,51 @@ class SidangKelulusanController extends Controller
         $calonSiswa->loadMissing([
             'jurusan',
             'program',
+            'programBelajar',
             'gelombang',
-            'dataOrangtua',
+            'sekolahAsal',
+            'asalSekolah',
+            'provinsi',
+            'kabupaten',
+            'kecamatan',
+            'desa',
+            'dataOrangtua.pekerjaanAyah',
+            'dataOrangtua.pekerjaanIbu',
+            'dataOrangtua.pekerjaanWali',
             'dataAkademik',
+            'nilaiRapor',
+            'prestasi',
+            'ukuranSeragam.seragam',
+            'ukuranSeragam.jenisSeragam',
             'dokumenPendaftaran',
-            'wawancara.details.kriteria',
-            'wawancara.pewawancara',
+            'pembayaranSeleksi.verifiedBy',
+            'wawancaraSiswa.pewawancara',
+            'wawancaraOrangTua.pewawancara',
+            'tagihan.details',
+            'tagihan.diskon',
+            'tagihan.pembayaran.verifiedBy',
+            'pembayaranDaftarUlang',
+            'diskon',
             'keputusanKelulusan.ditetapkanOleh',
+            'kesepahaman',
+            'riwayatStatus.changedBy',
         ]);
 
-        $wawancara = $calonSiswa->wawancaraTerakhir;
+        $estimasiBiayaDaftarUlang = $this->snapshotService->getApplicableRegistrationBiaya($calonSiswa);
+        $estimasiBiayaSeragam = $this->snapshotService->getApplicableUniformBiaya($calonSiswa);
+
+        $wawancaraSiswa = $calonSiswa->wawancaraSiswa;
+        $wawancaraOrangTua = $calonSiswa->wawancaraOrangTua;
         $keputusan = $calonSiswa->keputusanKelulusan;
 
-        return view('kepala-sekolah.sidang-kelulusan.show', compact('calonSiswa', 'wawancara', 'keputusan'));
+        return view('kepala-sekolah.sidang-kelulusan.show', compact(
+            'calonSiswa',
+            'wawancaraSiswa',
+            'wawancaraOrangTua',
+            'keputusan',
+            'estimasiBiayaDaftarUlang',
+            'estimasiBiayaSeragam'
+        ));
     }
 
     /**
@@ -169,8 +206,9 @@ class SidangKelulusanController extends Controller
             'alasan_catatan' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        DB::transaction(function () use ($validated, $calonSiswa) {
-            $isAccepted = $validated['keputusan'] === 'DITERIMA';
+        $isAccepted = $validated['keputusan'] === 'DITERIMA';
+
+        DB::transaction(function () use ($validated, $calonSiswa, $isAccepted) {
             $defaultNote = $isAccepted
                 ? 'Dinyatakan lulus seleksi berdasarkan hasil sidang pleno komite SPMB.'
                 : 'Belum memenuhi kualifikasi kelulusan seleksi SPMB tahun ini.';
@@ -198,6 +236,13 @@ class SidangKelulusanController extends Controller
                 changedBy: auth()->user()
             );
 
+            // Ketika kepala sekolah memutuskan DITERIMA, aktifkan/terbitkan langsung Tagihan Daftar Ulang (& Seragam jika ada)
+            if ($isAccepted) {
+                if ($calonSiswa->tagihan()->where('jenis_tagihan', Tagihan::JENIS_DAFTAR_ULANG)->doesntExist()) {
+                    $this->invoiceService->generateInvoice($calonSiswa, actor: auth()->user());
+                }
+            }
+
             activity('kelulusan')
                 ->performedOn($calonSiswa)
                 ->causedBy(auth()->user())
@@ -209,8 +254,12 @@ class SidangKelulusanController extends Controller
                 ->log("Kepala Sekolah menetapkan hasil seleksi {$calonSiswa->nama_lengkap}: {$validated['keputusan']}");
         });
 
+        $successMsg = $isAccepted
+            ? "Keputusan kelulusan (DITERIMA) untuk {$calonSiswa->nama_lengkap} berhasil ditetapkan. Tagihan Daftar Ulang telah otomatis diaktifkan dan siap dibayar oleh calon siswa."
+            : "Keputusan kelulusan (DITOLAK) untuk {$calonSiswa->nama_lengkap} berhasil ditetapkan.";
+
         return redirect()->route('kepala-sekolah.sidang-kelulusan.show', $calonSiswa)
-            ->with('success', "Keputusan kelulusan ({$validated['keputusan']}) untuk {$calonSiswa->nama_lengkap} berhasil ditetapkan.");
+            ->with('success', $successMsg);
     }
 
     /**
@@ -228,9 +277,9 @@ class SidangKelulusanController extends Controller
         $candidates = CalonSiswa::whereIn('id', $validated['calon_siswa_ids'])->get();
         $isAccepted = $validated['keputusan'] === 'DITERIMA';
         $targetStatus = $isAccepted ? SpmbStatus::DITERIMA : SpmbStatus::DITOLAK;
-        $note = $validated['catatan_sidang'] ?: ($isAccepted ? 'Dinyatakan lulus seleksi pada sidang pleno bersama.' : 'Belum memenuhi kriteria kelulusan.');
+        $note = ($validated['catatan_sidang'] ?? null) ?: ($isAccepted ? 'Dinyatakan lulus seleksi pada sidang pleno bersama.' : 'Belum memenuhi kriteria kelulusan.');
 
-        DB::transaction(function () use ($candidates, $validated, $targetStatus, $note) {
+        DB::transaction(function () use ($candidates, $validated, $targetStatus, $note, $isAccepted) {
             foreach ($candidates as $siswa) {
                 KeputusanKelulusan::updateOrCreate(
                     ['calon_siswa_id' => $siswa->id],
@@ -249,11 +298,22 @@ class SidangKelulusanController extends Controller
                     catatan: $note,
                     changedBy: auth()->user()
                 );
+
+                // Aktifkan Tagihan Daftar Ulang untuk setiap siswa yang diterima
+                if ($isAccepted) {
+                    if ($siswa->tagihan()->where('jenis_tagihan', Tagihan::JENIS_DAFTAR_ULANG)->doesntExist()) {
+                        $this->invoiceService->generateInvoice($siswa, actor: auth()->user());
+                    }
+                }
             }
         });
 
+        $successMsg = $isAccepted
+            ? "Berhasil menetapkan keputusan (DITERIMA) untuk " . count($candidates) . " calon siswa. Tagihan Daftar Ulang seluruh siswa yang diterima telah otomatis diaktifkan."
+            : "Berhasil menetapkan keputusan (DITOLAK) untuk " . count($candidates) . " calon siswa.";
+
         return redirect()->route('kepala-sekolah.sidang-kelulusan.index')
-            ->with('success', "Berhasil menetapkan keputusan ({$validated['keputusan']}) untuk " . count($candidates) . " calon siswa.");
+            ->with('success', $successMsg);
     }
 
     /**
