@@ -198,6 +198,20 @@
             <td class="val"><code>{{ $calonSiswa->no_kk ?? '-' }}</code></td>
         </tr>
         <tr>
+            <td class="lbl">Urutan Anak / Saudara</td>
+            <td class="colon">:</td>
+            <td class="val">
+                @if($calonSiswa->anak_ke)
+                    Anak ke-<strong>{{ $calonSiswa->anak_ke }}</strong> dari <strong>{{ $calonSiswa->jumlah_saudara ?? '-' }}</strong> bersaudara
+                @else
+                    -
+                @endif
+            </td>
+            <td class="lbl">Tahun Kelulusan SMP</td>
+            <td class="colon">:</td>
+            <td class="val"><strong>{{ $calonSiswa->tahun_lulus ?? '-' }}</strong></td>
+        </tr>
+        <tr>
             <td class="lbl">No. WhatsApp / HP Siswa</td>
             <td class="colon">:</td>
             <td class="val">{{ $calonSiswa->no_hp_siswa ?? '-' }}</td>
@@ -241,9 +255,89 @@
     </table>
 </div>
 
-<!-- 3. DATA ORANG TUA / WALI -->
+<!-- 3. DATA KESEHATAN & FISIK SISWA -->
 <div class="box-avoid">
-    <div class="section-title">3. Data Orang Tua & Wali Murid</div>
+    <div class="section-title">3. Data Kesehatan & Fisik Siswa</div>
+    @php
+        $kes = $calonSiswa->dataKesehatan;
+        $tb = (float) ($kes?->tinggi_badan ?? 0);
+        $bb = (float) ($kes?->berat_badan ?? 0);
+        $bmi = null;
+        $bmiCategory = '-';
+        if ($tb > 0 && $bb > 0) {
+            $bmi = round($bb / pow($tb / 100, 2), 1);
+            if ($bmi < 18.5) {
+                $bmiCategory = 'Kurus';
+            } elseif ($bmi <= 22.9) {
+                $bmiCategory = 'Normal / Ideal';
+            } elseif ($bmi <= 24.9) {
+                $bmiCategory = 'Kelebihan BB';
+            } else {
+                $bmiCategory = 'Obesitas';
+            }
+        }
+    @endphp
+    @if ($kes)
+    <table class="grid-table">
+        <tbody>
+            <tr>
+                <td style="width: 22%; background-color: #f8fafc; font-weight: bold;">Tinggi & Berat Badan</td>
+                <td style="width: 28%;">
+                    TB: <strong>{{ $kes->tinggi_badan ? $kes->tinggi_badan . ' cm' : '-' }}</strong> &bull; 
+                    BB: <strong>{{ $kes->berat_badan ? $kes->berat_badan . ' kg' : '-' }}</strong>
+                </td>
+                <td style="width: 22%; background-color: #f8fafc; font-weight: bold;">Indeks Massa Tubuh (BMI)</td>
+                <td style="width: 28%;">
+                    @if ($bmi)
+                        <strong>{{ $bmi }} kg/m²</strong> ({{ $bmiCategory }})
+                    @else
+                        -
+                    @endif
+                </td>
+            </tr>
+            <tr>
+                <td style="background-color: #f8fafc; font-weight: bold;">Golongan Darah</td>
+                <td><strong>{{ $kes->golongan_darah ?? 'Tidak Tahu' }}</strong></td>
+                <td style="background-color: #f8fafc; font-weight: bold;">Buta Warna & Mata</td>
+                <td>
+                    {{ $kes->buta_warna ? ucwords($kes->buta_warna) : 'Tidak buta warna' }}
+                    &bull; Mata: {{ $kes->kesehatan_mata ? ucwords($kes->kesehatan_mata) : 'Normal' }}
+                </td>
+            </tr>
+            <tr>
+                <td style="background-color: #f8fafc; font-weight: bold;">Penyakit Pernah Diderita</td>
+                <td>
+                    @if ($kes->penyakit_pernah_diderita === 'Lainnya')
+                        {{ $kes->penyakit_pernah_diderita_lainnya ?: 'Lainnya' }}
+                    @else
+                        {{ $kes->penyakit_pernah_diderita ?? 'Tidak ada' }}
+                    @endif
+                </td>
+                <td style="background-color: #f8fafc; font-weight: bold;">Penyakit Sedang Diderita</td>
+                <td>
+                    @if ($kes->penyakit_sedang_diderita === 'Lainnya')
+                        {{ $kes->penyakit_sedang_diderita_lainnya ?: 'Lainnya' }}
+                    @else
+                        {{ $kes->penyakit_sedang_diderita ?? 'Tidak ada' }}
+                    @endif
+                </td>
+            </tr>
+            <tr>
+                <td style="background-color: #f8fafc; font-weight: bold;">Riwayat / Jenis Alergi</td>
+                <td colspan="3">
+                    {{ $kes->jenis_alergi ?: 'Tidak ada riwayat alergi' }}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    @else
+        <p style="font-size: 8.5pt; font-style: italic; color: #64748b; margin: 4px 0;">Data kesehatan dan fisik belum diisi oleh calon siswa.</p>
+    @endif
+</div>
+
+<!-- 4. DATA ORANG TUA / WALI -->
+<div class="box-avoid">
+    <div class="section-title">4. Data Orang Tua & Wali Murid</div>
     @php $ortu = $calonSiswa->dataOrangtua; @endphp
     @if ($ortu)
     <table class="grid-table">
@@ -297,9 +391,9 @@
     @endif
 </div>
 
-<!-- 4. NILAI RAPOR SISWA -->
+<!-- 5. NILAI RAPOR SISWA -->
 <div class="box-avoid">
-    <div class="section-title">4. Nilai Rapor SMP/MTs (Semester 1 s.d. 5)</div>
+    <div class="section-title">5. Nilai Rapor SMP/MTs (Semester 1 s.d. 5)</div>
     @php $rapor = $calonSiswa->nilaiRapor; @endphp
     @if ($rapor)
     @php
@@ -375,9 +469,9 @@
     @endif
 </div>
 
-<!-- 5. UKURAN SERAGAM -->
+<!-- 6. UKURAN SERAGAM -->
 <div class="box-avoid">
-    <div class="section-title">5. Data Ukuran Seragam & Atribut Sekolah</div>
+    <div class="section-title">6. Data Ukuran Seragam & Atribut Sekolah</div>
     @if ($calonSiswa->ukuranSeragam->isNotEmpty())
     <table class="grid-table">
         <thead>
@@ -386,17 +480,33 @@
                 <th style="width: 45%;">Jenis Seragam / Perlengkapan</th>
                 <th style="width: 20%;" class="center">Ukuran Terpilih</th>
                 <th style="width: 15%;" class="center">Jumlah</th>
-                <th style="width: 20%;" class="center">Status Pengadaan</th>
+                <th style="width: 20%;" class="center">Status Pemesanan</th>
             </tr>
         </thead>
         <tbody>
             @foreach($calonSiswa->ukuranSeragam as $idx => $srg)
+            @php
+                $statusColor = '#15803d';
+                $statusText = 'Pesan Sekarang';
+                if ($srg->status_pemesanan === 'PESAN_NANTI') {
+                    $statusText = 'Pesan Nanti';
+                    $statusColor = '#b45309';
+                } elseif ($srg->status_pemesanan === 'TIDAK_PESAN') {
+                    $statusText = 'Tidak Pesan';
+                    $statusColor = '#64748b';
+                } elseif ($srg->beli_di_sekolah === false) {
+                    $statusText = 'Pesan Nanti';
+                    $statusColor = '#b45309';
+                }
+            @endphp
             <tr>
                 <td class="center">{{ $idx + 1 }}</td>
                 <td>{{ $srg->seragam?->nama ?? $srg->seragam?->nama_seragam ?? 'Seragam Sekolah' }}</td>
                 <td class="center"><strong>{{ $srg->ukuran ?? '-' }}</strong></td>
                 <td class="center">{{ $srg->jumlah ?? 1 }} stel</td>
-                <td class="center">{{ $srg->status_label ?? ($srg->beli_di_sekolah ? 'Pesan Sekarang' : 'Pesan Nanti') }}</td>
+                <td class="center" style="font-weight: bold; color: {{ $statusColor }};">
+                    {{ $statusText }}
+                </td>
             </tr>
             @endforeach
         </tbody>
@@ -406,9 +516,9 @@
     @endif
 </div>
 
-<!-- 6. KESEPAHAMAN / PAKTA INTEGRITAS (EULA) -->
+<!-- 7. KESEPAHAMAN / PAKTA INTEGRITAS (EULA) -->
 <div class="box-avoid">
-    <div class="section-title">6. Kesepahaman & Pakta Integritas (EULA)</div>
+    <div class="section-title">7. Kesepahaman & Pakta Integritas (EULA)</div>
     @php $eula = $calonSiswa->kesepahaman->first(); @endphp
     @if ($eula)
     <table class="sub-table">
@@ -445,9 +555,9 @@
     @endif
 </div>
 
-<!-- 7. VERIFIKASI DOKUMEN PERSYARATAN -->
+<!-- 8. VERIFIKASI DOKUMEN PERSYARATAN -->
 <div class="box-avoid">
-    <div class="section-title">7. Status Verifikasi Berkas & Dokumen Pendaftaran</div>
+    <div class="section-title">8. Status Verifikasi Berkas & Dokumen Pendaftaran</div>
     @php $doc = $calonSiswa->dokumenPendaftaran; @endphp
     <table class="grid-table">
         <thead>
@@ -461,47 +571,47 @@
         <tbody>
             <tr>
                 <td class="center">1</td>
-                <td>Kartu Keluarga (KK)</td>
+                <td>Kartu Keluarga (KK) <em>(Wajib)</em></td>
                 <td class="center">
-                    <span class="badge-status {{ $doc?->kk_path ? 'badge-verified' : 'badge-pending' }}">
+                    <span class="badge-status {{ $doc?->kk_path ? 'badge-verified' : 'badge-danger' }}">
                         {{ $doc?->kk_path ? 'BERKAS TERSEDIA' : 'BELUM DIUNGGAH' }}
                     </span>
                 </td>
-                <td class="center">{{ $doc?->kk_path ? 'Tervalidasi' : '-' }}</td>
+                <td class="center" style="font-weight: bold; color: #b91c1c;">Wajib Validasi</td>
             </tr>
             <tr>
                 <td class="center">2</td>
-                <td>Akta Kelahiran</td>
+                <td>Akta Kelahiran <em>(Opsional)</em></td>
                 <td class="center">
                     <span class="badge-status {{ $doc?->akta_path ? 'badge-verified' : 'badge-pending' }}">
                         {{ $doc?->akta_path ? 'BERKAS TERSEDIA' : 'BELUM DIUNGGAH' }}
                     </span>
                 </td>
-                <td class="center">{{ $doc?->akta_path ? 'Tervalidasi' : '-' }}</td>
+                <td class="center">Opsional / Validasi</td>
             </tr>
             <tr>
                 <td class="center">3</td>
-                <td>Ijazah / Surat Keterangan Lulus (SKL) SMP</td>
+                <td>Ijazah / Surat Keterangan Lulus (SKL) SMP <em>(Opsional)</em></td>
                 <td class="center">
                     <span class="badge-status {{ $doc?->ijazah_skl_path ? 'badge-verified' : 'badge-pending' }}">
                         {{ $doc?->ijazah_skl_path ? 'BERKAS TERSEDIA' : 'BELUM DIUNGGAH' }}
                     </span>
                 </td>
-                <td class="center">{{ $doc?->ijazah_skl_path ? 'Tervalidasi' : '-' }}</td>
+                <td class="center">Opsional / Menyusul</td>
             </tr>
             <tr>
                 <td class="center">4</td>
-                <td>Pas Foto Calon Siswa (Terbaru)</td>
+                <td>Pas Foto Calon Siswa Terbaru <em>(Wajib)</em></td>
                 <td class="center">
-                    <span class="badge-status {{ $doc?->pas_foto_path ? 'badge-verified' : 'badge-pending' }}">
+                    <span class="badge-status {{ $doc?->pas_foto_path ? 'badge-verified' : 'badge-danger' }}">
                         {{ $doc?->pas_foto_path ? 'BERKAS TERSEDIA' : 'BELUM DIUNGGAH' }}
                     </span>
                 </td>
-                <td class="center">{{ $doc?->pas_foto_path ? 'Tervalidasi' : '-' }}</td>
+                <td class="center" style="font-weight: bold; color: #b91c1c;">Wajib Validasi</td>
             </tr>
             <tr>
                 <td class="center">5</td>
-                <td>Dokumen Pendukung / Prestasi / KIP (Opsional)</td>
+                <td>Dokumen Pendukung / Prestasi / KIP <em>(Opsional)</em></td>
                 <td class="center">
                     <span class="badge-status {{ $doc?->dokumen_pendukung_path ? 'badge-verified' : 'badge-info' }}">
                         {{ $doc?->dokumen_pendukung_path ? 'BERKAS TERSEDIA' : 'TIDAK ADA' }}
@@ -513,9 +623,9 @@
     </table>
 </div>
 
-<!-- 8. PEMBAYARAN BIAYA SELEKSI -->
+<!-- 9. PEMBAYARAN BIAYA SELEKSI -->
 <div class="box-avoid">
-    <div class="section-title">8. Data Pembayaran Biaya Seleksi Pendaftaran</div>
+    <div class="section-title">9. Data Pembayaran Biaya Seleksi Pendaftaran</div>
     @php $bayarSeleksi = $calonSiswa->pembayaranSeleksi; @endphp
     <table class="sub-table">
         <tr>
@@ -558,9 +668,9 @@
     </table>
 </div>
 
-<!-- 9. HASIL EVALUASI WAWANCARA -->
+<!-- 10. HASIL EVALUASI WAWANCARA -->
 <div class="box-avoid">
-    <div class="section-title">9. Hasil Evaluasi Wawancara (Siswa & Orang Tua)</div>
+    <div class="section-title">10. Hasil Evaluasi Wawancara (Siswa & Orang Tua)</div>
     @php
         $wSiswa = $calonSiswa->wawancaraSiswa;
         $wOrtu  = $calonSiswa->wawancaraOrangTua;
@@ -623,9 +733,9 @@
     </table>
 </div>
 
-<!-- 10. KEUANGAN & DAFTAR ULANG -->
+<!-- 11. KEUANGAN & DAFTAR ULANG -->
 <div class="box-avoid">
-    <div class="section-title">10. Data Keuangan & Daftar Ulang Siswa</div>
+    <div class="section-title">11. Data Keuangan & Daftar Ulang Siswa</div>
     @php
         $tagihanDU = $calonSiswa->tagihan->firstWhere('jenis_tagihan', 'DAFTAR_ULANG');
         $tagihanSRG = $calonSiswa->tagihan->firstWhere('jenis_tagihan', 'SERAGAM');
@@ -732,7 +842,39 @@
     @endif
 </div>
 
-<!-- 11. LEMBAR PENGESAHAN -->
+<!-- 12. KEPUTUSAN SIDANG PLENO KELULUSAN -->
+<div class="box-avoid">
+    <div class="section-title">12. Keputusan Sidang Pleno Kelulusan</div>
+    @php $keputusan = $calonSiswa->keputusanKelulusan; @endphp
+    @if ($keputusan)
+    <table class="sub-table">
+        <tr>
+            <td class="lbl">Keputusan Akhir</td>
+            <td class="colon">:</td>
+            <td class="val">
+                <span class="badge-status {{ $keputusan->keputusan === 'DITERIMA' ? 'badge-verified' : 'badge-danger' }}" style="font-size: 8.5pt; padding: 3px 8px;">
+                    {{ $keputusan->keputusan }}
+                </span>
+            </td>
+            <td class="lbl">Waktu Penetapan</td>
+            <td class="colon">:</td>
+            <td class="val">{{ $keputusan->ditetapkan_at ? $keputusan->ditetapkan_at->translatedFormat('d F Y H:i') : '-' }}</td>
+        </tr>
+        <tr>
+            <td class="lbl">Ditetapkan Oleh</td>
+            <td class="colon">:</td>
+            <td class="val"><strong>{{ $keputusan->ditetapkanOleh?->name ?? 'Kepala Sekolah' }}</strong></td>
+            <td class="lbl">Catatan Pleno</td>
+            <td class="colon">:</td>
+            <td class="val"><em>{{ $keputusan->alasan_catatan ?: '-' }}</em></td>
+        </tr>
+    </table>
+    @else
+        <p style="font-size: 8.5pt; font-style: italic; color: #64748b; margin: 4px 0;">Sidang pleno penetapan kelulusan belum dilaksanakan.</p>
+    @endif
+</div>
+
+<!-- 13. LEMBAR PENGESAHAN -->
 <div class="box-avoid" style="margin-top: 15px;">
     <table style="width: 100%; text-align: center; font-size: 8.5pt;">
         <tr>

@@ -137,6 +137,8 @@ class CalonSiswaController extends Controller
             'wawancaraOrangTua.pewawancara',
             'keputusanKelulusan.ditetapkanOleh',
             'kesepahaman',
+            'dataKesehatan',
+            'user',
             'riwayatStatus.changedBy',
         ]);
 
@@ -165,6 +167,8 @@ class CalonSiswaController extends Controller
             'dataOrangtua.pekerjaanAyah',
             'dataOrangtua.pekerjaanIbu',
             'dataOrangtua.pekerjaanWali',
+            'dataKesehatan',
+            'user',
             'dataAkademik',
             'nilaiRapor',
             'prestasi',
@@ -181,6 +185,8 @@ class CalonSiswaController extends Controller
             'wawancaraOrangTua.pewawancara',
             'keputusanKelulusan.ditetapkanOleh',
             'kesepahaman',
+            'dataKesehatan',
+            'user',
             'riwayatStatus.changedBy',
         ]);
 

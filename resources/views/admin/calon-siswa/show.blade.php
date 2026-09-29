@@ -109,20 +109,71 @@
                 </div>
             </div>
 
-            <!-- Status Indicator -->
-            <div class="flex flex-col md:items-end gap-2 shrink-0">
+            <!-- Status Indicator & Quick Contact -->
+            <div class="flex flex-col md:items-end gap-2.5 shrink-0">
                 @php
                     $statusStr = is_string($calonSiswa->status_spmb) ? $calonSiswa->status_spmb : ($calonSiswa->status_spmb?->value ?? '-');
+                    $hpSiswaRaw = preg_replace('/[^0-9]/', '', $calonSiswa->no_hp_siswa ?? '');
+                    $hpSiswaWa = $hpSiswaRaw ? preg_replace('/^0/', '62', $hpSiswaRaw) : null;
+                    $hpAyahRaw = preg_replace('/[^0-9]/', '', $calonSiswa->no_hp_ayah ?: ($calonSiswa->dataOrangtua?->no_hp_ayah ?? ''));
+                    $hpAyahWa = $hpAyahRaw ? preg_replace('/^0/', '62', $hpAyahRaw) : null;
+                    $hpIbuRaw = preg_replace('/[^0-9]/', '', $calonSiswa->no_hp_ibu ?: ($calonSiswa->dataOrangtua?->no_hp_ibu ?? ''));
+                    $hpIbuWa = $hpIbuRaw ? preg_replace('/^0/', '62', $hpIbuRaw) : null;
                 @endphp
-                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-black
-                    {{ in_array($statusStr, ['DITERIMA', 'RESMI_TERDAFTAR', 'DAFTAR_ULANG_DIVERIFIKASI']) ? 'bg-emerald-50 text-emerald-800 border border-emerald-300' :
-                       (in_array($statusStr, ['DITOLAK', 'MENGUNDURKAN_DIRI']) ? 'bg-rose-50 text-rose-800 border border-rose-300' : 'bg-amber-50 text-amber-800 border border-amber-300') }}">
-                    <span class="w-2.5 h-2.5 rounded-full {{ in_array($statusStr, ['DITERIMA', 'RESMI_TERDAFTAR', 'DAFTAR_ULANG_DIVERIFIKASI']) ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500' }}"></span>
-                    STATUS: {{ str_replace('_', ' ', $statusStr) }}
-                </span>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-black
+                        {{ in_array($statusStr, ['DITERIMA', 'RESMI_TERDAFTAR', 'DAFTAR_ULANG_DIVERIFIKASI']) ? 'bg-emerald-50 text-emerald-800 border border-emerald-300' :
+                           (in_array($statusStr, ['DITOLAK', 'MENGUNDURKAN_DIRI']) ? 'bg-rose-50 text-rose-800 border border-rose-300' : 'bg-amber-50 text-amber-800 border border-amber-300') }}">
+                        <span class="w-2.5 h-2.5 rounded-full {{ in_array($statusStr, ['DITERIMA', 'RESMI_TERDAFTAR', 'DAFTAR_ULANG_DIVERIFIKASI']) ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500' }}"></span>
+                        STATUS: {{ str_replace('_', ' ', $statusStr) }}
+                    </span>
+                </div>
+                <div class="flex flex-wrap items-center gap-1.5 print:hidden">
+                    @if($hpSiswaWa)
+                        <a href="https://wa.me/{{ $hpSiswaWa }}" target="_blank"
+                           class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold shadow-xs transition-colors"
+                           title="Kirim pesan WhatsApp ke Calon Siswa ({{ $calonSiswa->no_hp_siswa }})">
+                            <span>💬 Chat Siswa</span>
+                        </a>
+                    @endif
+                    @if($hpAyahWa)
+                        <a href="https://wa.me/{{ $hpAyahWa }}" target="_blank"
+                           class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-bold shadow-xs transition-colors"
+                           title="Kirim pesan WhatsApp ke Ayah ({{ $calonSiswa->no_hp_ayah ?: $calonSiswa->dataOrangtua?->no_hp_ayah }})">
+                            <span>👨 Chat Ayah</span>
+                        </a>
+                    @endif
+                    @if($hpIbuWa)
+                        <a href="https://wa.me/{{ $hpIbuWa }}" target="_blank"
+                           class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-bold shadow-xs transition-colors"
+                           title="Kirim pesan WhatsApp ke Ibu ({{ $calonSiswa->no_hp_ibu ?: $calonSiswa->dataOrangtua?->no_hp_ibu }})">
+                            <span>👩 Chat Ibu</span>
+                        </a>
+                    @endif
+                </div>
                 <span class="text-[11px] text-slate-400 font-mono">
                     Registrasi: {{ $calonSiswa->created_at ? $calonSiswa->created_at->translatedFormat('d M Y H:i') : '-' }}
                 </span>
+            </div>
+        </div>
+
+        <!-- Sticky Quick Navigation Tab Bar (Hidden on Print) -->
+        <div class="sticky top-2 z-30 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-slate-200/90 shadow-sm print:hidden">
+            <div class="flex items-center gap-1.5 overflow-x-auto text-[11px] font-bold text-slate-600 no-scrollbar">
+                <span class="text-slate-400 text-xs shrink-0 mr-1 font-semibold">Lompat ke:</span>
+                <a href="#sec-registrasi" class="px-2.5 py-1 rounded-lg hover:bg-slate-100 hover:text-slate-900 transition-colors shrink-0">1. Registrasi</a>
+                <a href="#sec-biodata" class="px-2.5 py-1 rounded-lg hover:bg-slate-100 hover:text-slate-900 transition-colors shrink-0">2. Biodata</a>
+                <a href="#sec-kesehatan" class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition-colors shrink-0 font-black">3. Kesehatan & Fisik</a>
+                <a href="#sec-orangtua" class="px-2.5 py-1 rounded-lg hover:bg-slate-100 hover:text-slate-900 transition-colors shrink-0">4. Orang Tua</a>
+                <a href="#sec-rapor" class="px-2.5 py-1 rounded-lg hover:bg-slate-100 hover:text-slate-900 transition-colors shrink-0">5. Nilai Rapor</a>
+                <a href="#sec-seragam" class="px-2.5 py-1 rounded-lg hover:bg-slate-100 hover:text-slate-900 transition-colors shrink-0">6. Seragam</a>
+                <a href="#sec-eula" class="px-2.5 py-1 rounded-lg hover:bg-slate-100 hover:text-slate-900 transition-colors shrink-0">7. EULA</a>
+                <a href="#sec-berkas" class="px-2.5 py-1 rounded-lg hover:bg-slate-100 hover:text-slate-900 transition-colors shrink-0">8. Berkas</a>
+                <a href="#sec-seleksi" class="px-2.5 py-1 rounded-lg hover:bg-slate-100 hover:text-slate-900 transition-colors shrink-0">9. Biaya Seleksi</a>
+                <a href="#sec-wawancara" class="px-2.5 py-1 rounded-lg hover:bg-slate-100 hover:text-slate-900 transition-colors shrink-0">10. Wawancara</a>
+                <a href="#sec-keuangan" class="px-2.5 py-1 rounded-lg hover:bg-slate-100 hover:text-slate-900 transition-colors shrink-0">11. Keuangan</a>
+                <a href="#sec-kelulusan" class="px-2.5 py-1 rounded-lg hover:bg-slate-100 hover:text-slate-900 transition-colors shrink-0">12. Kelulusan</a>
+                <a href="#sec-riwayat" class="px-2.5 py-1 rounded-lg hover:bg-slate-100 hover:text-slate-900 transition-colors shrink-0">13. Riwayat</a>
             </div>
         </div>
 
@@ -133,7 +184,7 @@
             <div class="lg:col-span-7 space-y-6">
 
                 <!-- 1. DATA REGISTRASI & AKUN -->
-                <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
+                <div id="sec-registrasi" class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                         <div class="flex items-center gap-2.5">
                             <span class="w-8 h-8 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center font-bold text-sm">1</span>
@@ -177,6 +228,21 @@
                                 {{ $calonSiswa->status_data ?? 'LENGKAP' }}
                             </span>
                         </div>
+                        <div>
+                            <span class="text-slate-400 block font-medium">Akun Pengguna (Login Siswa)</span>
+                            <span class="font-semibold text-slate-800 mt-0.5 block">
+                                {{ $calonSiswa->user?->email ?? $calonSiswa->email ?? '-' }}
+                                @if($calonSiswa->user?->is_active)
+                                    <span class="text-[10px] text-emerald-600 font-bold ml-1">● Aktif</span>
+                                @endif
+                            </span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block font-medium">Username Login</span>
+                            <span class="font-mono font-bold text-slate-700 mt-0.5 block">
+                                {{ $calonSiswa->user?->username ?? '-' }}
+                            </span>
+                        </div>
                         @if ($calonSiswa->referensi_jenis)
                             <div class="sm:col-span-2 pt-2 border-t border-slate-100">
                                 <span class="text-slate-400 block font-medium">Referensi / Promotor</span>
@@ -194,7 +260,7 @@
                 </div>
 
                 <!-- 2. BIODATA PRIBADI -->
-                <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
+                <div id="sec-biodata" class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
                     <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
                         <span class="w-8 h-8 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm">2</span>
                         <div>
@@ -215,6 +281,18 @@
                             <span class="font-bold text-slate-800 mt-0.5 block">{{ $calonSiswa->agama ?? 'Islam' }}</span>
                         </div>
                         <div>
+                            <span class="text-slate-400 block font-medium">Susunan Keluarga</span>
+                            <span class="font-bold text-slate-800 mt-0.5 block">
+                                Anak ke- <strong class="text-blue-700 font-mono">{{ $calonSiswa->anak_ke ?? '-' }}</strong> dari <strong class="text-blue-700 font-mono">{{ $calonSiswa->jumlah_saudara ?? '-' }}</strong> bersaudara
+                            </span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block font-medium">Tahun Lulus SMP/MTs</span>
+                            <span class="font-mono font-bold text-slate-800 mt-0.5 block">
+                                {{ $calonSiswa->tahun_lulus ? 'Tahun ' . $calonSiswa->tahun_lulus : '-' }}
+                            </span>
+                        </div>
+                        <div>
                             <span class="text-slate-400 block font-medium">NIK (No. KTP Calon Siswa)</span>
                             <span class="font-mono font-bold text-slate-800 mt-0.5 block">{{ $calonSiswa->nik ?? '-' }}</span>
                         </div>
@@ -226,7 +304,7 @@
                             <span class="text-slate-400 block font-medium">No. HP / WhatsApp Siswa</span>
                             <span class="font-mono font-bold text-slate-800 mt-0.5 block">
                                 @if($calonSiswa->no_hp_siswa)
-                                    <a href="https://wa.me/{{ preg_replace('/^0/', '62', $calonSiswa->no_hp_siswa) }}" target="_blank" class="text-emerald-600 hover:underline">
+                                    <a href="https://wa.me/{{ preg_replace('/^0/', '62', preg_replace('/[^0-9]/', '', $calonSiswa->no_hp_siswa)) }}" target="_blank" class="text-emerald-600 hover:underline">
                                         📱 {{ $calonSiswa->no_hp_siswa }}
                                     </a>
                                 @else
@@ -263,15 +341,21 @@
                                         @if($calonSiswa->kode_pos) &bull; Kode Pos: <strong>{{ $calonSiswa->kode_pos }}</strong> @endif
                                     </div>
                                 @else
+                                    @php
+                                        $desaText = $calonSiswa->nama_desa ?: ($calonSiswa->desa?->nama ?? $calonSiswa->desa_nama);
+                                        $kecText = $calonSiswa->nama_kecamatan ?: ($calonSiswa->kecamatan?->nama ?? $calonSiswa->kecamatan_nama);
+                                        $kabText = $calonSiswa->nama_kabupaten ?: ($calonSiswa->kabupaten?->nama ?? $calonSiswa->kabupaten_nama);
+                                        $provText = $calonSiswa->nama_provinsi ?: ($calonSiswa->provinsi?->nama ?? $calonSiswa->provinsi_nama);
+                                    @endphp
                                     {{ $calonSiswa->alamat_lengkap ?? '-' }}
                                     @if ($calonSiswa->rt || $calonSiswa->rw)
                                         (RT {{ $calonSiswa->rt ?? '0' }} / RW {{ $calonSiswa->rw ?? '0' }})
                                     @endif
                                     <div class="text-[11px] text-slate-500 mt-1">
-                                        @if($calonSiswa->desa) Desa/Kel. <strong>{{ $calonSiswa->desa->nama }}</strong> &bull; @endif
-                                        @if($calonSiswa->kecamatan) Kec. <strong>{{ $calonSiswa->kecamatan->nama }}</strong> &bull; @endif
-                                        @if($calonSiswa->kabupaten) Kab/Kota <strong>{{ $calonSiswa->kabupaten->nama }}</strong> &bull; @endif
-                                        @if($calonSiswa->provinsi) Prov. <strong>{{ $calonSiswa->provinsi->nama }}</strong> @endif
+                                        @if($desaText) Desa/Kel. <strong>{{ $desaText }}</strong> &bull; @endif
+                                        @if($kecText) Kec. <strong>{{ $kecText }}</strong> &bull; @endif
+                                        @if($kabText) Kab/Kota <strong>{{ $kabText }}</strong> &bull; @endif
+                                        @if($provText) Prov. <strong>{{ $provText }}</strong> @endif
                                         @if($calonSiswa->kode_pos) &bull; Kode Pos: <strong>{{ $calonSiswa->kode_pos }}</strong> @endif
                                     </div>
                                 @endif
@@ -285,21 +369,162 @@
                                         {{ $calonSiswa->sekolahAsal?->nama_sekolah ?? $calonSiswa->asal_sekolah_lainnya ?? '-' }}
                                     </span>
                                     <span class="text-[11px] text-slate-400">
-                                        NPSN: {{ $calonSiswa->sekolahAsal?->npsn ?? '-' }} &bull; Wilayah: {{ $calonSiswa->sekolahAsal?->kabupaten ?? 'Garut' }}
+                                        @if($calonSiswa->sekolahAsal)
+                                            NPSN: {{ $calonSiswa->sekolahAsal->npsn ?? '-' }} &bull; Wilayah: {{ $calonSiswa->sekolahAsal->kabupaten ?? 'Garut' }}
+                                        @else
+                                            Sekolah Tidak Terdaftar di Master (Pilihan Mandiri / Luar Daerah)
+                                        @endif
+                                        @if($calonSiswa->tahun_lulus)
+                                            &bull; Tahun Kelulusan: <strong>{{ $calonSiswa->tahun_lulus }}</strong>
+                                        @endif
                                     </span>
                                 </div>
-                                <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-200 text-slate-700">
-                                    SMP Terverifikasi
-                                </span>
+                                @if($calonSiswa->sekolahAsal)
+                                    <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        ✓ SMP Terdata
+                                    </span>
+                                @else
+                                    <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                                        ✎ Input Mandiri
+                                    </span>
+                                @endif
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 3. DATA ORANG TUA / WALI -->
-                <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
+                <!-- 3. DATA KESEHATAN & FISIK -->
+                <div id="sec-kesehatan" class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-8 h-8 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center font-bold text-sm">3</span>
+                            <div>
+                                <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">Data Kesehatan & Fisik Siswa</h2>
+                                <p class="text-[11px] text-slate-400">Pemeriksaan fisik antropometri, riwayat medis, dan kondisi penglihatan</p>
+                            </div>
+                        </div>
+                        @php
+                            $kes = $calonSiswa->dataKesehatan;
+                        @endphp
+                        <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold {{ $kes ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
+                            {{ $kes ? '✓ Terdata' : 'Belum Diisi' }}
+                        </span>
+                    </div>
+
+                    @if ($kes)
+                        @php
+                            $tb = (float) ($kes->tinggi_badan ?? 0);
+                            $bb = (float) ($kes->berat_badan ?? 0);
+                            $bmi = ($tb > 0 && $bb > 0) ? round($bb / (($tb / 100) ** 2), 1) : null;
+                            $bmiLabel = '-';
+                            $bmiBadge = 'bg-slate-100 text-slate-600 border-slate-200';
+                            if ($bmi) {
+                                if ($bmi < 18.5) {
+                                    $bmiLabel = 'Kurus / Berat Kurang';
+                                    $bmiBadge = 'bg-amber-50 text-amber-800 border-amber-200';
+                                } elseif ($bmi <= 22.9) {
+                                    $bmiLabel = 'Normal / Ideal';
+                                    $bmiBadge = 'bg-emerald-50 text-emerald-800 border-emerald-200';
+                                } elseif ($bmi <= 24.9) {
+                                    $bmiLabel = 'Kelebihan Berat Badan';
+                                    $bmiBadge = 'bg-orange-50 text-orange-800 border-orange-200';
+                                } else {
+                                    $bmiLabel = 'Obesitas';
+                                    $bmiBadge = 'bg-rose-50 text-rose-800 border-rose-200';
+                                }
+                            }
+                        @endphp
+
+                        <!-- 3 Kartu Metrik Fisik -->
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="p-3.5 rounded-2xl bg-teal-50/60 border border-teal-100 text-center">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-teal-600 block">Tinggi Badan</span>
+                                <span class="text-xl font-black text-teal-900 mt-0.5 block font-mono">
+                                    {{ $tb > 0 ? $tb . ' cm' : '-' }}
+                                </span>
+                            </div>
+                            <div class="p-3.5 rounded-2xl bg-cyan-50/60 border border-cyan-100 text-center">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-600 block">Berat Badan</span>
+                                <span class="text-xl font-black text-cyan-900 mt-0.5 block font-mono">
+                                    {{ $bb > 0 ? $bb . ' kg' : '-' }}
+                                </span>
+                            </div>
+                            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Indeks Massa Tubuh</span>
+                                <span class="text-xl font-black text-slate-900 mt-0.5 block font-mono">
+                                    {{ $bmi ?? '-' }}
+                                </span>
+                                @if($bmi)
+                                    <span class="inline-block mt-1 px-2 py-0.5 rounded-md text-[9px] font-bold border {{ $bmiBadge }}">
+                                        {{ $bmiLabel }}
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+
+                        <!-- Data Klinis & Riwayat -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                                <span class="text-slate-400 block text-[11px] font-medium">Golongan Darah</span>
+                                <div class="mt-1 flex items-center gap-1.5">
+                                    <span class="w-6 h-6 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-xs">🩸</span>
+                                    <span class="font-bold text-slate-900 text-sm">{{ $kes->golongan_darah ?: '-' }}</span>
+                                </div>
+                            </div>
+                            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                                <span class="text-slate-400 block text-[11px] font-medium">Status Buta Warna</span>
+                                <div class="mt-1 flex items-center gap-1.5">
+                                    <span class="w-6 h-6 rounded-lg {{ str_contains(strtolower($kes->buta_warna ?? ''), 'tidak') ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700' }} flex items-center justify-center font-bold text-xs">👁</span>
+                                    <span class="font-bold {{ str_contains(strtolower($kes->buta_warna ?? ''), 'tidak') ? 'text-emerald-800' : 'text-amber-800' }} text-xs">
+                                        {{ $kes->buta_warna ?: '-' }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                                <span class="text-slate-400 block text-[11px] font-medium">Kesehatan Mata</span>
+                                <span class="font-bold text-slate-800 mt-1 block capitalize">
+                                    {{ $kes->kesehatan_mata ?: 'Normal' }}
+                                </span>
+                            </div>
+                            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                                <span class="text-slate-400 block text-[11px] font-medium">Jenis Alergi yang Diderita</span>
+                                <span class="font-bold text-slate-800 mt-1 block">
+                                    {{ $kes->jenis_alergi ?: 'Tidak ada alergi tercatat' }}
+                                </span>
+                            </div>
+                            <div class="sm:col-span-2 p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                                <div>
+                                    <span class="text-slate-400 block text-[11px] font-medium">Penyakit Berat yang Pernah Diderita:</span>
+                                    <span class="font-bold text-slate-800 mt-0.5 block">
+                                        {{ $kes->penyakit_pernah_diderita ?: 'Tidak ada' }}
+                                        @if($kes->penyakit_pernah_diderita_lainnya)
+                                            <span class="font-normal text-slate-600">({{ $kes->penyakit_pernah_diderita_lainnya }})</span>
+                                        @endif
+                                    </span>
+                                </div>
+                                <div class="pt-2 border-t border-slate-200">
+                                    <span class="text-slate-400 block text-[11px] font-medium">Penyakit Berat yang Sedang Diderita:</span>
+                                    <span class="font-bold text-slate-800 mt-0.5 block">
+                                        {{ $kes->penyakit_sedang_diderita ?: 'Tidak ada' }}
+                                        @if($kes->penyakit_sedang_diderita_lainnya)
+                                            <span class="font-normal text-slate-600">({{ $kes->penyakit_sedang_diderita_lainnya }})</span>
+                                        @endif
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <div class="p-4 rounded-2xl bg-amber-50/60 border border-amber-200 text-center text-xs text-amber-800">
+                            <p class="font-bold">Calon siswa belum melengkapi data kesehatan.</p>
+                            <p class="text-[11px] text-amber-600 mt-0.5">Data antropometri dan riwayat medis akan muncul setelah calon siswa mengisi formulir kesehatan.</p>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- 4. DATA ORANG TUA / WALI -->
+                <div id="sec-orangtua" class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
                     <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-                        <span class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-sm">3</span>
+                        <span class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-sm">4</span>
                         <div>
                             <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">Data Orang Tua & Wali</h2>
                             <p class="text-[11px] text-slate-400">Identitas ayah, ibu kandung, wali murid dan penghasilan keluarga</p>
@@ -402,11 +627,11 @@
                     @endif
                 </div>
 
-                <!-- 4. NILAI RAPOR SISWA -->
-                <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
+                <!-- 5. NILAI RAPOR SISWA -->
+                <div id="sec-rapor" class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                         <div class="flex items-center gap-2.5">
-                            <span class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">4</span>
+                            <span class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">5</span>
                             <div>
                                 <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">Nilai Rapor SMP (Semester 1–5)</h2>
                                 <p class="text-[11px] text-slate-400">Rekapitulasi 4 mata pelajaran pokok penentu kelulusan</p>
@@ -498,48 +723,155 @@
                     @endif
                 </div>
 
-                <!-- 5. UKURAN SERAGAM -->
-                <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
-                    <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-                        <span class="w-8 h-8 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center font-bold text-sm">5</span>
-                        <div>
-                            <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">Data Ukuran Seragam & Atribut</h2>
-                            <p class="text-[11px] text-slate-400">Pilihan ukuran baju, celana/rok, dan paket perlengkapan siswa</p>
+                <!-- 6. UKURAN SERAGAM (KLASTER 1, 2, 3) -->
+                <div id="sec-seragam" class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-8 h-8 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center font-bold text-sm">6</span>
+                            <div>
+                                <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">Data Ukuran Seragam & Atribut</h2>
+                                <p class="text-[11px] text-slate-400">Rincian pemesanan seragam berdasarkan Klaster 1, Klaster 2, dan Klaster 3</p>
+                            </div>
                         </div>
+                        <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-700">
+                            {{ $calonSiswa->ukuranSeragam->count() }} Item Terdata
+                        </span>
                     </div>
 
                     @if ($calonSiswa->ukuranSeragam->isNotEmpty())
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
-                            @foreach($calonSiswa->ukuranSeragam as $srg)
-                                <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-                                    <div>
-                                        <span class="font-bold text-slate-800 block text-xs">
-                                            {{ $srg->seragam?->nama ?? $srg->seragam?->nama_seragam ?? 'Seragam Sekolah' }}
-                                        </span>
-                                        <span class="text-[10px] {{ $srg->status_pemesanan === 'PESAN_SEKARANG' ? 'text-emerald-700 font-semibold' : 'text-amber-700 font-medium' }}">
-                                            {{ $srg->status_label ?? ($srg->beli_di_sekolah ? 'Pesan Sekarang' : 'Pesan Nanti') }}
-                                            @if($srg->tagihan_id)
-                                                &bull; <span class="font-mono">#{{ $srg->tagihan?->nomor_tagihan }}</span>
-                                            @endif
-                                            &bull; {{ $srg->jumlah ?? 1 }} stel
-                                        </span>
-                                    </div>
-                                    <span class="px-2.5 py-1 rounded-xl text-xs font-black bg-white border border-slate-200 text-slate-900 shadow-2xs">
-                                        {{ $srg->ukuran ?? '-' }}
+                        @php
+                            $semuaUkuran = $calonSiswa->ukuranSeragam->loadMissing('seragam');
+                            $klaster1 = $semuaUkuran->filter(function($s) {
+                                $kl = strtoupper($s->seragam?->klaster ?? '');
+                                $nm = strtolower($s->seragam?->nama ?? $s->seragam?->nama_jenis ?? '');
+                                return $kl === 'MPLS' || str_contains($nm, 'almamater') || str_contains($nm, 'olahraga') || str_contains($nm, 'olah raga') || str_contains($nm, 'atribut');
+                            });
+                            $klaster2 = $semuaUkuran->filter(function($s) use ($klaster1) {
+                                if ($klaster1->contains('id', $s->id)) return false;
+                                $kl = strtoupper($s->seragam?->klaster ?? '');
+                                $nm = strtolower($s->seragam?->nama ?? $s->seragam?->nama_jenis ?? '');
+                                return $kl === 'KBM' || str_contains($nm, 'celana') || str_contains($nm, 'rok') || str_contains($nm, 'muslim');
+                            });
+                            $klaster3 = $semuaUkuran->filter(function($s) use ($klaster1, $klaster2) {
+                                return !$klaster1->contains('id', $s->id) && !$klaster2->contains('id', $s->id);
+                            });
+                        @endphp
+
+                        <div class="space-y-4">
+                            <!-- Klaster 1 -->
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                        Klaster 1 (Prioritas SPMB)
                                     </span>
+                                    <span class="text-[10px] font-medium text-slate-400">Jas Almamater, Olahraga, Atribut</span>
                                 </div>
-                            @endforeach
+                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 text-xs">
+                                    @forelse($klaster1 as $srg)
+                                        <div class="p-3 rounded-2xl bg-emerald-50/40 border border-emerald-200/70 flex items-center justify-between">
+                                            <div>
+                                                <span class="font-bold text-slate-800 block text-xs">
+                                                    {{ $srg->seragam?->nama ?? $srg->seragam?->nama_seragam ?? 'Seragam' }}
+                                                </span>
+                                                <span class="text-[10px] text-emerald-700 font-semibold block mt-0.5">
+                                                    ✓ Pesan Sekarang &bull; {{ $srg->jumlah ?? 1 }} stel
+                                                </span>
+                                            </div>
+                                            <span class="px-2.5 py-1 rounded-xl text-xs font-black bg-white border border-emerald-200 text-slate-900 shadow-2xs">
+                                                {{ $srg->ukuran ?: '-' }}
+                                            </span>
+                                        </div>
+                                    @empty
+                                        <p class="text-slate-400 text-xs italic col-span-3">Item Klaster 1 belum dipilih.</p>
+                                    @endforelse
+                                </div>
+                            </div>
+
+                            <!-- Klaster 2 -->
+                            <div class="pt-2 border-t border-slate-100">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                        Klaster 2 (Seragam Khusus)
+                                    </span>
+                                    <span class="text-[10px] font-medium text-slate-400">Celana/Rok Hijau, Seragam Muslim</span>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 text-xs">
+                                    @forelse($klaster2 as $srg)
+                                        <div class="p-3 rounded-2xl bg-blue-50/40 border border-blue-200/70 flex items-center justify-between">
+                                            <div>
+                                                <span class="font-bold text-slate-800 block text-xs">
+                                                    {{ $srg->seragam?->nama ?? $srg->seragam?->nama_seragam ?? 'Seragam' }}
+                                                </span>
+                                                <span class="text-[10px] text-blue-700 font-semibold block mt-0.5">
+                                                    ✓ Pesan Sekarang &bull; {{ $srg->jumlah ?? 1 }} stel
+                                                </span>
+                                            </div>
+                                            <span class="px-2.5 py-1 rounded-xl text-xs font-black bg-white border border-blue-200 text-slate-900 shadow-2xs">
+                                                {{ $srg->ukuran ?: '-' }}
+                                            </span>
+                                        </div>
+                                    @empty
+                                        <p class="text-slate-400 text-xs italic col-span-3">Item Klaster 2 belum dipilih.</p>
+                                    @endforelse
+                                </div>
+                            </div>
+
+                            <!-- Klaster 3 -->
+                            <div class="pt-2 border-t border-slate-100">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                                        Klaster 3 (Pilihan Fleksibel)
+                                    </span>
+                                    <span class="text-[10px] font-medium text-slate-400">Pramuka, Kemeja Putih, Sepatu Pantovel</span>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 text-xs">
+                                    @forelse($klaster3 as $srg)
+                                        @php
+                                            $stPesan = $srg->status_pemesanan ?: ($srg->beli_di_sekolah ? 'PESAN_SEKARANG' : 'PESAN_NANTI');
+                                            $cardBg = $stPesan === 'PESAN_SEKARANG' ? 'bg-emerald-50/50 border-emerald-200' :
+                                                      ($stPesan === 'TIDAK_PESAN' ? 'bg-slate-100/60 border-slate-200 opacity-75' : 'bg-amber-50/50 border-amber-200');
+                                        @endphp
+                                        <div class="p-3 rounded-2xl border {{ $cardBg }} flex items-center justify-between">
+                                            <div>
+                                                <span class="font-bold text-slate-800 block text-xs">
+                                                    {{ $srg->seragam?->nama ?? $srg->seragam?->nama_seragam ?? 'Seragam' }}
+                                                </span>
+                                                <span class="text-[10px] mt-0.5 block">
+                                                    @if($stPesan === 'PESAN_SEKARANG')
+                                                        <span class="text-emerald-700 font-bold">✓ Pesan Sekarang</span>
+                                                    @elseif($stPesan === 'TIDAK_PESAN')
+                                                        <span class="text-slate-500 font-semibold">✕ Tidak Pesan (Beli Sendiri)</span>
+                                                    @else
+                                                        <span class="text-amber-700 font-semibold">⏳ Pesan Nanti</span>
+                                                    @endif
+                                                    @if($stPesan !== 'TIDAK_PESAN')
+                                                        &bull; {{ $srg->jumlah ?? 1 }} {{ str_contains(strtolower($srg->seragam?->nama ?? ''), 'pantovel') ? 'pasang' : 'stel' }}
+                                                    @endif
+                                                </span>
+                                            </div>
+                                            <span class="px-2.5 py-1 rounded-xl text-xs font-black bg-white border border-slate-200 text-slate-900 shadow-2xs">
+                                                {{ $srg->ukuran ?: '-' }}
+                                            </span>
+                                        </div>
+                                    @empty
+                                        <p class="text-slate-400 text-xs italic col-span-3">Item Klaster 3 belum dipilih.</p>
+                                    @endforelse
+                                </div>
+                            </div>
                         </div>
                     @else
                         <p class="text-xs text-slate-400 italic">Pilihan ukuran seragam belum diinput.</p>
                     @endif
                 </div>
 
-                <!-- 6. KESEPAHAMAN / PAKTA INTEGRITAS (EULA) -->
-                <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
+                <!-- 7. KESEPAHAMAN / PAKTA INTEGRITAS (EULA) -->
+                <div id="sec-eula" class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4 scroll-mt-24">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                         <div class="flex items-center gap-2.5">
-                            <span class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">6</span>
+                            <span class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">7</span>
                             <div>
                                 <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">Kesepahaman & Pakta Integritas (EULA)</h2>
                                 <p class="text-[11px] text-slate-400">Tanda tangan elektronik persetujuan komitmen dan tata tertib sekolah</p>
@@ -586,14 +918,17 @@
                     @endif
                 </div>
 
-                <!-- 7. DOKUMEN & BERKAS PERSYARATAN -->
-                <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
-                    <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-                        <span class="w-8 h-8 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-sm">7</span>
-                        <div>
-                            <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">Berkas & Dokumen Terunggah</h2>
-                            <p class="text-[11px] text-slate-400">Dokumen asli persyaratan seleksi yang diunggah calon siswa</p>
+                <!-- 8. DOKUMEN & BERKAS PERSYARATAN -->
+                <div id="sec-berkas" class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4 scroll-mt-24">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-8 h-8 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-sm">8</span>
+                            <div>
+                                <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">Berkas & Dokumen Terunggah</h2>
+                                <p class="text-[11px] text-slate-400">Dokumen asli seleksi (KK & Pas Foto Wajib, Akta & Ijazah Opsional)</p>
+                            </div>
                         </div>
+                        <span class="text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">Maks. 10 MB / berkas</span>
                     </div>
 
                     @php $doc = $calonSiswa->dokumenPendaftaran; @endphp
@@ -603,12 +938,15 @@
                             <div class="p-4 rounded-2xl border {{ $doc->kk_path ? 'bg-emerald-50/50 border-emerald-200' : 'bg-slate-50 border-slate-200' }} flex flex-col justify-between gap-3">
                                 <div>
                                     <div class="flex items-center justify-between">
-                                        <span class="font-bold text-slate-900 text-sm">Kartu Keluarga (KK)</span>
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="font-bold text-slate-900 text-sm">Kartu Keluarga (KK)</span>
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-rose-100 text-rose-700 border border-rose-200">WAJIB</span>
+                                        </div>
                                         <span class="px-2 py-0.5 rounded text-[10px] font-bold {{ $doc->kk_path ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500' }}">
                                             {{ $doc->kk_path ? '✓ Terunggah' : 'Belum Ada' }}
                                         </span>
                                     </div>
-                                    <span class="text-[11px] text-slate-400 block mt-0.5">Wajib diverifikasi kesesuaian data</span>
+                                    <span class="text-[11px] text-slate-400 block mt-0.5">Wajib diverifikasi kesesuaian nomor KK dan NIK</span>
                                 </div>
                                 @if ($doc->kk_path)
                                     <div class="flex items-center gap-2">
@@ -624,12 +962,15 @@
                             <div class="p-4 rounded-2xl border {{ $doc->akta_path ? 'bg-emerald-50/50 border-emerald-200' : 'bg-slate-50 border-slate-200' }} flex flex-col justify-between gap-3">
                                 <div>
                                     <div class="flex items-center justify-between">
-                                        <span class="font-bold text-slate-900 text-sm">Akta Kelahiran</span>
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="font-bold text-slate-900 text-sm">Akta Kelahiran</span>
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-200 text-slate-600">OPSIONAL</span>
+                                        </div>
                                         <span class="px-2 py-0.5 rounded text-[10px] font-bold {{ $doc->akta_path ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500' }}">
                                             {{ $doc->akta_path ? '✓ Terunggah' : 'Belum Ada' }}
                                         </span>
                                     </div>
-                                    <span class="text-[11px] text-slate-400 block mt-0.5">Untuk validasi tanggal & tempat lahir</span>
+                                    <span class="text-[11px] text-slate-400 block mt-0.5">Opsional / validasi tempat & tanggal lahir</span>
                                 </div>
                                 @if ($doc->akta_path)
                                     <div class="flex items-center gap-2">
@@ -645,12 +986,15 @@
                             <div class="p-4 rounded-2xl border {{ $doc->ijazah_skl_path ? 'bg-emerald-50/50 border-emerald-200' : 'bg-slate-50 border-slate-200' }} flex flex-col justify-between gap-3">
                                 <div>
                                     <div class="flex items-center justify-between">
-                                        <span class="font-bold text-slate-900 text-sm">Ijazah / SKL SMP</span>
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="font-bold text-slate-900 text-sm">Ijazah / SKL SMP</span>
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-200 text-slate-600">OPSIONAL</span>
+                                        </div>
                                         <span class="px-2 py-0.5 rounded text-[10px] font-bold {{ $doc->ijazah_skl_path ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500' }}">
                                             {{ $doc->ijazah_skl_path ? '✓ Terunggah' : 'Belum Ada' }}
                                         </span>
                                     </div>
-                                    <span class="text-[11px] text-slate-400 block mt-0.5">Surat Keterangan Lulus / Ijazah</span>
+                                    <span class="text-[11px] text-slate-400 block mt-0.5">Opsional / Surat Keterangan Lulus / Ijazah</span>
                                 </div>
                                 @if ($doc->ijazah_skl_path)
                                     <div class="flex items-center gap-2">
@@ -666,12 +1010,15 @@
                             <div class="p-4 rounded-2xl border {{ $doc->pas_foto_path ? 'bg-emerald-50/50 border-emerald-200' : 'bg-slate-50 border-slate-200' }} flex flex-col justify-between gap-3">
                                 <div>
                                     <div class="flex items-center justify-between">
-                                        <span class="font-bold text-slate-900 text-sm">Pas Foto Calon Siswa</span>
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="font-bold text-slate-900 text-sm">Pas Foto Calon Siswa</span>
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-rose-100 text-rose-700 border border-rose-200">WAJIB</span>
+                                        </div>
                                         <span class="px-2 py-0.5 rounded text-[10px] font-bold {{ $doc->pas_foto_path ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500' }}">
                                             {{ $doc->pas_foto_path ? '✓ Terunggah' : 'Belum Ada' }}
                                         </span>
                                     </div>
-                                    <span class="text-[11px] text-slate-400 block mt-0.5">Foto resmi berseragam</span>
+                                    <span class="text-[11px] text-slate-400 block mt-0.5">Wajib untuk kartu peserta & arsip resmi</span>
                                 </div>
                                 @if ($doc->pas_foto_path)
                                     <div class="flex items-center gap-2">
@@ -693,11 +1040,11 @@
             <!-- RIGHT COLUMN (5 COLS): Biaya Seleksi, Wawancara, Keuangan & Tagihan Daftar Ulang, Keputusan, Riwayat -->
             <div class="lg:col-span-5 space-y-6">
 
-                <!-- 8. DATA PEMBAYARAN BIAYA SELEKSI -->
-                <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
+                <!-- 9. DATA PEMBAYARAN BIAYA SELEKSI -->
+                <div id="sec-seleksi" class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4 scroll-mt-24">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                         <div class="flex items-center gap-2.5">
-                            <span class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">8</span>
+                            <span class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">9</span>
                             <div>
                                 <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">Biaya Seleksi Pendaftaran</h2>
                                 <p class="text-[11px] text-slate-400">Verifikasi pembayaran awal formulir seleksi</p>
@@ -744,10 +1091,10 @@
                     </div>
                 </div>
 
-                <!-- 9. HASIL EVALUASI WAWANCARA (SISWA & ORTU) -->
-                <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
+                <!-- 10. HASIL EVALUASI WAWANCARA (SISWA & ORTU) -->
+                <div id="sec-wawancara" class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4 scroll-mt-24">
                     <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-                        <span class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-sm">9</span>
+                        <span class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-sm">10</span>
                         <div>
                             <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">Hasil Wawancara Seleksi</h2>
                             <p class="text-[11px] text-slate-400">Data hasil observasi siswa dan komitmen orang tua</p>
@@ -863,11 +1210,11 @@
                     </div>
                 </div>
 
-                <!-- 10. KEUANGAN & DAFTAR ULANG (WALAU BELUM DITERBITKAN) -->
-                <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
+                <!-- 11. KEUANGAN & DAFTAR ULANG (WALAU BELUM DITERBITKAN) -->
+                <div id="sec-keuangan" class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4 scroll-mt-24">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                         <div class="flex items-center gap-2.5">
-                            <span class="w-8 h-8 rounded-xl bg-cyan-100 text-cyan-800 flex items-center justify-center font-bold text-sm">10</span>
+                            <span class="w-8 h-8 rounded-xl bg-cyan-100 text-cyan-800 flex items-center justify-center font-bold text-sm">11</span>
                             <div>
                                 <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">Keuangan Daftar Ulang</h2>
                                 <p class="text-[11px] text-slate-400">Rincian invoice resmi atau estimasi biaya baku program</p>
@@ -1002,11 +1349,11 @@
                     @endif
                 </div>
 
-                <!-- 11. KEPUTUSAN SIDANG PLENO KELULUSAN -->
-                <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-3">
+                <!-- 12. KEPUTUSAN SIDANG PLENO KELULUSAN -->
+                <div id="sec-kelulusan" class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-3 scroll-mt-24">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                         <div class="flex items-center gap-2.5">
-                            <span class="w-8 h-8 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-sm">11</span>
+                            <span class="w-8 h-8 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-sm">12</span>
                             <div>
                                 <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">Keputusan Sidang Kelulusan</h2>
                                 <p class="text-[11px] text-slate-400">Keputusan resmi hasil pleno pimpinan sekolah</p>
@@ -1045,10 +1392,10 @@
                     @endif
                 </div>
 
-                <!-- 12. AUDIT TRAIL / RIWAYAT STATUS -->
-                <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-3 print:hidden">
+                <!-- 13. AUDIT TRAIL / RIWAYAT STATUS -->
+                <div id="sec-riwayat" class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-3 print:hidden scroll-mt-24">
                     <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-                        <span class="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-sm">12</span>
+                        <span class="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-sm">13</span>
                         <div>
                             <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">Riwayat Status SPMB (Audit Trail)</h2>
                             <p class="text-[11px] text-slate-400">Log kronologis perubahan status calon siswa</p>
