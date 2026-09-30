@@ -128,7 +128,7 @@ class AdminDashboardTest extends TestCase
         $response->assertOk();
         $response->assertSee($this->calonSiswa->nama_lengkap);
         $response->assertSee($this->calonSiswa->nomor_pendaftaran);
-        $response->assertSee('Biodata Pribadi Calon Siswa');
+        $response->assertSee('Biodata Pribadi Calon Murid');
         $response->assertSee('Biaya Seleksi Pendaftaran');
     }
 

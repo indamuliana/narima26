@@ -346,7 +346,7 @@ class KeputusanKelulusanTest extends TestCase
             ->get(route('kepala-sekolah.calon-siswa.index'));
 
         $indexResponse->assertOk();
-        $indexResponse->assertSee('Direktori Data Calon Siswa');
+        $indexResponse->assertSee('Direktori Data Calon Murid');
         $indexResponse->assertSee($this->calonSiswa->nama_lengkap);
         $indexResponse->assertSee('✓ Lunas');
         $indexResponse->assertSee('⏳ Verifikasi');
@@ -357,7 +357,7 @@ class KeputusanKelulusanTest extends TestCase
 
         $showResponse->assertOk();
         $showResponse->assertSee($this->calonSiswa->nama_lengkap);
-        $showResponse->assertSee('Biodata Pribadi Calon Siswa');
+        $showResponse->assertSee('Biodata Pribadi Calon Murid');
         $showResponse->assertSee('Hasil Wawancara Seleksi');
         $showResponse->assertSee('Keuangan Daftar Ulang');
         $showResponse->assertSee('Berkas & Dokumen Terunggah', false);

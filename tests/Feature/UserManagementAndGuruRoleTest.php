@@ -197,7 +197,7 @@ class UserManagementAndGuruRoleTest extends TestCase
         $response = $this->actingAs($this->guru)->get(route('admin.dashboard'));
 
         $response->assertStatus(200);
-        $response->assertSee('Direktori Calon Siswa');
+        $response->assertSee('Direktori Calon Murid');
         $response->assertSee('Laporan & Rekapitulasi', false);
     }
 
