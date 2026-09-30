@@ -56,7 +56,7 @@
                 <!-- Desktop Menu -->
                 <nav class="hidden lg:flex items-center gap-6">
                     <a href="{{ url('/') }}" class="text-sm font-medium text-slate-700 hover:text-nampi-orange transition-colors">Beranda</a>
-                    <a href="{{ url('/#gelombang-highlight') }}" class="text-sm font-medium text-amber-600 hover:text-amber-700 transition-colors font-semibold">Gelombang Aktif</a>
+                    <!-- <a href="{{ url('/#gelombang-highlight') }}" class="text-sm font-medium text-amber-600 hover:text-amber-700 transition-colors font-semibold">Gelombang Aktif</a> -->
                     <a href="{{ url('/#fasilitas') }}" class="text-sm font-medium text-slate-600 hover:text-nampi-orange transition-colors">Fasilitas</a>
                     <a href="{{ url('/#pembelajaran') }}" class="text-sm font-medium text-slate-600 hover:text-nampi-orange transition-colors">Pembelajaran</a>
                     <a href="{{ url('/#testimoni') }}" class="text-sm font-medium text-slate-600 hover:text-nampi-orange transition-colors">Alumni & Testimoni</a>

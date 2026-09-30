@@ -260,7 +260,7 @@
                                    autocomplete="off"
                                    class="w-full rounded-xl border border-slate-300 pl-11 pr-3.5 py-2 text-sm font-semibold text-slate-800 focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
                         </div>
-                        <p class="text-[11px] text-slate-400 mt-1">Nominal per bulan (otomatis format delimiter per 3 digit).</p>
+                        <p class="text-[11px] text-slate-400 mt-1"><strong>pastikan jelaskan</strong> kepada orang tua.</strong></p>
                     </div>
 
                     <div class="sm:col-span-2 md:col-span-3">

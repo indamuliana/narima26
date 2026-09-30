@@ -272,6 +272,245 @@
         </div>
     </section>
 
+    <!-- SECTION ALUR SPMB 7 LANGKAH (1 BARIS MINIMALIS) -->
+    <section id="alur" class="py-10 lg:py-12 bg-white border-b border-slate-200/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 pb-4 border-b border-slate-100 gap-3">
+                <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-nampi-orange/10 text-nampi-orange flex items-center justify-center font-bold text-sm">✓</span>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+                            Alur Pendaftaran (7 Tahapan Mudah)
+                        </h2>
+                        <p class="text-xs text-slate-500">
+                            Proses terintegrasi dan transparan dari awal registrasi hingga pengumuman kelulusan.
+                        </p>
+                    </div>
+                </div>
+                <div class="inline-flex items-center gap-2 self-start sm:self-auto">
+                    <a href="{{ url('/register') }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-nampi-orange hover:bg-nampi-orange-hover shadow-2xs transition-all">
+                        <span>Daftar Sekarang</span>
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 1 Baris Minimalis (7 Kolom) -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+                <!-- 1 -->
+                <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/80 hover:bg-white hover:border-nampi-orange/50 hover:shadow-xs transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="w-6 h-6 rounded-md bg-nampi-orange text-white font-bold text-xs flex items-center justify-center shadow-2xs">1</span>
+                            <span class="text-[10px] font-semibold text-slate-400">Tahap 1</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-xs mb-1">Registrasi Akun</h4>
+                        <p class="text-[11px] text-slate-600 leading-snug">
+                            Mengisi Link di <a href="{{ url('/register') }}" class="font-semibold text-nampi-orange hover:underline break-all">spmb.smkwikrama1garut.sch.id</a> (online) atau datang langsung ke sekolah.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 2 -->
+                <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/80 hover:bg-white hover:border-nampi-cyan/50 hover:shadow-xs transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="w-6 h-6 rounded-md bg-nampi-cyan text-white font-bold text-xs flex items-center justify-center shadow-2xs">2</span>
+                            <span class="text-[10px] font-semibold text-slate-400">Tahap 2</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-xs mb-1">Membayar Biaya</h4>
+                        <p class="text-[11px] text-slate-600 leading-snug">
+                            Nominal <strong>Rp. 200.000</strong> melalui transfer atau langsung ke Bendahara Sekolah.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 3 -->
+                <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/80 hover:bg-white hover:border-blue-400 hover:shadow-xs transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="w-6 h-6 rounded-md bg-blue-600 text-white font-bold text-xs flex items-center justify-center shadow-2xs">3</span>
+                            <span class="text-[10px] font-semibold text-slate-400">Tahap 3</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-xs mb-1">Upload Bukti</h4>
+                        <p class="text-[11px] text-slate-600 leading-snug">
+                            <a href="{{ url('/login') }}" class="font-semibold text-blue-600 hover:underline break-all">spmb.smkwikrama1garut.sch.id/login</a> (gunakan akun Anda) untuk upload bukti bayar.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 4 -->
+                <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/80 hover:bg-white hover:border-amber-400 hover:shadow-xs transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="w-6 h-6 rounded-md bg-amber-500 text-white font-bold text-xs flex items-center justify-center shadow-2xs">4</span>
+                            <span class="text-[10px] font-semibold text-slate-400">Tahap 4</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-xs mb-1">Biodata Diri</h4>
+                        <p class="text-[11px] text-slate-600 leading-snug">
+                            Lengkapi Data diri, Orang tua, Kesehatan, Akademik, dan Prestasi.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 5 -->
+                <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/80 hover:bg-white hover:border-violet-400 hover:shadow-xs transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="w-6 h-6 rounded-md bg-violet-600 text-white font-bold text-xs flex items-center justify-center shadow-2xs">5</span>
+                            <span class="text-[10px] font-semibold text-slate-400">Tahap 5</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-xs mb-1">Unggah Berkas</h4>
+                        <p class="text-[11px] text-slate-600 leading-snug">
+                            Unggah Kartu Keluarga, KTP, Foto calon siswa, dan Akta Kelahiran.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 6 -->
+                <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/80 hover:bg-white hover:border-indigo-400 hover:shadow-xs transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="w-6 h-6 rounded-md bg-indigo-600 text-white font-bold text-xs flex items-center justify-center shadow-2xs">6</span>
+                            <span class="text-[10px] font-semibold text-slate-400">Tahap 6</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-xs mb-1">Wawancara</h4>
+                        <p class="text-[11px] text-slate-600 leading-snug">
+                            Interview pemetaan minat bakat calon siswa dan orang tua.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 7 -->
+                <div class="p-3 sm:p-3.5 rounded-xl bg-emerald-50/80 border border-emerald-200 hover:bg-white hover:border-emerald-400 hover:shadow-xs transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="w-6 h-6 rounded-md bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shadow-2xs">7</span>
+                            <span class="text-[10px] font-bold text-emerald-700 uppercase">Lolos</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-xs mb-1">Pengumuman</h4>
+                        <p class="text-[11px] text-slate-600 leading-snug">
+                            Cek status kelulusan di dashboard akun portal SPMB dan lanjutkan daftar ulang.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION PROGRAM KEAHLIAN & JURUSAN -->
+    <section id="program" class="py-20 bg-white border-b border-slate-200/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto space-y-3 mb-16">
+                <span class="text-xs font-bold uppercase tracking-wider text-nampi-orange bg-nampi-orange/10 px-3 py-1 rounded-full">Kompetensi Kejuruan</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                    4 Program Keahlian Berstandar Industri
+                </h2>
+                <p class="text-slate-600 text-sm sm:text-base">
+                    Dirancang dengan kurikulum berbasis kompetensi DUDI dan bersertifikasi BNSP untuk mencetak tenaga kerja profesional yang siap diserap dunia kerja.
+                </p>
+            </div>
+
+            <!-- Jurusan Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- PPLG -->
+                <div class="p-6 rounded-2xl border border-slate-200/90 bg-slate-50 hover:bg-white hover:border-nampi-orange/70 hover:shadow-xl transition-all duration-300 group flex flex-col justify-between">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-amber-100 text-nampi-orange flex items-center justify-center font-bold text-2xl mb-4 group-hover:scale-110 transition-transform">
+                            ⚙️
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-1">PPLG</h3>
+                        <p class="text-xs font-bold text-nampi-orange uppercase tracking-wider mb-3">Pengembangan Perangkat Lunak & Gim</p>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Fokus pada rekayasa perangkat lunak modern, pengembangan web (fullstack), aplikasi mobile Android/iOS, API services, dan logika komputasi.
+                        </p>
+                    </div>
+                    <div class="pt-4 mt-4 border-t border-slate-200/70 text-[11px] font-semibold text-slate-500">
+                        Karier: Web Developer, Mobile Dev, UI/UX, QA Tester
+                    </div>
+                </div>
+
+                <!-- TJKT -->
+                <div class="p-6 rounded-2xl border border-slate-200/90 bg-slate-50 hover:bg-white hover:border-nampi-cyan/70 hover:shadow-xl transition-all duration-300 group flex flex-col justify-between">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-cyan-100 text-nampi-cyan flex items-center justify-center font-bold text-2xl mb-4 group-hover:scale-110 transition-transform">
+                            💻
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-1">TJKT</h3>
+                        <p class="text-xs font-bold text-nampi-cyan uppercase tracking-wider mb-3">Teknik Jaringan Komputer & Telekomunikasi</p>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Keahlian instalasi infrastruktur fiber optic, routing BGP/OSPF, administrasi server Linux/Cloud, serta keamanan siber (cyber security).
+                        </p>
+                    </div>
+                    <div class="pt-4 mt-4 border-t border-slate-200/70 text-[11px] font-semibold text-slate-500">
+                        Karier: Network Engineer, SysAdmin, Cloud Ops, NOC
+                    </div>
+                </div>
+
+                <!-- PEMASARAN -->
+                <div class="p-6 rounded-2xl border border-slate-200/90 bg-slate-50 hover:bg-white hover:border-emerald-500/70 hover:shadow-xl transition-all duration-300 group flex flex-col justify-between">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-2xl mb-4 group-hover:scale-110 transition-transform">
+                            📈
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-1">Pemasaran</h3>
+                        <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-3">Bisnis Digital & Digital Marketing</p>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Mempelajari optimasi search engine (SEO), manajemen kampanye iklan berbayar (Ads), content creation, live commerce, dan kewirausahaan.
+                        </p>
+                    </div>
+                    <div class="pt-4 mt-4 border-t border-slate-200/70 text-[11px] font-semibold text-slate-500">
+                        Karier: Digital Marketer, Content Creator, E-Commerce Ops
+                    </div>
+                </div>
+
+                <!-- PERHOTELAN -->
+                <div class="p-6 rounded-2xl border border-slate-200/90 bg-slate-50 hover:bg-white hover:border-amber-400 hover:shadow-xl transition-all duration-300 group flex flex-col justify-between">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-2xl mb-4 group-hover:scale-110 transition-transform">
+                            🏨
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-1">Perhotelan</h3>
+                        <p class="text-xs font-bold text-amber-700 uppercase tracking-wider mb-3">Hospitality & Tourism Industry</p>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Keahlian tata hidang berstandar internasional (Food & Beverage Service), divisi kamar (Housekeeping), resepsionis (Front Office), dan event management.
+                        </p>
+                    </div>
+                    <div class="pt-4 mt-4 border-t border-slate-200/70 text-[11px] font-semibold text-slate-500">
+                        Karier: Hotelier, Front Desk VVIP, Event Planner
+                    </div>
+                </div>
+            </div>
+
+            <!-- Program Selector (Reguler / Unggulan) -->
+            <div class="mt-12 p-8 rounded-3xl bg-slate-900 text-white shadow-xl">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-nampi-orange">2 Jalur Pembinaan</span>
+                        <h3 class="text-2xl sm:text-3xl font-bold mt-1 mb-3">Program Reguler & Program Unggulan</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Calon peserta didik dapat menentukan jalur program yang selaras dengan cita-cita akademik, kesiapan mandiri, serta pembinaan akhlak komprehensif.
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="p-5 rounded-2xl bg-slate-800 border border-slate-700">
+                            <h4 class="font-bold text-white text-base">Program Reguler</h4>
+                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Kurikulum vokasi standar industri dengan pembelajaran teori dan praktik seimbang (non-asrama).</p>
+                        </div>
+                        <div class="p-5 rounded-2xl bg-slate-800 border border-nampi-orange/50">
+                            <div class="flex items-center justify-between">
+                                <h4 class="font-bold text-nampi-orange text-base">Program Unggulan</h4>
+                                <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-nampi-orange text-white">Boarding</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Wajib tinggal di asrama pondok, bimbingan Tahfidz Al-Qur'an, pembiasaan akhlak 24 jam, dan pendalaman IT.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{--
     <!-- SECTION GALERI FASILITAS SEKOLAH (1 Baris 4 Gambar, Tinggi ~200px, Hover Zoom) -->
     <section id="fasilitas" class="py-20 bg-slate-50 border-b border-slate-200/80">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -285,7 +524,7 @@
                 </p>
             </div>
 
-            <!-- 12 Facilities Grid: 1 Baris 4 Gambar di Desktop -->
+            
             @php
                 $fasilitasItems = [
                     [
@@ -874,118 +1113,7 @@
 
         </div>
     </section>
-
-    <!-- SECTION PROGRAM KEAHLIAN & JURUSAN -->
-    <section id="program" class="py-20 bg-white border-b border-slate-200/80">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto space-y-3 mb-16">
-                <span class="text-xs font-bold uppercase tracking-wider text-nampi-orange bg-nampi-orange/10 px-3 py-1 rounded-full">Kompetensi Kejuruan</span>
-                <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-                    4 Program Keahlian Berstandar Industri
-                </h2>
-                <p class="text-slate-600 text-sm sm:text-base">
-                    Dirancang dengan kurikulum berbasis kompetensi DUDI dan bersertifikasi BNSP untuk mencetak tenaga kerja profesional yang siap diserap dunia kerja.
-                </p>
-            </div>
-
-            <!-- Jurusan Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- PPLG -->
-                <div class="p-6 rounded-2xl border border-slate-200/90 bg-slate-50 hover:bg-white hover:border-nampi-orange/70 hover:shadow-xl transition-all duration-300 group flex flex-col justify-between">
-                    <div>
-                        <div class="w-14 h-14 rounded-2xl bg-amber-100 text-nampi-orange flex items-center justify-center font-bold text-2xl mb-4 group-hover:scale-110 transition-transform">
-                            ⚙️
-                        </div>
-                        <h3 class="text-lg font-bold text-slate-900 mb-1">PPLG</h3>
-                        <p class="text-xs font-bold text-nampi-orange uppercase tracking-wider mb-3">Pengembangan Perangkat Lunak & Gim</p>
-                        <p class="text-xs text-slate-600 leading-relaxed">
-                            Fokus pada rekayasa perangkat lunak modern, pengembangan web (fullstack), aplikasi mobile Android/iOS, API services, dan logika komputasi.
-                        </p>
-                    </div>
-                    <div class="pt-4 mt-4 border-t border-slate-200/70 text-[11px] font-semibold text-slate-500">
-                        Karier: Web Developer, Mobile Dev, UI/UX, QA Tester
-                    </div>
-                </div>
-
-                <!-- TJKT -->
-                <div class="p-6 rounded-2xl border border-slate-200/90 bg-slate-50 hover:bg-white hover:border-nampi-cyan/70 hover:shadow-xl transition-all duration-300 group flex flex-col justify-between">
-                    <div>
-                        <div class="w-14 h-14 rounded-2xl bg-cyan-100 text-nampi-cyan flex items-center justify-center font-bold text-2xl mb-4 group-hover:scale-110 transition-transform">
-                            💻
-                        </div>
-                        <h3 class="text-lg font-bold text-slate-900 mb-1">TJKT</h3>
-                        <p class="text-xs font-bold text-nampi-cyan uppercase tracking-wider mb-3">Teknik Jaringan Komputer & Telekomunikasi</p>
-                        <p class="text-xs text-slate-600 leading-relaxed">
-                            Keahlian instalasi infrastruktur fiber optic, routing BGP/OSPF, administrasi server Linux/Cloud, serta keamanan siber (cyber security).
-                        </p>
-                    </div>
-                    <div class="pt-4 mt-4 border-t border-slate-200/70 text-[11px] font-semibold text-slate-500">
-                        Karier: Network Engineer, SysAdmin, Cloud Ops, NOC
-                    </div>
-                </div>
-
-                <!-- PEMASARAN -->
-                <div class="p-6 rounded-2xl border border-slate-200/90 bg-slate-50 hover:bg-white hover:border-emerald-500/70 hover:shadow-xl transition-all duration-300 group flex flex-col justify-between">
-                    <div>
-                        <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-2xl mb-4 group-hover:scale-110 transition-transform">
-                            📈
-                        </div>
-                        <h3 class="text-lg font-bold text-slate-900 mb-1">Pemasaran</h3>
-                        <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-3">Bisnis Digital & Digital Marketing</p>
-                        <p class="text-xs text-slate-600 leading-relaxed">
-                            Mempelajari optimasi search engine (SEO), manajemen kampanye iklan berbayar (Ads), content creation, live commerce, dan kewirausahaan.
-                        </p>
-                    </div>
-                    <div class="pt-4 mt-4 border-t border-slate-200/70 text-[11px] font-semibold text-slate-500">
-                        Karier: Digital Marketer, Content Creator, E-Commerce Ops
-                    </div>
-                </div>
-
-                <!-- PERHOTELAN -->
-                <div class="p-6 rounded-2xl border border-slate-200/90 bg-slate-50 hover:bg-white hover:border-amber-400 hover:shadow-xl transition-all duration-300 group flex flex-col justify-between">
-                    <div>
-                        <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-2xl mb-4 group-hover:scale-110 transition-transform">
-                            🏨
-                        </div>
-                        <h3 class="text-lg font-bold text-slate-900 mb-1">Perhotelan</h3>
-                        <p class="text-xs font-bold text-amber-700 uppercase tracking-wider mb-3">Hospitality & Tourism Industry</p>
-                        <p class="text-xs text-slate-600 leading-relaxed">
-                            Keahlian tata hidang berstandar internasional (Food & Beverage Service), divisi kamar (Housekeeping), resepsionis (Front Office), dan event management.
-                        </p>
-                    </div>
-                    <div class="pt-4 mt-4 border-t border-slate-200/70 text-[11px] font-semibold text-slate-500">
-                        Karier: Hotelier, Front Desk VVIP, Event Planner
-                    </div>
-                </div>
-            </div>
-
-            <!-- Program Selector (Reguler / Unggulan) -->
-            <div class="mt-12 p-8 rounded-3xl bg-slate-900 text-white shadow-xl">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                    <div>
-                        <span class="text-xs font-bold uppercase tracking-wider text-nampi-orange">2 Jalur Pembinaan</span>
-                        <h3 class="text-2xl sm:text-3xl font-bold mt-1 mb-3">Program Reguler & Program Unggulan</h3>
-                        <p class="text-sm text-slate-300 leading-relaxed">
-                            Calon peserta didik dapat menentukan jalur program yang selaras dengan cita-cita akademik, kesiapan mandiri, serta pembinaan akhlak komprehensif.
-                        </p>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="p-5 rounded-2xl bg-slate-800 border border-slate-700">
-                            <h4 class="font-bold text-white text-base">Program Reguler</h4>
-                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Kurikulum vokasi standar industri dengan pembelajaran teori dan praktik seimbang (non-asrama).</p>
-                        </div>
-                        <div class="p-5 rounded-2xl bg-slate-800 border border-nampi-orange/50">
-                            <div class="flex items-center justify-between">
-                                <h4 class="font-bold text-nampi-orange text-base">Program Unggulan</h4>
-                                <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-nampi-orange text-white">Boarding</span>
-                            </div>
-                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Wajib tinggal di asrama pondok, bimbingan Tahfidz Al-Qur'an, pembiasaan akhlak 24 jam, dan pendalaman IT.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    --}}
 
     <!-- SECTION TRANSPARANSI BIAYA PENDIDIKAN (Minimalis, Ringkas, & Proporsional) -->
     <section id="biaya" class="py-16 sm:py-20 bg-slate-50/70 border-b border-slate-200/80">
@@ -1202,60 +1330,9 @@
             </div>
         </div>
     </section>
+ 
 
-    <!-- SECTION ALUR SPMB 5 LANGKAH -->
-    <section id="alur" class="py-20 bg-white border-b border-slate-200/80">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto space-y-3 mb-16">
-                <span class="text-xs font-bold uppercase tracking-wider text-nampi-cyan bg-cyan-50 text-cyan-800 px-3.5 py-1 rounded-full border border-cyan-200">Tahapan Praktis</span>
-                <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-                    5 Langkah Mudah Pendaftaran di SPMB NAMPI
-                </h2>
-                <p class="text-slate-600 text-sm sm:text-base">
-                    Proses terintegrasi dan transparan dari pengisian data awal hingga resmi menjadi siswa baru.
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
-                <div class="p-5 sm:p-6 bg-slate-50 rounded-2xl border border-slate-200/90 hover:bg-white hover:shadow-md transition-all flex flex-col justify-between">
-                    <div>
-                        <div class="w-10 h-10 rounded-xl bg-nampi-orange text-white font-bold flex items-center justify-center text-sm mb-4 shadow-2xs">1</div>
-                        <h3 class="font-bold text-slate-900 text-sm mb-1.5">Registrasi Akun</h3>
-                        <p class="text-xs text-slate-600 leading-relaxed">Isi formulir NISN, nama lengkap, dan nomor WhatsApp aktif. Akun dibuat seketika.</p>
-                    </div>
-                </div>
-                <div class="p-5 sm:p-6 bg-slate-50 rounded-2xl border border-slate-200/90 hover:bg-white hover:shadow-md transition-all flex flex-col justify-between">
-                    <div>
-                        <div class="w-10 h-10 rounded-xl bg-nampi-cyan text-white font-bold flex items-center justify-center text-sm mb-4 shadow-2xs">2</div>
-                        <h3 class="font-bold text-slate-900 text-sm mb-1.5">Bayar Biaya Seleksi (Rp 200.000)</h3>
-                        <p class="text-xs text-slate-600 leading-relaxed">Transfer biaya seleksi Rp 200.000 dan unggah bukti transfer ke portal untuk verifikasi panitia.</p>
-                    </div>
-                </div>
-                <div class="p-5 sm:p-6 bg-slate-50 rounded-2xl border border-slate-200/90 hover:bg-white hover:shadow-md transition-all flex flex-col justify-between">
-                    <div>
-                        <div class="w-10 h-10 rounded-xl bg-amber-500 text-white font-bold flex items-center justify-center text-sm mb-4 shadow-2xs">3</div>
-                        <h3 class="font-bold text-slate-900 text-sm mb-1.5">Isi Biodata</h3>
-                        <p class="text-xs text-slate-600 leading-relaxed">Lengkapi data pribadi, identitas orang tua, riwayat akademik rapor, ukuran seragam, dan berkas.</p>
-                    </div>
-                </div>
-                <div class="p-5 sm:p-6 bg-slate-50 rounded-2xl border border-slate-200/90 hover:bg-white hover:shadow-md transition-all flex flex-col justify-between">
-                    <div>
-                        <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white font-bold flex items-center justify-center text-sm mb-4 shadow-2xs">4</div>
-                        <h3 class="font-bold text-slate-900 text-sm mb-1.5">Wawancara</h3>
-                        <p class="text-xs text-slate-600 leading-relaxed">Ikuti sesi wawancara bakat minat calon siswa serta pemetaan kesepahaman bersama orang tua.</p>
-                    </div>
-                </div>
-                <div class="p-5 sm:p-6 bg-slate-50 rounded-2xl border border-slate-200/90 hover:bg-white hover:shadow-md transition-all flex flex-col justify-between">
-                    <div>
-                        <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white font-bold flex items-center justify-center text-sm mb-4 shadow-2xs">5</div>
-                        <h3 class="font-bold text-slate-900 text-sm mb-1.5">Pengumuman</h3>
-                        <p class="text-xs text-slate-600 leading-relaxed">Cek status kelulusan di dashboard, unduh rincian tagihan daftar ulang, lalu selesaikan pembayaran.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
+    {{--
     <!-- SECTION FAQ (10 Pertanyaan Lengkap) -->
     <section id="faq" class="py-20 bg-slate-50 border-b border-slate-200/80">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
@@ -1348,6 +1425,7 @@
             </div>
         </div>
     </section>
+    --}}
 
     <!-- FINAL CTA BANNER -->
     <section class="py-16 bg-gradient-to-r from-nampi-orange via-amber-500 to-amber-600 text-white relative overflow-hidden">

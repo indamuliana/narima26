@@ -70,7 +70,7 @@
                     <div style="margin: 4px 0; text-align: center;">
                         @if(!empty($tte['qrCodeBase64']))
                             <img src="{{ $tte['qrCodeBase64'] }}" alt="QR Code TTE" style="width: 68px; height: 68px; display: inline-block;">
-                            <div style="font-size: 6.5pt; color: #475569; margin-top: 1px; line-height: 1.2;">
+                            <div style="font-size: 5pt; color: #475569; margin-top: 1px; line-height: 1.2;">
                                 Ditandatangani secara elektronik<br>
                                 <em>Scan QR untuk verifikasi keaslian</em>
                             </div>

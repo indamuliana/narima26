@@ -103,7 +103,7 @@
                         <svg class="w-5 h-5 text-emerald-600 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        Persetujuan Digital Anda Telah Tercatat Sah Pada Sistem SPMB
+                        Persetujuan Digital Anda Telah Tercatat Sah Pada Sistem SPMB (Wajib dicetak dan dibubuhi materai + tanda tangan basah)
                     </div>
                     <div class="text-xs text-emerald-800 space-y-1">
                         <p>Disetujui secara digital pada: <strong>{{ \Carbon\Carbon::parse($eula->agreed_at)->translatedFormat('d F Y H:i:s') }} WIB</strong></p>
