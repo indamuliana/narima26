@@ -41,6 +41,7 @@ class SidangKelulusanController extends Controller
         $query = CalonSiswa::query()
             ->with([
                 'jurusan',
+                'jurusan2',
                 'program',
                 'gelombang',
                 'wawancaraSiswa.pewawancara',
@@ -148,6 +149,7 @@ class SidangKelulusanController extends Controller
     {
         $calonSiswa->loadMissing([
             'jurusan',
+            'jurusan2',
             'program',
             'programBelajar',
             'gelombang',

@@ -31,7 +31,7 @@
                     <tr>
                         <td class="label" style="padding: 2.5px 4px; font-size: 9pt;">Asal Sekolah</td>
                         <td class="colon" style="padding: 2.5px 2px; font-size: 9pt;">:</td>
-                        <td class="value" style="padding: 2.5px 4px; font-size: 9pt;">{{ $calonSiswa->sekolahAsal?->nama_sekolah ?? $calonSiswa->asal_sekolah_lainnya ?? '-' }}</td>
+                        <td class="value" style="padding: 2.5px 4px; font-size: 9pt;">{{ $calonSiswa->sekolah_asal_text }}</td>
                     </tr>
                     <tr>
                         <td class="label" style="padding: 2.5px 4px; font-size: 9pt;">Program Pilihan</td>
@@ -41,7 +41,7 @@
                     <tr>
                         <td class="label" style="padding: 2.5px 4px; font-size: 9pt;">Jurusan / Kompetensi</td>
                         <td class="colon" style="padding: 2.5px 2px; font-size: 9pt;">:</td>
-                        <td class="value" style="padding: 2.5px 4px; font-size: 9pt;"><strong>{{ $calonSiswa->jurusan?->nama ?? $calonSiswa->jurusan?->nama_jurusan ?? '-' }} ({{ $calonSiswa->jurusan?->kode ?? '-' }})</strong></td>
+                        <td class="value" style="padding: 2.5px 4px; font-size: 9pt;"><strong>{{ $calonSiswa->jurusan_pilihan_text }}</strong></td>
                     </tr>
                     <tr>
                         <td class="label" style="padding: 2.5px 4px; font-size: 9pt;">Gelombang Pendaftaran</td>

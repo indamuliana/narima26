@@ -1,5 +1,5 @@
 <x-layouts.app>
-    <x-slot name="title">Profil Lengkap Calon Siswa — {{ $calonSiswa->nama_lengkap }}</x-slot>
+    <x-slot name="title">Profil Lengkap Calon Murid — {{ $calonSiswa->nama_lengkap }}</x-slot>
 
     <x-slot name="sidebar">
         @if(auth()->user()->isKepalaSekolah())
@@ -9,7 +9,7 @@
         @endif
     </x-slot>
 
-    <div class="space-y-6 print:space-y-4">
+    <div x-data="{ showTagsModal: false }" class="space-y-6 print:space-y-4">
         <!-- Top Action Bar (Hidden on Print) -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:hidden">
             @if(auth()->user()->isKepalaSekolah())
@@ -18,7 +18,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
-                    <span>Kembali ke Direktori Calon Siswa</span>
+                    <span>Kembali ke Direktori Calon Murid</span>
                 </a>
             @else
                 <a href="{{ route('admin.calon-siswa.index') }}"
@@ -26,7 +26,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
-                    <span>Kembali ke Direktori Calon Siswa</span>
+                    <span>Kembali ke Direktori Calon Murid</span>
                 </a>
             @endif
             <div class="flex flex-wrap items-center gap-2.5">
@@ -38,6 +38,29 @@
                         </svg>
                         <span>Ruang Sidang Pleno</span>
                     </a>
+                @endif
+                @if(auth()->user()->isAdmin())
+                    <a href="{{ route('admin.calon-siswa.edit-data', $calonSiswa) }}"
+                       class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-sm">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        <span>Edit Data Siswa</span>
+                    </a>
+                    @if($calonSiswa->user)
+                        <form action="{{ route('admin.calon-siswa.impersonate', $calonSiswa) }}" method="POST" class="inline m-0"
+                              onsubmit="return confirm('Apakah Anda yakin ingin masuk sebagai calon siswa {{ $calonSiswa->nama_lengkap }}?');">
+                            @csrf
+                            <button type="submit"
+                                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
+                                    title="Masuk ke portal calon siswa menggunakan akun siswa ini">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                                <span>Masuk Sebagai Siswa</span>
+                            </button>
+                        </form>
+                    @endif
                 @endif
                 <a href="{{ auth()->user()->isKepalaSekolah() ? route('kepala-sekolah.calon-siswa.cetak-pdf', $calonSiswa) : route('admin.calon-siswa.cetak-pdf', $calonSiswa) }}" target="_blank"
                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-700 text-white text-xs font-bold hover:from-red-700 hover:to-rose-800 transition-all shadow-sm">
@@ -119,6 +142,8 @@
                     $hpAyahWa = $hpAyahRaw ? preg_replace('/^0/', '62', $hpAyahRaw) : null;
                     $hpIbuRaw = preg_replace('/[^0-9]/', '', $calonSiswa->no_hp_ibu ?: ($calonSiswa->dataOrangtua?->no_hp_ibu ?? ''));
                     $hpIbuWa = $hpIbuRaw ? preg_replace('/^0/', '62', $hpIbuRaw) : null;
+                    $hpWaliRaw = preg_replace('/[^0-9]/', '', $calonSiswa->dataOrangtua?->no_hp_wali ?? '');
+                    $hpWaliWa = $hpWaliRaw ? preg_replace('/^0/', '62', $hpWaliRaw) : null;
                 @endphp
                 <div class="flex items-center gap-2">
                     <span class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-black
@@ -127,6 +152,19 @@
                         <span class="w-2.5 h-2.5 rounded-full {{ in_array($statusStr, ['DITERIMA', 'RESMI_TERDAFTAR', 'DAFTAR_ULANG_DIVERIFIKASI']) ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500' }}"></span>
                         STATUS: {{ str_replace('_', ' ', $statusStr) }}
                     </span>
+                </div>
+                <div class="flex items-center gap-1.5 mt-1">
+                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                        Beasiswa: {{ $calonSiswa->tag_beasiswa ?? 'Normal' }}
+                    </span>
+                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                        Jalur: {{ $calonSiswa->tag_jalur ?? 'Normal' }}
+                    </span>
+                    @if(!auth()->user()->isKepalaSekolah() && auth()->user()->isAdmin())
+                        <button @click="showTagsModal = true" class="px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition-colors print:hidden">
+                            ✏️ Edit
+                        </button>
+                    @endif
                 </div>
                 <div class="flex flex-wrap items-center gap-1.5 print:hidden">
                     @if($hpSiswaWa)
@@ -148,6 +186,13 @@
                            class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-bold shadow-xs transition-colors"
                            title="Kirim pesan WhatsApp ke Ibu ({{ $calonSiswa->no_hp_ibu ?: $calonSiswa->dataOrangtua?->no_hp_ibu }})">
                             <span>👩 Chat Ibu</span>
+                        </a>
+                    @endif
+                    @if($hpWaliWa)
+                        <a href="https://wa.me/{{ $hpWaliWa }}" target="_blank"
+                           class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-cyan-700 hover:bg-cyan-800 text-white text-[11px] font-bold shadow-xs transition-colors"
+                           title="Kirim pesan WhatsApp ke Wali ({{ $calonSiswa->dataOrangtua?->no_hp_wali }})">
+                            <span>🤝 Chat Wali</span>
                         </a>
                     @endif
                 </div>
@@ -264,7 +309,7 @@
                     <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
                         <span class="w-8 h-8 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm">2</span>
                         <div>
-                            <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">Biodata Pribadi Calon Siswa</h2>
+                            <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">Biodata Pribadi Calon Murid</h2>
                             <p class="text-[11px] text-slate-400">Identitas kependudukan, kontak aktif, dan alamat domisili</p>
                         </div>
                     </div>
@@ -293,7 +338,7 @@
                             </span>
                         </div>
                         <div>
-                            <span class="text-slate-400 block font-medium">NIK (No. KTP Calon Siswa)</span>
+                            <span class="text-slate-400 block font-medium">NIK (No. KTP Calon Murid)</span>
                             <span class="font-mono font-bold text-slate-800 mt-0.5 block">{{ $calonSiswa->nik ?? '-' }}</span>
                         </div>
                         <div>
@@ -515,8 +560,8 @@
                         </div>
                     @else
                         <div class="p-4 rounded-2xl bg-amber-50/60 border border-amber-200 text-center text-xs text-amber-800">
-                            <p class="font-bold">Calon siswa belum melengkapi data kesehatan.</p>
-                            <p class="text-[11px] text-amber-600 mt-0.5">Data antropometri dan riwayat medis akan muncul setelah calon siswa mengisi formulir kesehatan.</p>
+                            <p class="font-bold">Calon Murid belum melengkapi data kesehatan.</p>
+                            <p class="text-[11px] text-amber-600 mt-0.5">Data antropometri dan riwayat medis akan muncul setelah Calon Murid mengisi formulir kesehatan.</p>
                         </div>
                     @endif
                 </div>
@@ -623,7 +668,7 @@
                             @endif
                         </div>
                     @else
-                        <p class="text-xs text-slate-400 italic">Data orang tua belum dilengkapi oleh calon siswa.</p>
+                        <p class="text-xs text-slate-400 italic">Data orang tua belum dilengkapi oleh Calon Murid.</p>
                     @endif
                 </div>
 
@@ -910,11 +955,11 @@
                                 </div>
                             </div>
                             <div class="p-3 rounded-xl bg-white border border-slate-200 text-slate-700 text-[11px] italic leading-relaxed">
-                                "{{ $eula->isi_dokumen_atau_referensi_dokumen ?? 'Calon siswa dan orang tua telah menyetujui seluruh ketentuan SPMB, pembiayaan, serta norma integritas SMK Wikrama 1 Garut.' }}"
+                                "{{ $eula->isi_dokumen_atau_referensi_dokumen ?? 'Calon Murid dan orang tua telah menyetujui seluruh ketentuan SPMB, pembiayaan, serta norma integritas SMK Wikrama 1 Garut.' }}"
                             </div>
                         </div>
                     @else
-                        <p class="text-xs text-slate-400 italic">Calon siswa belum menyetujui kesepahaman EULA.</p>
+                        <p class="text-xs text-slate-400 italic">Calon Murid belum menyetujui kesepahaman EULA.</p>
                     @endif
                 </div>
 
@@ -1011,7 +1056,7 @@
                                 <div>
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-1.5">
-                                            <span class="font-bold text-slate-900 text-sm">Pas Foto Calon Siswa</span>
+                                            <span class="font-bold text-slate-900 text-sm">Pas Foto Calon Murid</span>
                                             <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-rose-100 text-rose-700 border border-rose-200">WAJIB</span>
                                         </div>
                                         <span class="px-2 py-0.5 rounded text-[10px] font-bold {{ $doc->pas_foto_path ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500' }}">
@@ -1388,7 +1433,7 @@
                             @endif
                         </div>
                     @else
-                        <p class="text-xs text-slate-400 italic">Sidang pleno penetapan kelulusan belum dilaksanakan untuk calon siswa ini.</p>
+                        <p class="text-xs text-slate-400 italic">Sidang pleno penetapan kelulusan belum dilaksanakan untuk Calon Murid ini.</p>
                     @endif
                 </div>
 
@@ -1398,7 +1443,7 @@
                         <span class="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-sm">13</span>
                         <div>
                             <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">Riwayat Status SPMB (Audit Trail)</h2>
-                            <p class="text-[11px] text-slate-400">Log kronologis perubahan status calon siswa</p>
+                            <p class="text-[11px] text-slate-400">Log kronologis perubahan status Calon Murid</p>
                         </div>
                     </div>
 
@@ -1420,5 +1465,60 @@
 
             </div>
         </div>
+
+        <!-- Modal Edit Tags -->
+        @if(!auth()->user()->isKepalaSekolah() && auth()->user()->isAdmin())
+        <div x-show="showTagsModal" style="display: none" class="fixed inset-0 z-[100] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div x-show="showTagsModal" x-transition.opacity class="fixed inset-0 bg-slate-900/75 backdrop-blur-sm transition-opacity" @click="showTagsModal = false"></div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div x-show="showTagsModal" x-transition.scale.origin.bottom class="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full relative z-[101]">
+                    <form action="{{ route('admin.calon-siswa.update-tags', $calonSiswa) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <div class="bg-white px-6 pt-6 pb-6 text-left">
+                            <h3 class="text-lg font-black text-slate-900 mb-4">Edit Tag Siswa</h3>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Tag Beasiswa</label>
+                                    <input type="text" name="tag_beasiswa" list="beasiswa-options" value="{{ old('tag_beasiswa', $calonSiswa->tag_beasiswa ?? 'Normal') }}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                                    <datalist id="beasiswa-options">
+                                        <option value="Normal"></option>
+                                        <option value="Yatim"></option>
+                                        <option value="Prestasi"></option>
+                                        <option value="Keluarga Wikrama"></option>
+                                        <option value="Duafa"></option>
+                                        <option value="Tahfidz"></option>
+                                        <option value="OTA"></option>
+                                    </datalist>
+                                    <p class="text-[10px] text-slate-500 mt-1">Yatim, Duafa, OTA, Prestasi, Tahfidz, Keluarga Wikrama, Olahraga, Organisasi</p>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Tag Jalur</label>
+                                    <input type="text" name="tag_jalur" list="jalur-options" value="{{ old('tag_jalur', $calonSiswa->tag_jalur ?? 'Normal') }}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                                    <datalist id="jalur-options">
+                                        <option value="Normal"></option>
+                                        <option value="Adem"></option>
+                                        <option value="Kukar"></option>
+                                    </datalist>
+                                    <p class="text-[10px] text-slate-500 mt-1">ADEM, Kukar, Wikrama Bogor,.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 px-6 py-4 flex flex-row-reverse gap-3 rounded-b-3xl">
+                            <button type="submit" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-5 py-2 bg-indigo-600 text-sm font-bold text-white hover:bg-indigo-700 sm:w-auto">
+                                Simpan Perubahan
+                            </button>
+                            <button type="button" @click="showTagsModal = false" class="w-full inline-flex justify-center rounded-xl border border-slate-200 shadow-sm px-5 py-2 bg-white text-sm font-bold text-slate-700 hover:bg-slate-50 sm:w-auto">
+                                Batal
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
 </x-layouts.app>

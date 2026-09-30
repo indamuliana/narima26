@@ -8,7 +8,7 @@ class UpdateAkademikRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check() && auth()->user()->hasRole('calon_siswa');
+        return auth()->check() && (auth()->user()->hasRole('calon_siswa') || auth()->user()->isAdmin());
     }
 
     protected function prepareForValidation(): void

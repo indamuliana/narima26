@@ -74,6 +74,7 @@ class RegisterCalonSiswaRequest extends FormRequest
             ],
             'program_id' => ['required', 'exists:master_program,id'],
             'jurusan_id' => ['required', 'exists:master_jurusan,id'],
+            'jurusan_id_2' => ['required', 'exists:master_jurusan,id', 'different:jurusan_id'],
             'gelombang_id' => ['nullable', 'exists:master_gelombang,id'],
             'asal_sekolah_id' => [
                 'nullable', 
@@ -87,7 +88,6 @@ class RegisterCalonSiswaRequest extends FormRequest
                 'nullable', 
                 'string', 
                 'max:150',
-                Rule::requiredIf(fn () => $this->input('asal_sekolah_id') === 'lainnya')
             ],
             'referensi_jenis' => [
                 'nullable',
@@ -141,13 +141,16 @@ class RegisterCalonSiswaRequest extends FormRequest
             'no_hp_siswa.required' => 'Nomor WhatsApp Siswa wajib diisi.',
             'no_hp_ayah.required' => 'Nomor WhatsApp Ayah wajib diisi.',
             'program_id.required' => 'Program pendidikan (Reguler/Unggulan) wajib dipilih.',
-            'jurusan_id.required' => 'Kompetensi keahlian / jurusan pilihan wajib dipilih.',
+            'jurusan_id.required' => 'Kompetensi keahlian / jurusan pilihan ke-1 wajib dipilih.',
+            'jurusan_id_2.required' => 'Kompetensi keahlian / jurusan pilihan ke-2 wajib dipilih.',
+            'jurusan_id_2.different' => 'Jurusan pilihan ke-2 harus berbeda dengan jurusan pilihan ke-1.',
             'email.required' => 'Alamat email aktif wajib diisi.',
             'email.email' => 'Format alamat email tidak valid.',
             'email.unique' => 'Alamat email ini telah terdaftar di sistem.',
             'referensi_nama.required' => 'Nama referensi / promotor wajib diisi.',
             'referensi_rayon.required' => 'Rayon siswa aktif wajib dipilih.',
             'referensi_nomor_seleksi.required' => 'Nomor seleksi calon siswa referensi wajib diisi.',
+            'asal_sekolah_lainnya.required' => 'Asal sekolah (SMP / MTs) wajib diisi.',
         ];
     }
 }

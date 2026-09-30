@@ -112,14 +112,14 @@
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
             <div class="p-5 border-b border-slate-100">
                 <h2 class="text-base font-black text-slate-800">Riwayat Potongan & Diskon Beasiswa</h2>
-                <p class="text-xs text-slate-400 mt-0.5">Daftar calon siswa yang memperoleh keringanan atau beasiswa</p>
+                <p class="text-xs text-slate-400 mt-0.5">Daftar Calon Murid yang memperoleh keringanan atau beasiswa</p>
             </div>
 
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs text-slate-600">
                     <thead class="bg-slate-50/80 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase">
                         <tr>
-                            <th class="px-5 py-3">Calon Siswa</th>
+                            <th class="px-5 py-3">Calon Murid</th>
                             <th class="px-4 py-3">Jenis Diskon</th>
                             <th class="px-4 py-3 text-right">Nominal Potongan</th>
                             <th class="px-5 py-3">Alasan / Dasar Pertimbangan</th>
@@ -203,7 +203,7 @@
                 </div>
                 <div class="flex items-center gap-2 pt-1">
                     <input type="checkbox" id="wajib" name="wajib" value="1" checked class="rounded text-nampi-orange">
-                    <label for="wajib" class="font-medium text-slate-700">Wajib bagi semua calon siswa</label>
+                    <label for="wajib" class="font-medium text-slate-700">Wajib bagi semua Calon Murid</label>
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" onclick="document.getElementById('modalTambahBiaya').classList.add('hidden')"

@@ -76,7 +76,7 @@
                 <table class="w-full text-left text-xs text-slate-600">
                     <thead class="bg-slate-50/80 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase">
                         <tr>
-                            <th class="px-5 py-3.5">Calon Siswa</th>
+                            <th class="px-5 py-3.5">Calon Murid</th>
                             <th class="px-4 py-3.5">Jurusan</th>
                             <th class="px-4 py-3.5 text-right">Nominal Tagihan</th>
                             <th class="px-4 py-3.5 text-right">Nominal Bayar</th>
@@ -89,7 +89,7 @@
                         @forelse ($pembayarans as $p)
                             <tr class="hover:bg-slate-50/70 transition-colors">
                                 <td class="px-5 py-4">
-                                    <span class="font-bold text-slate-900 block text-sm">{{ $p->calonSiswa?->nama_lengkap ?? 'Calon Siswa' }}</span>
+                                    <span class="font-bold text-slate-900 block text-sm">{{ $p->calonSiswa?->nama_lengkap ?? 'Calon Murid' }}</span>
                                     <span class="text-slate-400 font-mono text-[11px]">{{ $p->calonSiswa?->nomor_pendaftaran }} &bull; NISN: {{ $p->calonSiswa?->nisn }}</span>
                                 </td>
                                 <td class="px-4 py-4 font-semibold text-slate-700">

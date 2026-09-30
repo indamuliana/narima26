@@ -26,8 +26,7 @@ class PembayaranSeleksiController extends Controller
     {
         $status = $request->query('status');
         $search = $request->query('q');
-
-        $query = PembayaranSeleksi::with(['calonSiswa.jurusan', 'calonSiswa.program', 'verifikator'])
+        $query = PembayaranSeleksi::with(['calonSiswa.jurusan', 'calonSiswa.jurusan2', 'calonSiswa.program', 'verifikator'])
             ->latest('id');
 
         if (!empty($status) && in_array(strtoupper($status), ['PENDING', 'DIVERIFIKASI', 'DITOLAK'])) {

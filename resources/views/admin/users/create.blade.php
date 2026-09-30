@@ -101,7 +101,7 @@
                             <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-100 text-teal-700">Role Baru</span>
                         </div>
                         <p class="text-[11px] text-slate-500 leading-relaxed pl-5">
-                            Akses Dashboard Utama, Direktori Calon Siswa (beserta detail & cetak PDF), Ekspor CSV/PDF, serta Laporan Rekapitulasi.
+                            Akses Dashboard Utama, Direktori Calon Murid (beserta detail & cetak PDF), Ekspor CSV/PDF, serta Laporan Rekapitulasi.
                         </p>
                     </label>
 
@@ -137,7 +137,7 @@
                             <span class="text-xs font-bold text-slate-900">Pewawancara</span>
                         </div>
                         <p class="text-[11px] text-slate-500 leading-relaxed pl-5">
-                            Penilaian antrean wawancara calon siswa & orang tua, pengisian rubrik instrumen, dan penentuan rekomendasi.
+                            Penilaian antrean wawancara Calon Murid & orang tua, pengisian rubrik instrumen, dan penentuan rekomendasi.
                         </p>
                     </label>
 

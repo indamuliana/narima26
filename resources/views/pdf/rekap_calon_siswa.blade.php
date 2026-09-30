@@ -39,7 +39,7 @@
                     <td style="text-align: center; font-family: monospace;">{{ $cs->nisn }}</td>
                     <td><strong>{{ strtoupper($cs->nama_lengkap) }}</strong></td>
                     <td style="text-align: center;">{{ $cs->jenis_kelamin === 'PEREMPUAN' ? 'P' : 'L' }}</td>
-                    <td>{{ $cs->jurusan?->nama_jurusan ?? '-' }}</td>
+                    <td>{{ $cs->jurusan_pilihan_text }}</td>
                     <td>{{ $cs->gelombang?->nama_gelombang ?? '-' }}</td>
                     <td style="text-align: center;">
                         <span style="font-size: 7.5pt; font-weight: bold; text-transform: uppercase;">

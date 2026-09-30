@@ -113,7 +113,7 @@
                                 <td class="px-4 py-4">
                                     <p class="font-bold text-slate-800">{{ $p->calonSiswa?->nama_lengkap ?? '-' }}</p>
                                     <p class="text-xs text-slate-400 font-mono mt-0.5">
-                                        {{ $p->calonSiswa?->nomor_pendaftaran }} • {{ $p->calonSiswa?->jurusan?->nama ?? $p->calonSiswa?->jurusan?->nama_jurusan ?? $p->calonSiswa?->jurusan?->kode }}
+                                        {{ $p->calonSiswa?->nomor_pendaftaran }} • {{ $p->calonSiswa?->jurusan_pilihan_text }}
                                     </p>
                                     <div class="mt-1">
                                         <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-bold {{ str_contains(strtolower($p->calonSiswa?->program?->nama ?? $p->calonSiswa?->program?->nama_program ?? ''), 'unggul') ? 'bg-amber-100 text-amber-800' : 'bg-blue-50 text-blue-700' }}">

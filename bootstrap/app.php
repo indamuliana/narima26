@@ -11,6 +11,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->redirectUsersTo(function () {
+            return \Illuminate\Support\Facades\Auth::check()
+                ? route(\Illuminate\Support\Facades\Auth::user()->getDashboardRoute())
+                : '/login';
+        });
+
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);

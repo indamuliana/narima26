@@ -10,7 +10,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
                 <h1 class="text-2xl font-black text-slate-800">Manajemen Alokasi Pewawancara</h1>
-                <p class="text-xs text-slate-400 mt-0.5">Penugasan guru penguji wawancara untuk calon siswa yang telah melengkapi berkas persyaratan</p>
+                <p class="text-xs text-slate-400 mt-0.5">Penugasan guru penguji wawancara untuk calon murid yang telah melengkapi berkas persyaratan</p>
             </div>
         </div>
 
@@ -41,7 +41,7 @@
                     <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 text-center">
                         <span class="font-bold text-slate-800 text-xs block truncate">{{ $pew->name }}</span>
                         <span class="text-lg font-black text-nampi-orange mt-0.5 block">{{ $pew->wawancara_count }}</span>
-                        <span class="text-[10px] text-slate-400">siswa dialokasikan</span>
+                        <span class="text-[10px] text-slate-400">murid dialokasikan</span>
                     </div>
                 @empty
                     <p class="text-xs text-slate-400 col-span-6 italic">Belum ada akun pewawancara aktif.</p>
@@ -114,7 +114,7 @@
                         <thead class="bg-slate-50/50 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase">
                             <tr>
                                 <th class="px-4 py-3 text-center" style="width: 4%;">Pilih</th>
-                                <th class="px-5 py-3" style="width: 28%;">Calon Siswa</th>
+                                <th class="px-5 py-3" style="width: 28%;">calon murid</th>
                                 <th class="px-4 py-3" style="width: 18%;">Kompetensi Keahlian</th>
                                 <th class="px-4 py-3" style="width: 22%;">Pewawancara Bertugas</th>
                                 <th class="px-4 py-3 text-center" style="width: 14%;">Status Wawancara</th>
@@ -173,7 +173,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="p-8 text-center text-slate-400">Tidak ada calon siswa pada antrian wawancara sesuai filter.</td>
+                                    <td colspan="6" class="p-8 text-center text-slate-400">Tidak ada calon murid pada antrian wawancara sesuai filter.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -200,7 +200,7 @@
             <form id="formSingleAlokasi" method="POST" action="" class="space-y-4 mt-4">
                 @csrf
                 <div>
-                    <label class="block font-bold text-slate-500 uppercase mb-1">Calon Siswa</label>
+                    <label class="block font-bold text-slate-500 uppercase mb-1">calon murid</label>
                     <p id="singleNamaSiswa" class="font-bold text-slate-900 text-sm"></p>
                 </div>
                 <div>

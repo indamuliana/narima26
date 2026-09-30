@@ -32,7 +32,7 @@ class PembayaranDaftarUlangController extends Controller
         $status = $request->input('status');
 
         $query = PembayaranDaftarUlang::query()
-            ->with(['calonSiswa.jurusan', 'calonSiswa.program', 'tagihan', 'verifiedBy']);
+            ->with(['calonSiswa.jurusan', 'calonSiswa.jurusan2', 'calonSiswa.program', 'tagihan', 'verifiedBy']);
 
         if (! empty($search)) {
             $query->where(function ($q) use ($search) {

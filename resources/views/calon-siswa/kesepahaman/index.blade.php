@@ -141,18 +141,6 @@
                     </p>
                 </div>
 
-                @if(!$isAgreed)
-                    <div class="flex items-center gap-3 shrink-0">
-                        <button type="button" onclick="selectAllPoints(true)"
-                                class="px-3.5 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold transition shadow-2xs cursor-pointer">
-                            ✓ Centang Semua Poin
-                        </button>
-                        <button type="button" onclick="selectAllPoints(false)"
-                                class="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition cursor-pointer">
-                            ✕ Reset
-                        </button>
-                    </div>
-                @endif
             </div>
 
             <!-- Form Persetujuan -->
@@ -261,11 +249,7 @@
 
     @if(!$isAgreed)
         <script>
-            function selectAllPoints(checked) {
-                const checkboxes = document.querySelectorAll('.point-checkbox');
-                checkboxes.forEach(cb => cb.checked = checked);
-                updateProgress();
-            }
+
 
             function updateProgress() {
                 const checkboxes = document.querySelectorAll('.point-checkbox');

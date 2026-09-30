@@ -27,7 +27,7 @@
         <tr>
             <td class="label">Asal Sekolah</td>
             <td class="colon">:</td>
-            <td class="value">{{ $calonSiswa->sekolahAsal?->nama_sekolah ?? $calonSiswa->asal_sekolah_lainnya ?? '-' }}</td>
+            <td class="value">{{ $calonSiswa->sekolah_asal_text }}</td>
         </tr>
     </table>
 
@@ -39,7 +39,7 @@
         @if($keputusan === 'DITERIMA')
             <p style="margin: 8px 0 0 0; font-size: 11pt; color: #166534;">
                 Sebagai Calon Peserta Didik pada Kompetensi Keahlian:<br>
-                <strong>{{ $calonSiswa->jurusan?->nama_jurusan ?? '-' }} ({{ $calonSiswa->program?->nama_program ?? 'Reguler' }})</strong>
+                <strong>{{ $calonSiswa->jurusan_pilihan_text }} ({{ $calonSiswa->program?->nama_program ?? 'Reguler' }})</strong>
             </p>
         @endif
     </div>

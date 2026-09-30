@@ -5,15 +5,15 @@
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
 
-**Sistem Penerimaan Murid Baru (SPMB) V4** adalah aplikasi berbasis web yang digunakan oleh SMK Wikrama 1 Garut untuk mengelola seluruh proses pendaftaran, seleksi, hingga daftar ulang calon siswa baru.
+**Sistem Penerimaan Murid Baru (SPMB) V4** adalah aplikasi berbasis web yang digunakan oleh SMK Wikrama 1 Garut untuk mengelola seluruh proses pendaftaran, seleksi, hingga daftar ulang calon murid baru.
 
 ## ✨ Fitur Utama
 
 - **👥 Multi-Role Management**: Memiliki hak akses khusus untuk *Admin, Bendahara, Pewawancara, Kepala Sekolah, dan Guru*.
-- **📝 Pendaftaran Online**: Form registrasi terintegrasi untuk calon siswa baru.
-- **🗣️ Seleksi Wawancara**: Modul penilaian wawancara komprehensif untuk calon siswa dan orang tua.
+- **📝 Pendaftaran Online**: Form registrasi terintegrasi untuk calon murid baru.
+- **🗣️ Seleksi Wawancara**: Modul penilaian wawancara komprehensif untuk calon murid dan orang tua.
 - **💳 Manajemen Keuangan**: Pengelolaan dan rekapitulasi pembayaran (Biaya Seleksi, DSP, SPP, Seragam).
-- **📱 Integrasi WhatsApp**: Fitur *Click-to-Chat* dengan template otomatis untuk mempermudah komunikasi dengan siswa atau orang tua.
+- **📱 Integrasi WhatsApp**: Fitur *Click-to-Chat* dengan template otomatis untuk mempermudah komunikasi dengan murid atau orang tua.
 - **📊 Laporan & Export**: Rekapitulasi data dalam bentuk tabel interaktif dan export CSV (mendukung mode simpel 15 kolom dan mode lengkap 65+ kolom).
 - **🎨 UI/UX Responsif**: Antarmuka modern yang responsif dengan fitur collapsible sidebar.
 

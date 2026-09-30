@@ -81,9 +81,22 @@
                                     </div>
                                 </td>
                                 <td class="px-4 py-4">
-                                    <span class="inline-block px-2.5 py-1 rounded-lg text-xs font-semibold bg-cyan-50 text-cyan-800 border border-cyan-200">
-                                        {{ $cs->jurusan?->nama_jurusan ?? '-' }}
+                                    <span class="inline-block px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-cyan-50 text-cyan-800 border border-cyan-200 mb-1">
+                                        1. {{ $cs->jurusan?->nama_jurusan ?? '-' }}
                                     </span>
+                                    @if($cs->jurusan2)
+                                        <span class="inline-block px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-slate-50 text-slate-600 border border-slate-200 block mb-1">
+                                            2. {{ $cs->jurusan2?->nama_jurusan ?? '-' }}
+                                        </span>
+                                    @endif
+                                    <div class="flex flex-wrap gap-1 mt-1">
+                                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                            Beasiswa: {{ $cs->tag_beasiswa ?? 'Normal' }}
+                                        </span>
+                                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                                            Jalur: {{ $cs->tag_jalur ?? 'Normal' }}
+                                        </span>
+                                    </div>
                                 </td>
                                 <td class="px-4 py-4">
                                     <span class="text-xs font-medium text-slate-700">
@@ -100,6 +113,7 @@
                                 </td>
                                 <td class="px-5 py-4 text-right">
                                     <div class="flex items-center justify-end gap-2">
+                                        <x-whatsapp-contact-dropdown :calonSiswa="$cs" />
                                         <a href="{{ route('pewawancara.wawancara.show', $cs) }}"
                                            class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition-colors">
                                             Detail

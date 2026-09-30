@@ -27,6 +27,8 @@
 </head>
 <body class="h-full antialiased text-slate-800 bg-slate-50 selection:bg-nampi-orange selection:text-white overflow-x-hidden">
 
+    @include('components.impersonation-banner')
+
     <div class="min-h-screen flex flex-col lg:flex-row overflow-x-hidden">
 
         <!-- Mobile Sidebar Backdrop -->

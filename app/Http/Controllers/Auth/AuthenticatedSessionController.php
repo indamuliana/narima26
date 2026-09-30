@@ -17,12 +17,8 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): View|RedirectResponse
+    public function create(): View
     {
-        if (Auth::check()) {
-            return redirect()->route(Auth::user()->getDashboardRoute());
-        }
-
         return view('auth.login');
     }
 
@@ -51,6 +47,12 @@ class AuthenticatedSessionController extends Controller
             ]);
         }
 
+        // If previously logged in as another user, invalidate previous session first
+        if (Auth::check()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+        }
+
         Auth::login($user, $request->boolean('remember'));
 
         $request->session()->regenerate();
@@ -67,7 +69,8 @@ class AuthenticatedSessionController extends Controller
                 ->log("Pengguna {$user->name} ({$user->role_label}) berhasil login.");
         }
 
-        return redirect()->intended(route($user->getDashboardRoute()));
+        return redirect()->intended(route($user->getDashboardRoute()))
+            ->with('success', "Selamat datang kembali, {$user->name}!");
     }
 
     /**
@@ -93,6 +96,8 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/')->with('success', 'Anda telah berhasil keluar.');
+        $redirectUrl = $request->input('redirect', $request->query('redirect', '/'));
+
+        return redirect($redirectUrl)->with('success', 'Anda telah berhasil keluar.');
     }
 }

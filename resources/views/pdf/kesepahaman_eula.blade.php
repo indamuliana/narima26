@@ -120,7 +120,7 @@
     <table class="doc-title-container" align="center">
         <tr>
             <td align="center" style="text-align: center; border: none; padding: 0;">
-                <div class="doc-title-main" align="center">NASKAH PERSETUJUAN<br>SISWA SMK WIKRAMA 1 GARUT DAN ORANG TUA<br>TENTANG<br>KETENTUAN UMUM SMK WIKRAMA 1 GARUT<br>PROGRAM {{ strtoupper($programNama ?? 'REGULER') }}</div>
+                <div class="doc-title-main" align="center">NASKAH PERSETUJUAN<br>MURID SMK WIKRAMA 1 GARUT DAN ORANG TUA<br>TENTANG<br>KETENTUAN UMUM SMK WIKRAMA 1 GARUT<br>PROGRAM {{ strtoupper($programNama ?? 'REGULER') }}</div>
             </td>
         </tr>
     </table>
@@ -143,7 +143,7 @@
             <td class="val-col"><strong>{{ $calonSiswa->nomor_pendaftaran }}</strong></td>
         </tr>
         <tr>
-            <td class="label-col">Nama Siswa</td>
+            <td class="label-col">Nama Murid</td>
             <td class="colon-col">:</td>
             <td class="val-col"><strong>{{ strtoupper($calonSiswa->nama_lengkap) }}</strong></td>
         </tr>
@@ -217,7 +217,7 @@
             <!-- Tanda Tangan Orang Tua / Wali -->
             <td style="width: 42%; text-align: right; vertical-align: top; font-size: 9pt; padding-right: 5px;">
                 <br>
-                Orang Tua / Wali Siswa,
+                Orang Tua / Wali Murid,
                 <div style="height: 130px;"></div>
 
                 <div style="border-bottom: 1px dotted #334155; width: 85%; margin-left: auto;"></div>
@@ -248,7 +248,7 @@
             <!-- Tanda Tangan Calon Siswa -->
             <td style="width: 42%; text-align: left; vertical-align: top; font-size: 9pt; padding-left: 5px;">
                 Garut, {{ now()->translatedFormat('d F Y') }}<br>
-                Calon Peserta Didik,
+                Calon Murid,
                 <div style="height: 130px;"></div>
 
                 <strong>( {{ strtoupper($calonSiswa->nama_lengkap) }} )</strong>
@@ -266,7 +266,7 @@
                     <div style="margin: 4px 0; text-align: center;">
                         @if(!empty($tte['qrCodeBase64']))
                             <img src="{{ $tte['qrCodeBase64'] }}" alt="QR Code TTE" style="width: 68px; height: 68px; display: inline-block;">
-                            <div style="font-size: 6.5pt; color: #475569; margin-top: 1px; line-height: 1.2;">
+                            <div style="font-size: 5pt; color: #475569; margin-top: 1px; line-height: 1.2;">
                                 Ditandatangani secara elektronik<br>
                                 <em>Scan QR untuk verifikasi keaslian</em>
                             </div>
@@ -293,7 +293,7 @@
                     <table style="border-collapse: collapse; margin-left: auto; margin-right: 0;" align="right">
                         <tr>
                             <td style="font-size: 6.5pt; color: #475569; padding-right: 4px; font-weight: bold; vertical-align: middle; border: none;">Paraf:</td>
-                            <td style="border: 1px solid #475569; width: 34px; height: 24px; text-align: center; vertical-align: bottom; font-size: 5.5pt; color: #64748b; padding-bottom: 2px;">Siswa</td>
+                            <td style="border: 1px solid #475569; width: 34px; height: 24px; text-align: center; vertical-align: bottom; font-size: 5.5pt; color: #64748b; padding-bottom: 2px;">Murid</td>
                             <td style="width: 4px; border: none;"></td>
                             <td style="border: 1px solid #475569; width: 34px; height: 24px; text-align: center; vertical-align: bottom; font-size: 5.5pt; color: #64748b; padding-bottom: 2px;">Ortu</td>
                             <td style="width: 4px; border: none;"></td>

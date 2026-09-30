@@ -49,11 +49,14 @@ class RegistrationController extends Controller
         
         $sekolahs = MasterSekolahAsal::aktif()
             ->when($query, function ($q, $query) {
-                return $q->where('nama_sekolah', 'like', "%{$query}%");
+                return $q->where(function ($sub) use ($query) {
+                    $sub->where('nama_sekolah', 'like', "%{$query}%")
+                        ->orWhere('npsn', 'like', "%{$query}%");
+                });
             })
             ->orderBy('nama_sekolah')
             ->limit(50)
-            ->get(['id', 'nama_sekolah', 'kokab', 'kabupaten']);
+            ->get(['id', 'npsn', 'nama_sekolah', 'kokab', 'kabupaten']);
 
         return response()->json($sekolahs);
     }
@@ -73,6 +76,7 @@ class RegistrationController extends Controller
             'nama_lengkap' => $result['calon_siswa']->nama_lengkap,
             'email' => $result['user']->email,
             'nominal_tagihan' => $result['pembayaran_seleksi']->nominal_tagihan,
+            'program_nama' => $result['calon_siswa']->program?->nama_program ?? $result['calon_siswa']->program?->nama ?? '',
         ]);
 
         return redirect()->route('pendaftaran.sukses', $result['calon_siswa']->nomor_pendaftaran);
@@ -84,7 +88,7 @@ class RegistrationController extends Controller
     public function sukses(string $nomorPendaftaran): View
     {
         $calonSiswa = CalonSiswa::where('nomor_pendaftaran', $nomorPendaftaran)
-            ->with(['user', 'program', 'jurusan', 'gelombang', 'pembayaranSeleksi'])
+            ->with(['user', 'program', 'jurusan', 'jurusan2', 'gelombang', 'pembayaranSeleksi'])
             ->firstOrFail();
 
         $sessionData = session('registration_result');

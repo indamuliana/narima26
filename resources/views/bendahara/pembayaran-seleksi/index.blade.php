@@ -153,6 +153,9 @@
                                 </td>
                                 <td class="p-3.5">
                                     <div class="font-semibold text-slate-800">{{ $pembayaran->calonSiswa?->jurusan?->nama ?? $pembayaran->calonSiswa?->jurusan?->nama_jurusan ?? '-' }}</div>
+                                    @if($pembayaran->calonSiswa?->jurusan2)
+                                        <div class="text-[11px] text-slate-500">Pil 2: {{ $pembayaran->calonSiswa->jurusan2->nama ?? $pembayaran->calonSiswa->jurusan2->nama_jurusan }}</div>
+                                    @endif
                                     <div class="mt-1">
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold {{ str_contains(strtolower($pembayaran->calonSiswa?->program?->nama ?? $pembayaran->calonSiswa?->program?->nama_program ?? ''), 'unggul') ? 'bg-amber-100 text-amber-800' : 'bg-blue-50 text-blue-700' }}">
                                             {{ $pembayaran->calonSiswa?->program?->nama ?? $pembayaran->calonSiswa?->program?->nama_program ?? 'Reguler' }}

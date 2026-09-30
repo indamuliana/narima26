@@ -9,7 +9,7 @@ class UpdateBiodataRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check() && auth()->user()->hasRole('calon_siswa');
+        return auth()->check() && (auth()->user()->hasRole('calon_siswa') || auth()->user()->isAdmin());
     }
 
     public function rules(): array
@@ -19,7 +19,12 @@ class UpdateBiodataRequest extends FormRequest
         $rules = [
             'nama_lengkap' => ['sometimes', 'required', 'string', 'max:150'],
             'nama_panggilan' => ['nullable', 'string', 'max:50'],
-            'jenis_kelamin' => ['sometimes', 'required', 'in:L,P'],
+            'jenis_kelamin' => ['sometimes', 'required', 'in:L,P,Laki-laki,Perempuan'],
+            'nisn' => ['nullable', 'string', 'digits:10'],
+            'jurusan_id' => ['nullable', 'exists:master_jurusan,id'],
+            'jurusan_id_2' => ['nullable', 'exists:master_jurusan,id'],
+            'asal_sekolah_id' => ['nullable', 'exists:sekolah_asal,id'],
+            'asal_sekolah_lainnya' => ['nullable', 'string', 'max:255'],
             'nik' => ['required', 'string', 'digits:16'],
             'no_kk' => ['required', 'string', 'digits:16'],
             'agama' => ['required', 'string', 'max:30'],

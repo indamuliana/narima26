@@ -30,7 +30,7 @@ class WawancaraService
         int $perPage = 15
     ): LengthAwarePaginator {
         $query = CalonSiswa::query()
-            ->with(['user', 'jurusan', 'programBelajar', 'sekolahAsal', 'wawancaraSiswa.pewawancara', 'wawancaraOrangTua.pewawancara', 'dokumenPendaftaran'])
+            ->with(['user', 'jurusan', 'jurusan2', 'programBelajar', 'sekolahAsal', 'dataOrangtua', 'wawancaraSiswa.pewawancara', 'wawancaraOrangTua.pewawancara', 'dokumenPendaftaran'])
             ->where(function (Builder $q) {
                 $q->where('status_spmb', SpmbStatus::MENUNGGU_WAWANCARA->value)
                   ->orWhere('status_spmb', SpmbStatus::SUDAH_DIWAWANCARA->value)
@@ -44,7 +44,7 @@ class WawancaraService
                 $q->where('nama_lengkap', 'like', "%{$search}%")
                   ->orWhere('nomor_pendaftaran', 'like', "%{$search}%")
                   ->orWhere('nisn', 'like', "%{$search}%")
-                  ->orWhere('sekolah_asal_text', 'like', "%{$search}%")
+                  ->orWhere('asal_sekolah_lainnya', 'like', "%{$search}%")
                   ->orWhereHas('sekolahAsal', function (Builder $sq) use ($search) {
                       $sq->where('nama_sekolah', 'like', "%{$search}%");
                   });
@@ -53,7 +53,10 @@ class WawancaraService
 
         // Filter by Jurusan
         if (! empty($jurusanId)) {
-            $query->where('jurusan_id', $jurusanId);
+            $query->where(function ($q) use ($jurusanId) {
+                $q->where('jurusan_id', $jurusanId)
+                  ->orWhere('jurusan_id_2', $jurusanId);
+            });
         }
 
         // Filter by interview status
@@ -83,7 +86,7 @@ class WawancaraService
         int $perPage = 15
     ): LengthAwarePaginator {
         $query = CalonSiswa::query()
-            ->with(['jurusan', 'programBelajar', 'sekolahAsal', 'wawancaraSiswa.pewawancara', 'wawancaraOrangTua.pewawancara'])
+            ->with(['jurusan', 'jurusan2', 'programBelajar', 'sekolahAsal', 'dataOrangtua', 'wawancaraSiswa.pewawancara', 'wawancaraOrangTua.pewawancara'])
             ->where(function (Builder $q) {
                 $q->where('status_spmb', SpmbStatus::SUDAH_DIWAWANCARA->value)
                   ->orWhereHas('wawancaraSiswa', function (Builder $wq) {
@@ -95,12 +98,19 @@ class WawancaraService
             $query->where(function (Builder $q) use ($search) {
                 $q->where('nama_lengkap', 'like', "%{$search}%")
                   ->orWhere('nomor_pendaftaran', 'like', "%{$search}%")
-                  ->orWhere('nisn', 'like', "%{$search}%");
+                  ->orWhere('nisn', 'like', "%{$search}%")
+                  ->orWhere('asal_sekolah_lainnya', 'like', "%{$search}%")
+                  ->orWhereHas('sekolahAsal', function (Builder $sq) use ($search) {
+                      $sq->where('nama_sekolah', 'like', "%{$search}%");
+                  });
             });
         }
 
         if (! empty($jurusanId)) {
-            $query->where('jurusan_id', $jurusanId);
+            $query->where(function ($q) use ($jurusanId) {
+                $q->where('jurusan_id', $jurusanId)
+                  ->orWhere('jurusan_id_2', $jurusanId);
+            });
         }
 
         return $query->latest('id')->paginate($perPage)->withQueryString();

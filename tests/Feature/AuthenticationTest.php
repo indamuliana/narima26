@@ -131,9 +131,9 @@ class AuthenticationTest extends TestCase
     }
 
     /**
-     * Test users can logout.
+     * Test users can logout via POST.
      */
-    public function test_users_can_logout(): void
+    public function test_users_can_logout_via_post(): void
     {
         $user = User::where('email', 'admin@wikrama.sch.id')->first();
 
@@ -142,4 +142,66 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
         $response->assertRedirect('/');
     }
+
+    /**
+     * Test users can logout via GET request (e.g., clicking a link or typing URL).
+     */
+    public function test_users_can_logout_via_get(): void
+    {
+        $user = User::where('email', 'admin@wikrama.sch.id')->first();
+
+        $response = $this->actingAs($user)->get('/logout');
+
+        $this->assertGuest();
+        $response->assertRedirect('/');
+    }
+
+    /**
+     * Test authenticated user accessing login screen sees active session banner and quick actions.
+     */
+    public function test_authenticated_user_can_access_login_screen_with_active_session_info(): void
+    {
+        $user = User::where('email', 'admin@wikrama.sch.id')->first();
+
+        $response = $this->actingAs($user)->get('/login');
+
+        $response->assertStatus(200);
+        $response->assertSee('Sesi Aktif');
+        $response->assertSee($user->name);
+        $response->assertSee('Buka Dashboard');
+        $response->assertSee('Keluar (Logout)');
+    }
+
+    /**
+     * Test authenticated user can switch account directly from login form without manual pre-logout.
+     */
+    public function test_authenticated_user_can_switch_account_directly(): void
+    {
+        $admin = User::where('email', 'admin@wikrama.sch.id')->first();
+
+        // Admin is initially logged in
+        $response = $this->actingAs($admin)->post('/login', [
+            'login' => 'bendahara@wikrama.sch.id',
+            'password' => 'bendahara123',
+        ]);
+
+        $this->assertAuthenticated();
+        $this->assertEquals('bendahara@wikrama.sch.id', auth()->user()->email);
+        $response->assertRedirect(route('bendahara.dashboard'));
+    }
+
+    /**
+     * Test universal /dashboard route redirects to the correct role dashboard.
+     */
+    public function test_universal_dashboard_redirects_to_role_dashboard(): void
+    {
+        $admin = User::where('email', 'admin@wikrama.sch.id')->first();
+        $response = $this->actingAs($admin)->get('/dashboard');
+        $response->assertRedirect(route('admin.dashboard'));
+
+        $calonSiswa = User::where('username', '0012345678')->first();
+        $response = $this->actingAs($calonSiswa)->get('/dashboard');
+        $response->assertRedirect(route('calon-siswa.dashboard'));
+    }
 }
+

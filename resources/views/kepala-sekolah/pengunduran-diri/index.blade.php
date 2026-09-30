@@ -109,7 +109,7 @@
                         <tbody class="divide-y divide-slate-100">
                             @forelse ($withdrawnList as $w)
                                 @php
-                                    $lastHistory = $w->statusHistory()->where('status_baru', 'MENGUNDURKAN_DIRI')->latest('changed_at')->first();
+                                    $lastHistory = $w->riwayatStatus()->where('status_baru', 'MENGUNDURKAN_DIRI')->latest('changed_at')->first();
                                 @endphp
                                 <tr class="hover:bg-slate-50/70 transition-colors">
                                     <td class="px-5 py-4">

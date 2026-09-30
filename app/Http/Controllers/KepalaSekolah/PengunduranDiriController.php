@@ -25,7 +25,7 @@ class PengunduranDiriController extends Controller
         $tab = $request->input('tab', 'withdrawn'); // 'withdrawn' or 'active'
 
         $withdrawnQuery = CalonSiswa::query()
-            ->with(['jurusan', 'program', 'gelombang', 'statusHistory.changedBy'])
+            ->with(['jurusan', 'program', 'gelombang', 'riwayatStatus.changedBy'])
             ->where('status_spmb', SpmbStatus::MENGUNDURKAN_DIRI->value);
 
         $activeQuery = CalonSiswa::query()

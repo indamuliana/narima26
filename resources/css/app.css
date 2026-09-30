@@ -17,6 +17,10 @@
     --color-nampi-dark: #0A1128;
     --color-nampi-gray: #64748B;
     --color-nampi-light-gray: #F8FAFC;
+    --color-nampi-midnight: #010736;
+    --color-nampi-navy: #0D1C42;
+    --color-nampi-royal: #22396F;
+    --color-nampi-warm-cream: #FCF1D0;
 }
 
 [x-cloak] { display: none !important; }

@@ -27,6 +27,7 @@ class CalonSiswaController extends Controller
     {
         $query = CalonSiswa::query()->with([
             'jurusan',
+            'jurusan2',
             'program',
             'gelombang',
             'sekolahAsal',
@@ -52,7 +53,10 @@ class CalonSiswaController extends Controller
         }
 
         if ($jurusanId = $request->input('jurusan_id')) {
-            $query->where('jurusan_id', $jurusanId);
+            $query->where(function ($q) use ($jurusanId) {
+                $q->where('jurusan_id', $jurusanId)
+                  ->orWhere('jurusan_id_2', $jurusanId);
+            });
         }
 
         if ($gelombangId = $request->input('gelombang_id')) {
@@ -219,7 +223,8 @@ class CalonSiswaController extends Controller
                 'Jenis Kelamin',
                 'No. HP Siswa',
                 'Sekolah Asal',
-                'Kompetensi Keahlian',
+                'Kompetensi Keahlian Pilihan 1',
+                'Kompetensi Keahlian Pilihan 2',
                 'Program',
                 'Gelombang',
                 'Status SPMB',
@@ -236,8 +241,11 @@ class CalonSiswaController extends Controller
             'Tanggal Pendaftaran',
             'Status SPMB',
             'Gelombang',
-            'Kompetensi Keahlian (Jurusan)',
+            'Kompetensi Keahlian (Jurusan) Pilihan 1',
+            'Kompetensi Keahlian (Jurusan) Pilihan 2',
             'Program Belajar',
+            'Tag Beasiswa',
+            'Tag Jalur',
             'NISN',
             'NIK Siswa',
             'No. Kartu Keluarga',
@@ -356,6 +364,7 @@ class CalonSiswaController extends Controller
         $bayarSeleksi = $cs->pembayaranSeleksi;
         $keputusan = $cs->keputusanKelulusan;
         $jurusanNama = $cs->jurusan?->nama ?? $cs->jurusan?->nama_jurusan ?? '-';
+        $jurusan2Nama = $cs->jurusan2?->nama ?? $cs->jurusan2?->nama_jurusan ?? '-';
         $programNama = $cs->program?->nama ?? $cs->program?->nama_program ?? '-';
         $gelombangNama = $cs->gelombang?->nama ?? $cs->gelombang?->nama_gelombang ?? '-';
 
@@ -373,6 +382,7 @@ class CalonSiswaController extends Controller
                 $cs->no_hp_siswa ? ($isCsv ? "'{$cs->no_hp_siswa}" : $cs->no_hp_siswa) : '-',
                 $sekolah,
                 $jurusanNama,
+                $jurusan2Nama,
                 $programNama,
                 $gelombangNama,
                 $statusVal,
@@ -468,7 +478,10 @@ class CalonSiswaController extends Controller
             $statusVal,
             $gelombangNama,
             $jurusanNama,
+            $jurusan2Nama,
             $programNama,
+            $cs->tag_beasiswa ?? 'Normal',
+            $cs->tag_jalur ?? 'Normal',
             $isCsv ? "'{$cs->nisn}" : $cs->nisn,
             $cs->nik ? ($isCsv ? "'{$cs->nik}" : $cs->nik) : '-',
             $cs->no_kk ? ($isCsv ? "'{$cs->no_kk}" : $cs->no_kk) : '-',
@@ -763,5 +776,23 @@ class CalonSiswaController extends Controller
         $pdf = $this->pdfService->generateRekapCalonSiswa($candidates, $filters);
 
         return $pdf->download('Rekap_Calon_Siswa_SPMB_' . date('Ymd_His') . '.pdf');
+    }
+
+    /**
+     * Update tag beasiswa and tag jalur for a candidate.
+     */
+    public function updateTags(Request $request, CalonSiswa $calonSiswa)
+    {
+        $validated = $request->validate([
+            'tag_beasiswa' => ['nullable', 'string', 'max:255'],
+            'tag_jalur' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $calonSiswa->update([
+            'tag_beasiswa' => $validated['tag_beasiswa'] ?: 'Normal',
+            'tag_jalur' => $validated['tag_jalur'] ?: 'Normal',
+        ]);
+
+        return redirect()->back()->with('success', 'Tag/Flag siswa berhasil diperbarui.');
     }
 }

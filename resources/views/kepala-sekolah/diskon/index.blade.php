@@ -21,7 +21,7 @@
             <div class="flex items-center gap-2 flex-wrap">
                 <button @click="openModalBeriDiskon()" type="button"
                         class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-nampi-orange text-white text-xs font-bold hover:bg-orange-600 transition-colors shadow-xs cursor-pointer">
-                    <span>🏷️ Berikan Diskon Siswa</span>
+                    <span>🏷️ Berikan Diskon Murid</span>
                 </button>
                 <button @click="openModalTambahMaster()" type="button"
                         class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-colors shadow-xs cursor-pointer">
@@ -55,11 +55,11 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Penerima Diskon</span>
-                        <p class="text-2xl font-black text-slate-900 mt-1">{{ number_format($stats['total_discounts']) }} Siswa</p>
+                        <p class="text-2xl font-black text-slate-900 mt-1">{{ number_format($stats['total_discounts']) }} Murid</p>
                     </div>
                     <div class="w-11 h-11 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center text-xl">🏷️</div>
                 </div>
-                <p class="text-[11px] text-slate-400 mt-2">Total siswa yang memperoleh potongan</p>
+                <p class="text-[11px] text-slate-400 mt-2">Total murid yang memperoleh potongan</p>
             </div>
 
             <div class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
@@ -106,7 +106,7 @@
             <button @click="activeTab = 'siswa'" type="button"
                     :class="activeTab === 'siswa' ? 'border-nampi-orange text-nampi-orange font-bold' : 'border-transparent text-slate-500 hover:text-slate-800'"
                     class="pb-3 px-4 border-b-2 text-sm transition-colors cursor-pointer flex items-center gap-2">
-                <span>📋 Calon Siswa Penerima Diskon</span>
+                <span>📋 Calon Murid Penerima Diskon</span>
                 <span class="px-2 py-0.5 rounded-full text-xs"
                       :class="activeTab === 'siswa' ? 'bg-orange-100 text-orange-800 font-black' : 'bg-slate-100 text-slate-600'">
                     {{ $stats['total_discounts'] }}
@@ -178,7 +178,7 @@
                     <table class="w-full text-left text-sm text-slate-600">
                         <thead class="bg-slate-50 border-b border-slate-100 text-xs font-bold text-slate-500 uppercase tracking-wider">
                             <tr>
-                                <th class="px-5 py-3.5">Calon Siswa</th>
+                                <th class="px-5 py-3.5">Calon Murid</th>
                                 <th class="px-4 py-3.5">Program Diskon / Beasiswa</th>
                                 <th class="px-4 py-3.5">Metode & Nilai</th>
                                 <th class="px-4 py-3.5 text-right">Potongan</th>
@@ -273,7 +273,7 @@
                                 <tr>
                                     <td colspan="7" class="px-5 py-12 text-center text-slate-400">
                                         <p class="text-base font-bold text-slate-600">Belum ada diskon yang tercatat</p>
-                                        <p class="text-xs text-slate-400 mt-1">Gunakan tombol "Berikan Diskon Siswa" untuk menetapkan potongan biaya.</p>
+                                        <p class="text-xs text-slate-400 mt-1">Gunakan tombol "Berikan Diskon Murid" untuk menetapkan potongan biaya.</p>
                                     </td>
                                 </tr>
                             @endforelse
@@ -369,7 +369,7 @@
                 <div @click.away="modalBeriDiskon = false" class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                         <div>
-                            <h3 class="text-base font-black text-slate-800">Pemberian Diskon / Beasiswa Siswa</h3>
+                            <h3 class="text-base font-black text-slate-800">Pemberian Diskon / Beasiswa Murid</h3>
                             <p class="text-xs text-slate-400">Dapat diaplikasikan ke semua jenis tagihan dengan otorisasi Kepala Sekolah.</p>
                         </div>
                         <button @click="modalBeriDiskon = false" class="text-slate-400 hover:text-slate-600 font-bold text-lg cursor-pointer">✕</button>
@@ -380,10 +380,10 @@
 
                         {{-- 1. Pilih Calon Siswa --}}
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Calon Siswa (Memiliki Tagihan Aktif) <span class="text-rose-500">*</span></label>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Calon Murid (Memiliki Tagihan Aktif) <span class="text-rose-500">*</span></label>
                             <select name="calon_siswa_id" x-model="selectedSiswaId" required @change="onSelectSiswa()"
                                     class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30 bg-white font-medium">
-                                <option value="">— Pilih Calon Siswa —</option>
+                                <option value="">— Pilih Calon Murid —</option>
                                 <template x-for="cs in siswaList" :key="cs.id">
                                     <option :value="cs.id" x-text="`${cs.nomor_pendaftaran} - ${cs.nama_lengkap} (${cs.jurusan}) [${cs.tagihans.length} Tagihan]`"></option>
                                 </template>
@@ -648,7 +648,7 @@
                     </div>
 
                     <p class="text-xs text-slate-500 leading-relaxed">
-                        Tagihan siswa akan dikembalikan ke nilai bruto awal dan kewajiban pembayaran akan disesuaikan kembali.
+                        Tagihan murid akan dikembalikan ke nilai bruto awal dan kewajiban pembayaran akan disesuaikan kembali.
                     </p>
 
                     <form :action="`{{ route('kepala-sekolah.diskon.index') }}/${confirmRevokeItem?.id}`" method="POST" x-ref="formRevoke">

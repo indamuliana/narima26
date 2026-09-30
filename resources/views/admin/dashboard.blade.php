@@ -28,7 +28,7 @@
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                     </svg>
-                    <span>Direktori Calon Siswa &rarr;</span>
+                    <span>Direktori Calon murid &rarr;</span>
                 </a>
                 <a href="{{ route('admin.laporan.index') }}"
                    class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-bold border border-slate-700 transition-all active:scale-95 cursor-pointer">
@@ -201,7 +201,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 gap-2">
                         <div>
                             <h2 class="text-base sm:text-lg font-black text-slate-900">Keterisian Kuota Kompetensi Keahlian</h2>
-                            <p class="text-xs text-slate-500 mt-0.5">Target kapasitas 72 siswa (2 rombel @ 36 siswa) per program keahlian</p>
+                            <p class="text-xs text-slate-500 mt-0.5">Target kapasitas 72 murid (2 rombel @ 36 murid) per program keahlian</p>
                         </div>
                         <a href="{{ route('admin.laporan.index') }}" class="inline-flex items-center gap-1 text-xs font-bold text-orange-600 hover:text-orange-700 hover:underline">
                             <span>Analitik Lengkap &rarr;</span>
@@ -278,7 +278,7 @@
                         <div class="p-4 rounded-2xl bg-purple-50/70 border border-purple-200/80 flex items-center justify-between">
                             <div>
                                 <span class="text-purple-950 font-bold block">Piutang Tagihan</span>
-                                <span class="text-slate-500 text-[11px]">Sisa cicilan siswa</span>
+                                <span class="text-slate-500 text-[11px]">Sisa cicilan murid</span>
                             </div>
                             <span class="font-black text-sm text-purple-900">Rp {{ number_format($keuangan['sisa_piutang'], 0, ',', '.') }}</span>
                         </div>
@@ -302,7 +302,7 @@
                     <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div>
                             <h2 class="text-base sm:text-lg font-black text-slate-900">Pendaftar Terbaru</h2>
-                            <p class="text-xs text-slate-500 mt-0.5">Calon siswa yang baru mendaftar mandiri ke portal SPMB</p>
+                            <p class="text-xs text-slate-500 mt-0.5">Calon murid yang baru mendaftar mandiri ke portal SPMB</p>
                         </div>
                         <a href="{{ route('admin.calon-siswa.index') }}"
                            class="inline-flex items-center gap-1 text-xs font-bold text-orange-600 hover:text-orange-700 hover:underline">
@@ -314,7 +314,7 @@
                         <table class="w-full text-left text-xs text-slate-600">
                             <thead class="bg-slate-50 border-b border-slate-200/70 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                 <tr>
-                                    <th class="px-6 py-3.5">Calon Siswa</th>
+                                    <th class="px-6 py-3.5">calon murid</th>
                                     <th class="px-4 py-3.5">Pilihan Jurusan</th>
                                     <th class="px-4 py-3.5">Gelombang</th>
                                     <th class="px-4 py-3.5 text-center">Status</th>
@@ -371,7 +371,7 @@
 
                 <div class="p-4 border-t border-slate-100 bg-slate-50/50 flex justify-end">
                     <a href="{{ route('admin.calon-siswa.index') }}" class="text-xs font-bold text-orange-600 hover:text-orange-700 hover:underline">
-                        Lihat Seluruh Direktori Siswa &rarr;
+                        Lihat Seluruh Direktori Murid &rarr;
                     </a>
                 </div>
             </div>

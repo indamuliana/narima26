@@ -127,7 +127,7 @@
                                     </p>
                                 </td>
                                 <td class="px-4 py-4">
-                                    <span class="text-xs font-bold text-slate-800 block">{{ $siswa->jurusan?->nama_jurusan ?? '-' }}</span>
+                                    <span class="text-xs font-bold text-slate-800 block">{{ $siswa->jurusan_pilihan_text }}</span>
                                     <div class="mt-1 flex items-center gap-1.5 flex-wrap">
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold {{ str_contains(strtolower($siswa->program?->nama_program ?? ''), 'unggul') ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-blue-50 text-blue-700 border border-blue-200' }}">
                                             {{ $siswa->program?->nama_program ?? 'Reguler' }}

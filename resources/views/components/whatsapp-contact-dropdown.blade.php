@@ -157,7 +157,7 @@
             @endif
 
             <!-- Wali (Opsional jika ada) -->
-            @if($phoneWaliRaw)
+            @if($linkWali)
                 <a href="{{ $linkWali }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between px-3 py-1.5 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors group">
                     <div class="flex items-center gap-2">
                         <span class="w-5 h-5 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-[10px]">W</span>
@@ -171,6 +171,17 @@
                         <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                     </span>
                 </a>
+            @else
+                <div class="flex items-center justify-between px-3 py-1.5 text-xs text-slate-400 opacity-60">
+                    <div class="flex items-center gap-2">
+                        <span class="w-5 h-5 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center font-bold text-[10px]">W</span>
+                        <div>
+                            <p class="font-medium text-slate-500 leading-tight">Hubungi Wali</p>
+                            <p class="text-[10px] text-slate-400 leading-tight">Belum didaftarkan</p>
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-slate-300">-</span>
+                </div>
             @endif
         </div>
     </div>

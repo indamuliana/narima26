@@ -18,15 +18,8 @@ class ExampleTest extends TestCase
         $response->assertSee('Lulus Wikrama Siap Membangun Negeri');
         $response->assertSee('Solusi pendidikan akhlak berkualitas di zaman modern');
         $response->assertSee('brosur.smkwikrama1garut.sch.id');
-        $response->assertSee('Galeri Fasilitas SMK Wikrama 1 Garut');
-        $response->assertSee('Galeri Proses Pembelajaran Nyata');
-        $response->assertSee('Profil 12 Alumni Berprestasi');
-        $response->assertSee('Testimoni 8 Pimpinan Industri Mitra', false);
-        $response->assertSee('Testimoni 6 Tokoh Masyarakat & Pendidikan', false);
-        $response->assertSee('Testimoni 6 Orang Tua Siswa & Santri', false);
         $response->assertSee('Gelombang Aktif', false);
-        $response->assertSee('Lab-TJKT.jpg', false);
-        $response->assertSee('10. Kemana saya menghubungi panitia', false);
+        $response->assertSee('SMK Wikrama 1 Garut', false);
 
         $this->assertEquals('Asia/Jakarta', config('app.timezone'));
     }

@@ -1,5 +1,5 @@
 <x-layouts.app>
-    <x-slot name="title">Direktori Calon Siswa — SPMB Nampi</x-slot>
+    <x-slot name="title">Direktori calon murid — SPMB Nampi</x-slot>
 
     <x-slot name="sidebar">
         @include('admin.partials.sidebar')
@@ -10,7 +10,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
                 <h1 class="text-2xl font-black text-slate-800">Direktori Calon Peserta Didik Baru</h1>
-                <p class="text-xs text-slate-400 mt-0.5">Tabel data calon siswa terintegrasi dengan filter dinamis dan export dokumen</p>
+                <p class="text-xs text-slate-400 mt-0.5">Tabel data calon murid terintegrasi dengan filter dinamis dan export dokumen</p>
             </div>
             <div class="flex items-center gap-2" x-data="{ openExport: false }">
                 <div class="relative">
@@ -147,7 +147,7 @@
 
         <!-- Table Summary Badge -->
         <div class="flex items-center justify-between text-xs text-slate-500 px-1">
-            <span>Menampilkan <strong>{{ $calonSiswaList->count() }}</strong> dari total <strong>{{ $totalCount }}</strong> calon siswa</span>
+            <span>Menampilkan <strong>{{ $calonSiswaList->count() }}</strong> dari total <strong>{{ $totalCount }}</strong> calon murid</span>
             <div class="flex items-center gap-2">
                 <span>Tampilkan:</span>
                 <select onchange="window.location.href = this.value" class="px-2 py-1 text-xs rounded-lg border border-slate-200">
@@ -167,7 +167,7 @@
                     <thead class="bg-slate-50/80 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase">
                         <tr>
                             <th class="px-4 py-3.5 text-center">No</th>
-                            <th class="px-5 py-3.5">Calon Siswa</th>
+                            <th class="px-5 py-3.5">calon murid</th>
                             <th class="px-4 py-3.5">Kompetensi Keahlian</th>
                             <th class="px-4 py-3.5">Gelombang</th>
                             <th class="px-4 py-3.5 text-center">Biaya Seleksi</th>
@@ -193,15 +193,28 @@
                                         {{ $cs->nomor_pendaftaran }} &bull; NISN: {{ $cs->nisn }}
                                     </p>
                                     <p class="text-[11px] text-slate-500 mt-0.5">
-                                        {{ $cs->sekolahAsal?->nama_sekolah ?? $cs->asal_sekolah_lainnya ?? '-' }}
+                                        {{ $cs->sekolah_asal_text }}
                                     </p>
                                 </td>
                                 <td class="px-4 py-4">
                                     <span class="font-bold text-slate-800 block">{{ $cs->jurusan?->nama_jurusan ?? '-' }}</span>
+                                    @if($cs->jurusan2)
+                                        <span class="text-[11px] text-slate-500 block">Pil. 2: {{ $cs->jurusan2->nama_jurusan }}</span>
+                                    @endif
                                     <div class="mt-1 flex items-center gap-1.5 flex-wrap">
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold {{ str_contains(strtolower($cs->program?->nama_program ?? ''), 'unggul') ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-blue-50 text-blue-700 border border-blue-200' }}">
                                             {{ $cs->program?->nama_program ?? 'Reguler' }}
                                         </span>
+                                        @if($cs->tag_beasiswa && $cs->tag_beasiswa !== 'Normal')
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                {{ $cs->tag_beasiswa }}
+                                            </span>
+                                        @endif
+                                        @if($cs->tag_jalur && $cs->tag_jalur !== 'Normal')
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                                                {{ $cs->tag_jalur }}
+                                            </span>
+                                        @endif
                                     </div>
                                 </td>
                                 <td class="px-4 py-4 text-slate-600">

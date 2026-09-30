@@ -17,7 +17,7 @@
                     <span>/</span>
                     <span class="text-slate-600">Formulir Wawancara Siswa</span>
                 </div>
-                <h1 class="text-2xl font-black text-slate-900 mt-1">Formulir Wawancara Calon Siswa</h1>
+                <h1 class="text-2xl font-black text-slate-900 mt-1">Formulir Wawancara Calon Murid</h1>
                 <p class="text-xs text-slate-500 mt-0.5">Instrumen evaluasi tatap muka langsung untuk menggali kepribadian, akhlak, motivasi, dan kesiapan fisik calon murid.</p>
             </div>
             <div class="flex items-center gap-2 shrink-0">
@@ -77,6 +77,12 @@
                         </span>
                         <span class="px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-cyan-50 text-cyan-800 border border-cyan-200">
                             {{ $calonSiswa->jurusan?->nama ?? '-' }}
+                        </span>
+                        <span class="px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                            Beasiswa: {{ $calonSiswa->tag_beasiswa ?? 'Normal' }}
+                        </span>
+                        <span class="px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                            Jalur: {{ $calonSiswa->tag_jalur ?? 'Normal' }}
                         </span>
                     </div>
                 </div>

@@ -60,21 +60,34 @@
 
                     <!-- Call-to-Action Buttons including Download Brosur -->
                     <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-2">
-                        <a href="{{ url('/register') }}" class="relative group w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl font-bold bg-nampi-orange hover:bg-nampi-orange-hover text-white text-sm shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
-                            <span class="absolute -inset-0.5 rounded-xl bg-nampi-orange opacity-40 animate-ping pointer-events-none"></span>
-                            <span class="relative flex h-2 w-2">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-                            </span>
-                            <span class="relative">Daftar Sekarang</span>
-                            <svg class="relative w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                            </svg>
-                        </a>
+                        @auth
+                            <a href="{{ route('dashboard') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl font-bold bg-nampi-orange hover:bg-nampi-orange-hover text-white text-sm shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
+                                <span>Buka Dashboard ({{ ucfirst(Auth::user()->role) }})</span>
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                </svg>
+                            </a>
 
-                        <a href="{{ url('/login') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3.5 rounded-xl font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 text-sm border border-slate-200 transition-colors bg-blue-500 text-white">
-                            Masuk Akun
-                        </a>
+                            <a href="{{ route('logout') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3.5 rounded-xl font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-sm transition-colors">
+                                Keluar (Logout)
+                            </a>
+                        @else
+                            <a href="{{ url('/register') }}" class="relative group w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl font-bold bg-nampi-orange hover:bg-nampi-orange-hover text-white text-sm shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
+                                <span class="absolute -inset-0.5 rounded-xl bg-nampi-orange opacity-40 animate-ping pointer-events-none"></span>
+                                <span class="relative flex h-2 w-2">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                                </span>
+                                <span class="relative">Daftar Sekarang</span>
+                                <svg class="relative w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                </svg>
+                            </a>
+
+                            <a href="{{ url('/login') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3.5 rounded-xl font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 text-sm border border-slate-300 transition-colors shadow-xs">
+                                Masuk Akun
+                            </a>
+                        @endauth
 
                         <a href="https://brosur.smkwikrama1garut.sch.id" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-sm shadow-xs transition-all group">
                             <svg class="w-4 h-4 text-amber-600 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -362,7 +375,7 @@
                         </div>
                         <h4 class="font-bold text-slate-900 text-xs mb-1">Unggah Berkas</h4>
                         <p class="text-[11px] text-slate-600 leading-snug">
-                            Unggah Kartu Keluarga, KTP, Foto calon siswa, dan Akta Kelahiran.
+                            Unggah Kartu Keluarga, KTP, Foto calon murid, dan Akta Kelahiran.
                         </p>
                     </div>
                 </div>
@@ -376,7 +389,7 @@
                         </div>
                         <h4 class="font-bold text-slate-900 text-xs mb-1">Wawancara</h4>
                         <p class="text-[11px] text-slate-600 leading-snug">
-                            Interview pemetaan minat bakat calon siswa dan orang tua.
+                            Interview pemetaan minat bakat calon murid dan orang tua.
                         </p>
                     </div>
                 </div>
@@ -576,12 +589,12 @@
                     [
                         'kategori' => 'Auditorium',
                         'judul' => 'Convention Hall & Amphitheatre Presentasi',
-                        'deskripsi' => 'Gedung pertemuan representatif berkapasitas besar untuk wisuda, seminar nasional, sidang tugas akhir siswa, dan pameran teknologi.',
+                        'deskripsi' => 'Gedung pertemuan representatif berkapasitas besar untuk wisuda, seminar nasional, sidang tugas akhir murid, dan pameran teknologi.',
                     ],
                     [
                         'kategori' => 'Gizi & Nutrisi',
                         'judul' => 'Kantin Sehat Higienis & Dining Hall',
-                        'deskripsi' => 'Layanan konsumsi higienis bersertifikasi sehat dengan menu bergizi seimbang bebas bahan pengawet untuk seluruh siswa dan santri.',
+                        'deskripsi' => 'Layanan konsumsi higienis bersertifikasi sehat dengan menu bergizi seimbang bebas bahan pengawet untuk seluruh murid dan santri.',
                     ],
                     [
                         'kategori' => 'Lingkungan Asri',
@@ -642,7 +655,7 @@
                     [
                         'kategori' => 'Project Based Learning',
                         'judul' => 'Penyelesaian Proyek Perangkat Lunak Industri',
-                        'deskripsi' => 'Siswa PPLG menggarap aplikasi nyata sesuai pesanan klien industri, mulai dari analisis kebutuhan, rancang basis data, hingga rilis produksi.',
+                        'deskripsi' => 'murid PPLG menggarap aplikasi nyata sesuai pesanan klien industri, mulai dari analisis kebutuhan, rancang basis data, hingga rilis produksi.',
                     ],
                     [
                         'kategori' => 'Pendidikan Karakter',
@@ -657,7 +670,7 @@
                     [
                         'kategori' => 'Infrastruktur Jaringan',
                         'judul' => 'Praktik Fiber Optic Splicing & Server Setup',
-                        'deskripsi' => 'Siswa TJKT melakukan pengelasan kabel serat optik dengan fusi presisi dan konfigurasi routing antar-jaringan berskala enterprise.',
+                        'deskripsi' => 'murid TJKT melakukan pengelasan kabel serat optik dengan fusi presisi dan konfigurasi routing antar-jaringan berskala enterprise.',
                     ],
                     [
                         'kategori' => 'Etika Profesional',
@@ -667,7 +680,7 @@
                     [
                         'kategori' => 'Bisnis Digital',
                         'judul' => 'Live Commerce & Strategi Kampanye Medsos',
-                        'deskripsi' => 'Siswa Pemasaran mempraktikkan penjualan langsung (live selling) multi-channel dan riset tren konten digital berkonversi tinggi.',
+                        'deskripsi' => 'murid Pemasaran mempraktikkan penjualan langsung (live selling) multi-channel dan riset tren konten digital berkonversi tinggi.',
                     ],
                     [
                         'kategori' => 'Program Unggulan',
@@ -677,7 +690,7 @@
                     [
                         'kategori' => 'Sertifikasi Kompetensi',
                         'judul' => 'Uji Kompetensi Keahlian (UKK) Bersama BNSP',
-                        'deskripsi' => 'Pengujian kemampuan teknis siswa di hadapan asesor profesional independen dari Badan Nasional Sertifikasi Profesi (BNSP).',
+                        'deskripsi' => 'Pengujian kemampuan teknis murid di hadapan asesor profesional independen dari Badan Nasional Sertifikasi Profesi (BNSP).',
                     ],
                     [
                         'kategori' => 'Budaya Industri',
@@ -697,7 +710,7 @@
                     [
                         'kategori' => 'Apresiasi Karya',
                         'judul' => 'Gelar Karya & Wikrama Innovation Expo',
-                        'deskripsi' => 'Pameran tahunan hasil karya aplikasi, produk wirausaha, dan demonstrasi keahlian siswa yang disaksikan orang tua dan publik.',
+                        'deskripsi' => 'Pameran tahunan hasil karya aplikasi, produk wirausaha, dan demonstrasi keahlian murid yang disaksikan orang tua dan publik.',
                     ],
                 ];
             @endphp
@@ -887,13 +900,13 @@
                             'nama' => 'Maya Anggraeni, M.Psi.',
                             'jabatan' => 'Head of People & Culture',
                             'perusahaan' => 'PT Astra International Tbk (Digital)',
-                            'testimoni' => 'Setiap kali proses rekrutmen magang dan kerja, siswa Wikrama selalu menonjol dalam hal kedisiplinan waktu, kesantunan bertutur, serta inisiatif pemecahan masalah.',
+                            'testimoni' => 'Setiap kali proses rekrutmen magang dan kerja, murid Wikrama selalu menonjol dalam hal kedisiplinan waktu, kesantunan bertutur, serta inisiatif pemecahan masalah.',
                         ],
                         [
                             'nama' => 'Ir. Bambang Sugiarto',
                             'jabatan' => 'Head of Network Infrastructure',
                             'perusahaan' => 'PT Indosat Ooredoo Hutchison',
-                            'testimoni' => 'Siswa TJKT Wikrama Garut sudah menguasai arsitektur serat optik dan konfigurasi routing dinamis. Masa onboarding dan adaptasi mereka sangat singkat.',
+                            'testimoni' => 'murid TJKT Wikrama Garut sudah menguasai arsitektur serat optik dan konfigurasi routing dinamis. Masa onboarding dan adaptasi mereka sangat singkat.',
                         ],
                         [
                             'nama' => 'Dewi Sartika, CHA',
@@ -989,7 +1002,7 @@
                             'nama' => 'Hj. Siti Nurjanah, S.Pd., M.Si.',
                             'jabatan' => 'Tokoh Pendidikan & Literasi',
                             'institusi' => 'Dewan Pendidikan Kabupaten Garut',
-                            'testimoni' => 'Budaya literasi, kebersihan lingkungan, dan ketertiban di Wikrama Garut adalah teladan terbaik bagaimana sekolah menciptakan atmosfer belajar yang sangat memanusiakan siswa.',
+                            'testimoni' => 'Budaya literasi, kebersihan lingkungan, dan ketertiban di Wikrama Garut adalah teladan terbaik bagaimana sekolah menciptakan atmosfer belajar yang sangat memanusiakan murid.',
                         ],
                         [
                             'nama' => 'Budi Santoso, S.E.',
@@ -1032,12 +1045,12 @@
                 </div>
             </div>
 
-            <!-- 4. TESTIMONI ORANG TUA SISWA (6 Orang - Mengikuti Format Mitra Industri) -->
+            <!-- 4. TESTIMONI ORANG TUA murid (6 Orang - Mengikuti Format Mitra Industri) -->
             <div class="pt-8 border-t border-slate-200">
                 <div class="text-center max-w-3xl mx-auto space-y-3 mb-14">
                     <span class="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-100 px-3.5 py-1 rounded-full border border-amber-300">Kepercayaan Keluarga</span>
                     <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-                        Testimoni 6 Orang Tua Siswa & Santri
+                        Testimoni 6 Orang Tua murid & Santri
                     </h2>
                     <p class="text-slate-600 text-sm sm:text-base">
                         Kisah haru dan rasa syukur para orang tua murid melihat transformasi karakter, kemandirian, dan masa depan putra-putrinya di SMK Wikrama 1 Garut.
@@ -1403,15 +1416,15 @@
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs">
                     <h4 class="font-bold text-slate-900 text-sm sm:text-base">8. Kapan seragam sekolah dibagikan dan bagaimana proses pengukurannya?</h4>
                     <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
-                        Penginputan ukuran seragam dilakukan secara online pada portal calon siswa setelah data diri lengkap. Pengambilan seragam fisik dijadwalkan menjelang Masa Pengenalan Lingkungan Sekolah (MPLS) setelah daftar ulang diselesaikan.
+                        Penginputan ukuran seragam dilakukan secara online pada portal calon murid setelah data diri lengkap. Pengambilan seragam fisik dijadwalkan menjelang Masa Pengenalan Lingkungan Sekolah (MPLS) setelah daftar ulang diselesaikan.
                     </p>
                 </div>
 
                 <!-- FAQ 9 -->
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs">
-                    <h4 class="font-bold text-slate-900 text-sm sm:text-base">9. Apakah calon siswa dari luar Kabupaten Garut atau luar provinsi bisa mendaftar?</h4>
+                    <h4 class="font-bold text-slate-900 text-sm sm:text-base">9. Apakah calon murid dari luar Kabupaten Garut atau luar provinsi bisa mendaftar?</h4>
                     <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
-                        Sangat bisa. Sistem SPMB NAMPI berbasis online penuh sehingga calon siswa dari seluruh Indonesia dapat mendaftar, mengunggah dokumen, dan mengikuti wawancara secara daring, khususnya bagi yang memilih Program Unggulan Berasrama.
+                        Sangat bisa. Sistem SPMB NAMPI berbasis online penuh sehingga calon murid dari seluruh Indonesia dapat mendaftar, mengunggah dokumen, dan mengikuti wawancara secara daring, khususnya bagi yang memilih Program Unggulan Berasrama.
                     </p>
                 </div>
 

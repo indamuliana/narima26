@@ -142,7 +142,7 @@
         <tr>
             <td class="lbl">Kompetensi Keahlian</td>
             <td class="colon">:</td>
-            <td class="val"><strong>{{ $calonSiswa->jurusan?->nama ?? $calonSiswa->jurusan?->nama_jurusan ?? '-' }} ({{ $calonSiswa->jurusan?->kode ?? '-' }})</strong></td>
+            <td class="val"><strong>{{ $calonSiswa->jurusan_pilihan_text }}</strong></td>
             <td class="lbl">Program Pendidikan</td>
             <td class="colon">:</td>
             <td class="val"><strong>{{ $calonSiswa->program?->nama ?? $calonSiswa->program?->nama_program ?? '-' }}</strong></td>
@@ -247,7 +247,7 @@
             <td class="lbl">Sekolah Asal (SMP/MTs)</td>
             <td class="colon">:</td>
             <td class="val" colspan="4">
-                <strong>{{ $calonSiswa->sekolahAsal?->nama_sekolah ?? $calonSiswa->asal_sekolah_lainnya ?? '-' }}</strong>
+                <strong>{{ $calonSiswa->sekolah_asal_text }}</strong>
                 @if($calonSiswa->sekolahAsal?->npsn) (NPSN: {{ $calonSiswa->sekolahAsal->npsn }}) @endif
                 @if($calonSiswa->sekolahAsal?->kabupaten) &bull; {{ $calonSiswa->sekolahAsal->kabupaten }} @endif
             </td>

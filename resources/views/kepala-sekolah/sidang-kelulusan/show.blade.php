@@ -76,11 +76,11 @@
                     </div>
                     <h1 class="text-xl sm:text-2xl font-black text-slate-900 mt-1.5">{{ $calonSiswa->nama_lengkap }}</h1>
                     <div class="flex flex-wrap items-center gap-2.5 mt-2 text-xs text-slate-600">
-                        <span class="font-bold text-slate-800">{{ $calonSiswa->jurusan?->nama_jurusan ?? $calonSiswa->jurusan?->nama ?? '-' }}</span>
+                        <span class="font-bold text-slate-800">{{ $calonSiswa->jurusan_pilihan_text }}</span>
                         <span>&bull;</span>
                         <span class="font-bold text-slate-800">{{ $calonSiswa->program?->nama ?? 'Reguler' }} &bull; {{ $calonSiswa->gelombang?->nama ?? 'Gelombang 1' }}</span>
                         <span>&bull;</span>
-                        <span>SMP: <strong>{{ $calonSiswa->sekolahAsal?->nama_sekolah ?? $calonSiswa->asal_sekolah_lainnya ?? '-' }}</strong></span>
+                        <span>SMP: <strong>{{ $calonSiswa->sekolah_asal_text }}</strong></span>
                     </div>
                 </div>
             </div>

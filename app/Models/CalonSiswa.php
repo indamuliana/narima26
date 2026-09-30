@@ -60,10 +60,13 @@ class CalonSiswa extends Model
         'referensi_nomor_seleksi',
         'program_id',
         'jurusan_id',
+        'jurusan_id_2',
         'gelombang_id',
         'status_spmb',
         'status_data',
         'catatan_admin',
+        'tag_beasiswa',
+        'tag_jalur',
     ];
 
     protected function casts(): array
@@ -133,6 +136,19 @@ class CalonSiswa extends Model
         return implode(', ', $parts);
     }
 
+    public function getSekolahAsalTextAttribute(): string
+    {
+        return $this->sekolahAsal?->nama_sekolah 
+            ?: ($this->asal_sekolah_lainnya ?: '-');
+    }
+
+    public function getJurusanPilihanTextAttribute(): string
+    {
+        $j1 = $this->jurusan?->nama_jurusan ?: ($this->jurusan?->nama ?: '-');
+        $j2 = $this->jurusan2?->nama_jurusan ?: ($this->jurusan2?->nama ?: null);
+        return $j2 ? "1. {$j1} | 2. {$j2}" : $j1;
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -151,6 +167,11 @@ class CalonSiswa extends Model
     public function jurusan(): BelongsTo
     {
         return $this->belongsTo(MasterJurusan::class, 'jurusan_id');
+    }
+
+    public function jurusan2(): BelongsTo
+    {
+        return $this->belongsTo(MasterJurusan::class, 'jurusan_id_2');
     }
 
     public function gelombang(): BelongsTo

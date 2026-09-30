@@ -110,14 +110,26 @@
                                     </div>
                                 </td>
                                 <td class="px-4 py-4">
-                                    <span class="inline-block px-2.5 py-1 rounded-lg text-xs font-semibold bg-cyan-50 text-cyan-800 border border-cyan-200">
-                                        {{ $cs->jurusan?->nama_jurusan ?? '-' }}
+                                    <span class="inline-block px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-cyan-50 text-cyan-800 border border-cyan-200 mb-1">
+                                        1. {{ $cs->jurusan?->nama_jurusan ?? '-' }}
                                     </span>
-                                    <p class="text-[11px] text-slate-400 mt-1">{{ $cs->programBelajar?->nama_program ?? '-' }}</p>
+                                    @if($cs->jurusan2)
+                                        <span class="inline-block px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-slate-50 text-slate-600 border border-slate-200 block mb-1">
+                                            2. {{ $cs->jurusan2?->nama_jurusan ?? '-' }}
+                                        </span>
+                                    @endif
+                                    <p class="text-[10px] text-slate-400 font-bold uppercase">{{ $cs->programBelajar?->nama_program ?? '-' }}</p>
+                                    <div class="flex flex-wrap gap-1 mt-1.5">
+                                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                            Beasiswa: {{ $cs->tag_beasiswa ?? 'Normal' }}
+                                        </span>
+                                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                                            Jalur: {{ $cs->tag_jalur ?? 'Normal' }}
+                                        </span>
+                                    </div>
                                 </td>
                                 <td class="px-4 py-4">
-                                    <p class="font-medium text-slate-700">{{ $cs->sekolahAsal?->nama_sekolah ?? $cs->sekolah_asal_text ?? '-' }}</p>
-                                    <p class="text-xs text-slate-400">{{ $cs->sekolahAsal?->kabupaten_kota ?? 'Garut' }}</p>
+                                    <p class="font-medium text-slate-700 text-xs">{{ $cs->sekolah_asal_text }}</p>
                                 </td>
                                 <td class="px-4 py-4">
                                     @if ($wStatus === 'SELESAI')
@@ -146,8 +158,10 @@
                                     @endif
                                 </td>
                                 <td class="px-5 py-4 text-right">
-                                    @if ($wStatus === 'SELESAI')
-                                        <div class="flex items-center justify-end gap-2">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <x-whatsapp-contact-dropdown :calonSiswa="$cs" />
+
+                                        @if ($wStatus === 'SELESAI')
                                             <a href="{{ route('pewawancara.wawancara.show', $cs) }}"
                                                class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition-colors">
                                                 Lihat Detail
@@ -156,18 +170,18 @@
                                                class="px-2.5 py-1.5 rounded-lg border border-blue-200 text-blue-700 text-xs font-semibold hover:bg-blue-50 transition-colors">
                                                 Edit
                                             </a>
-                                        </div>
-                                    @elseif ($wStatus === 'PROSES')
-                                        <a href="{{ route('pewawancara.wawancara.hub', $cs) }}"
-                                           class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition-colors shadow-xs">
-                                            Lanjutkan Draft
-                                        </a>
-                                    @else
-                                        <a href="{{ route('pewawancara.wawancara.hub', $cs) }}"
-                                           class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-nampi-orange text-white text-xs font-bold hover:bg-orange-600 transition-colors shadow-xs">
-                                            Mulai Wawancara →
-                                        </a>
-                                    @endif
+                                        @elseif ($wStatus === 'PROSES')
+                                            <a href="{{ route('pewawancara.wawancara.hub', $cs) }}"
+                                               class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition-colors shadow-xs">
+                                                Lanjutkan Draft
+                                            </a>
+                                        @else
+                                            <a href="{{ route('pewawancara.wawancara.hub', $cs) }}"
+                                               class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-nampi-orange text-white text-xs font-bold hover:bg-orange-600 transition-colors shadow-xs">
+                                                Mulai Wawancara →
+                                            </a>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @empty

@@ -78,6 +78,12 @@
                         <span class="px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-cyan-50 text-cyan-800 border border-cyan-200">
                             {{ $calonSiswa->jurusan?->nama ?? '-' }}
                         </span>
+                        <span class="px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                            Beasiswa: {{ $calonSiswa->tag_beasiswa ?? 'Normal' }}
+                        </span>
+                        <span class="px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                            Jalur: {{ $calonSiswa->tag_jalur ?? 'Normal' }}
+                        </span>
                     </div>
                 </div>
             </div>

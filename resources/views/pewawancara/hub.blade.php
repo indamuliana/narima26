@@ -54,24 +54,40 @@
                         <span>&bull;</span>
                         <span>NISN: <strong class="font-mono text-slate-700">{{ $calonSiswa->nisn }}</strong></span>
                         <span>&bull;</span>
-                        <span>Asal Sekolah: <strong class="text-slate-700">{{ $calonSiswa->asalSekolah?->nama_sekolah ?? $calonSiswa->asal_sekolah_lainnya ?? '-' }}</strong></span>
+                        <span>Asal Sekolah: <strong class="text-slate-700">{{ $calonSiswa->sekolah_asal_text }}</strong></span>
                     </div>
                     <div class="flex flex-wrap items-center gap-2 mt-2">
                         <span class="px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-orange-50 text-orange-700 border border-orange-200">
                             {{ $calonSiswa->programBelajar?->nama ?? 'Reguler' }}
                         </span>
                         <span class="px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-cyan-50 text-cyan-800 border border-cyan-200">
-                            {{ $calonSiswa->jurusan?->nama ?? '-' }}
+                            1. {{ $calonSiswa->jurusan?->nama ?? '-' }}
+                        </span>
+                        @if($calonSiswa->jurusan2)
+                        <span class="px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-slate-50 text-slate-700 border border-slate-200">
+                            2. {{ $calonSiswa->jurusan2?->nama ?? '-' }}
+                        </span>
+                        @endif
+                        <span class="px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                            Beasiswa: {{ $calonSiswa->tag_beasiswa ?? 'Normal' }}
+                        </span>
+                        <span class="px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                            Jalur: {{ $calonSiswa->tag_jalur ?? 'Normal' }}
                         </span>
                     </div>
                 </div>
             </div>
 
-            <div class="flex flex-col md:items-end gap-1 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100">
-                <span class="text-xs font-bold text-slate-400">Status SPMB:</span>
-                <span class="px-3 py-1 inline-flex text-xs font-black rounded-full bg-slate-100 text-slate-700 border border-slate-200">
-                    {{ $calonSiswa->status_spmb instanceof \BackedEnum ? $calonSiswa->status_spmb->label() : $calonSiswa->status_spmb }}
-                </span>
+            <div class="flex flex-col md:items-end gap-2 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-slate-400">Status SPMB:</span>
+                    <span class="px-3 py-1 inline-flex text-xs font-black rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                        {{ $calonSiswa->status_spmb instanceof \BackedEnum ? $calonSiswa->status_spmb->label() : $calonSiswa->status_spmb }}
+                    </span>
+                </div>
+                <div>
+                    <x-whatsapp-contact-dropdown :calonSiswa="$calonSiswa" />
+                </div>
             </div>
         </div>
 

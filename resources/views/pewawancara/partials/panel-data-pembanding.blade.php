@@ -11,6 +11,12 @@
                     <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-indigo-500/30 text-indigo-200 border border-indigo-400/30">
                         VERIFIKASI
                     </span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white border border-white/30">
+                        Beasiswa: {{ $calonSiswa->tag_beasiswa ?? 'Normal' }}
+                    </span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-500/30 text-pink-200 border border-pink-400/30">
+                        Jalur: {{ $calonSiswa->tag_jalur ?? 'Normal' }}
+                    </span>
                 </div>
                 <p class="text-xs text-indigo-200/80 mt-0.5">Gunakan informasi ini untuk memverifikasi dan mencocokkan jawaban lisan calon siswa / orang tua.</p>
             </div>
@@ -94,19 +100,41 @@
                 </div>
             </div>
 
+            <!-- Tag Beasiswa & Tag Jalur (Input Admin) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white p-4 rounded-2xl border border-indigo-100 text-xs">
+                <div class="p-2.5 rounded-xl bg-indigo-50 border border-indigo-200">
+                    <span class="block text-indigo-800 font-bold uppercase text-[10px]">🏷️ Tag Beasiswa (Admin)</span>
+                    <span class="font-black text-indigo-900 text-sm mt-0.5 block">{{ $calonSiswa->tag_beasiswa ?? 'Normal' }}</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-purple-50 border border-purple-200">
+                    <span class="block text-purple-800 font-bold uppercase text-[10px]">🏷️ Tag Jalur (Admin)</span>
+                    <span class="font-black text-purple-900 text-sm mt-0.5 block">{{ $calonSiswa->tag_jalur ?? 'Normal' }}</span>
+                </div>
+            </div>
+
             <!-- Kontak & Referensi Promotor -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 bg-white p-4 rounded-2xl border border-slate-200 text-xs">
-                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                    <span class="block text-slate-400 font-bold uppercase text-[10px]">📱 WhatsApp Siswa</span>
-                    <span class="font-mono font-bold text-slate-800 text-sm">{{ $calonSiswa->no_hp_siswa ?? '-' }}</span>
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 text-xs space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                    <span class="text-slate-500 font-bold uppercase text-[10px]">Kontak WhatsApp (Siswa, Orang Tua, & Wali)</span>
+                    <x-whatsapp-contact-dropdown :calonSiswa="$calonSiswa" />
                 </div>
-                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                    <span class="block text-slate-400 font-bold uppercase text-[10px]">📱 WhatsApp Ayah</span>
-                    <span class="font-mono font-bold text-slate-800 text-sm">{{ $calonSiswa->no_hp_ayah ?? '-' }}</span>
-                </div>
-                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                    <span class="block text-slate-400 font-bold uppercase text-[10px]">📱 WhatsApp Ibu</span>
-                    <span class="font-mono font-bold text-slate-800 text-sm">{{ $calonSiswa->no_hp_ibu ?? '-' }}</span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                        <span class="block text-slate-400 font-bold uppercase text-[10px]">📱 WhatsApp Siswa</span>
+                        <span class="font-mono font-bold text-slate-800 text-sm block mt-0.5">{{ $calonSiswa->no_hp_siswa ?? '-' }}</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                        <span class="block text-slate-400 font-bold uppercase text-[10px]">📱 WhatsApp Ayah</span>
+                        <span class="font-mono font-bold text-slate-800 text-sm block mt-0.5">{{ $calonSiswa->no_hp_ayah ?? $calonSiswa->dataOrangtua?->no_hp_ayah ?? '-' }}</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                        <span class="block text-slate-400 font-bold uppercase text-[10px]">📱 WhatsApp Ibu</span>
+                        <span class="font-mono font-bold text-slate-800 text-sm block mt-0.5">{{ $calonSiswa->no_hp_ibu ?? $calonSiswa->dataOrangtua?->no_hp_ibu ?? '-' }}</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                        <span class="block text-slate-400 font-bold uppercase text-[10px]">📱 WhatsApp Wali</span>
+                        <span class="font-mono font-bold text-slate-800 text-sm block mt-0.5">{{ $calonSiswa->dataOrangtua?->no_hp_wali ?? '-' }}</span>
+                    </div>
                 </div>
                 <div class="p-2.5 rounded-xl bg-orange-50/50 border border-orange-200">
                     <span class="block text-orange-700 font-bold uppercase text-[10px]">Referensi / Promotor</span>
@@ -298,7 +326,7 @@
             <div class="bg-white p-4 rounded-2xl border border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
                 <div>
                     <span class="text-slate-400 uppercase font-bold text-[10px]">Asal Sekolah SMP/MTs</span>
-                    <p class="font-bold text-slate-900 text-sm">{{ $akademik?->nama_sekolah ?? $calonSiswa->asalSekolah?->nama_sekolah ?? $calonSiswa->asal_sekolah_lainnya ?? '-' }} (NPSN: {{ $akademik?->npsn ?? $calonSiswa->asalSekolah?->npsn ?? '-' }})</p>
+                    <p class="font-bold text-slate-900 text-sm">{{ $akademik?->nama_sekolah ?? $calonSiswa->sekolah_asal_text }} (NPSN: {{ $akademik?->npsn ?? $calonSiswa->asalSekolah?->npsn ?? '-' }})</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <div class="px-3.5 py-1.5 rounded-xl bg-orange-50 border border-orange-200">

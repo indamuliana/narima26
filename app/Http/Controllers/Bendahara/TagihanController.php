@@ -32,7 +32,7 @@ class TagihanController extends Controller
         $jenisTagihan = $request->input('jenis_tagihan');
 
         $query = Tagihan::query()
-            ->with(['calonSiswa.jurusan', 'calonSiswa.program', 'diskon', 'pembayaran']);
+            ->with(['calonSiswa.jurusan', 'calonSiswa.jurusan2', 'calonSiswa.program', 'diskon', 'pembayaran']);
 
         if (! empty($search)) {
             $query->where(function ($q) use ($search) {

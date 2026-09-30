@@ -41,16 +41,16 @@ Route::controller(RegistrationController::class)->group(function () {
 Route::get('/verifikasi-dokumen/{kode}', [\App\Http\Controllers\VerifikasiDokumenController::class, 'show'])
     ->name('dokumen.verifikasi');
 
-// Guest Authentication Routes
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
-    Route::post('/login', [AuthenticatedSessionController::class, 'store']);
-});
+// Authentication Routes
+Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
+Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+Route::match(['GET', 'POST'], '/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+Route::post('/impersonate/leave', [\App\Http\Controllers\Auth\ImpersonateController::class, 'leave'])->middleware('auth')->name('impersonate.leave');
 
-// Authenticated General Routes
-Route::middleware('auth')->group(function () {
-    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
-});
+// Universal Dashboard Route (redirects authenticated users to their specific role dashboard)
+Route::middleware('auth')->get('/dashboard', function () {
+    return redirect()->route(auth()->user()->getDashboardRoute());
+})->name('dashboard');
 
 // Admin & Guru Shared Area (Executive & Read-Only Directory Access)
 Route::middleware(['auth', 'role:admin,guru'])
@@ -69,6 +69,7 @@ Route::middleware(['auth', 'role:admin,guru'])
                 Route::get('/export/xls', 'exportXls')->name('export.xls');
                 Route::get('/export/pdf', 'exportPdf')->name('export.pdf');
                 Route::get('/{calonSiswa}/cetak-pdf', 'cetakPdf')->name('cetak-pdf');
+                Route::put('/{calonSiswa}/tags', 'updateTags')->name('update-tags');
                 Route::get('/{calonSiswa}', 'show')->name('show');
             });
 
@@ -90,6 +91,23 @@ Route::middleware(['auth', 'role:admin'])
         // Manajemen Pengguna (User Management)
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except(['show']);
         Route::patch('/users/{user}/toggle', [\App\Http\Controllers\Admin\UserController::class, 'toggleStatus'])->name('users.toggle');
+
+        // Edit Data Calon Siswa (Admin Direct Edit)
+        Route::controller(\App\Http\Controllers\Admin\CalonSiswaDataEditController::class)
+            ->prefix('calon-siswa/{calonSiswa}')
+            ->name('calon-siswa.')
+            ->group(function () {
+                Route::get('/edit-data', 'edit')->name('edit-data');
+                Route::put('/update-biodata', 'updateBiodata')->name('update-biodata');
+                Route::put('/update-orang-tua', 'updateOrangTua')->name('update-orang-tua');
+                Route::put('/update-akademik', 'updateAkademik')->name('update-akademik');
+                Route::put('/update-kesehatan', 'updateKesehatan')->name('update-kesehatan');
+                Route::put('/update-seragam', 'updateSeragam')->name('update-seragam');
+            });
+
+        // Impersonasi Calon Siswa (Masuk Sebagai Calon Siswa)
+        Route::post('/calon-siswa/{calonSiswa}/impersonate', [\App\Http\Controllers\Auth\ImpersonateController::class, 'start'])
+            ->name('calon-siswa.impersonate');
 
         // 1. Manajemen Jurusan (Kompetensi Keahlian)
         Route::controller(\App\Http\Controllers\Admin\JurusanController::class)

@@ -64,12 +64,27 @@
 
                 <!-- Auth Buttons -->
                 <div class="hidden sm:flex items-center gap-3">
-                    <a href="{{ url('/login') }}" class="px-4 py-2 text-sm font-medium text-slate-700 hover:text-nampi-orange hover:bg-slate-50 rounded-lg transition-colors">
-                        Masuk
-                    </a>
-                    <a href="{{ url('/register') }}" class="px-4 py-2 text-sm font-semibold text-white bg-nampi-orange hover:bg-nampi-orange-hover rounded-lg shadow-sm hover:shadow transition-all">
-                        Daftar Sekarang
-                    </a>
+                    @auth
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200 max-w-[160px] truncate" title="{{ Auth::user()->name }}">
+                                {{ Auth::user()->name }}
+                            </span>
+                            <a href="{{ route('dashboard') }}" class="px-3.5 py-2 text-sm font-semibold text-white bg-nampi-orange hover:bg-nampi-orange-hover rounded-lg shadow-xs transition-all flex items-center gap-1.5">
+                                <span>Dashboard</span>
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </a>
+                            <a href="{{ route('logout') }}" class="px-3 py-2 text-sm font-medium text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" title="Keluar dari akun">
+                                Keluar
+                            </a>
+                        </div>
+                    @else
+                        <a href="{{ url('/login') }}" class="px-4 py-2 text-sm font-medium text-slate-700 hover:text-nampi-orange hover:bg-slate-50 rounded-lg transition-colors">
+                            Masuk
+                        </a>
+                        <a href="{{ url('/register') }}" class="px-4 py-2 text-sm font-semibold text-white bg-nampi-orange hover:bg-nampi-orange-hover rounded-lg shadow-xs hover:shadow transition-all">
+                            Daftar Sekarang
+                        </a>
+                    @endauth
                 </div>
 
                 <!-- Mobile Menu Button -->
@@ -91,8 +106,17 @@
             <a href="{{ url('/#biaya') }}" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-600 hover:bg-slate-50">Biaya</a>
             <a href="{{ url('/#faq') }}" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-600 hover:bg-slate-50">FAQ</a>
             <div class="pt-3 border-t border-slate-100 flex flex-col gap-2">
-                <a href="{{ url('/login') }}" class="w-full text-center px-4 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg">Masuk</a>
-                <a href="{{ url('/register') }}" class="w-full text-center px-4 py-2.5 text-sm font-semibold text-white bg-nampi-orange hover:bg-nampi-orange-hover rounded-lg">Daftar Sekarang</a>
+                @auth
+                    <div class="px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-xs">
+                        <span class="text-slate-500">Masuk sebagai:</span>
+                        <div class="font-bold text-slate-800">{{ Auth::user()->name }} ({{ ucfirst(Auth::user()->role) }})</div>
+                    </div>
+                    <a href="{{ route('dashboard') }}" class="w-full text-center px-4 py-2.5 text-sm font-semibold text-white bg-nampi-orange hover:bg-nampi-orange-hover rounded-lg">Buka Dashboard</a>
+                    <a href="{{ route('logout') }}" class="w-full text-center px-4 py-2.5 text-sm font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg">Keluar (Logout)</a>
+                @else
+                    <a href="{{ url('/login') }}" class="w-full text-center px-4 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg">Masuk</a>
+                    <a href="{{ url('/register') }}" class="w-full text-center px-4 py-2.5 text-sm font-semibold text-white bg-nampi-orange hover:bg-nampi-orange-hover rounded-lg">Daftar Sekarang</a>
+                @endauth
             </div>
         </div>
     </header>

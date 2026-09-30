@@ -70,8 +70,18 @@ class RegistrationService
 
             // Prepare asal sekolah
             $asalSekolahId = $data['asal_sekolah_id'] ?? null;
+            $asalSekolahLainnya = !empty($data['asal_sekolah_lainnya']) ? trim($data['asal_sekolah_lainnya']) : null;
+
             if ($asalSekolahId === 'lainnya') {
                 $asalSekolahId = null;
+            }
+
+            // Jika asal_sekolah_id belum ada tapi ada nama sekolah manual, coba cari kecocokan di master_sekolah_asal
+            if (!$asalSekolahId && !empty($asalSekolahLainnya)) {
+                $matchedSekolah = \App\Models\MasterSekolahAsal::where('nama_sekolah', 'like', $asalSekolahLainnya)->first();
+                if ($matchedSekolah) {
+                    $asalSekolahId = $matchedSekolah->id;
+                }
             }
 
             // 6. Buat entitas CalonSiswa
@@ -89,13 +99,14 @@ class RegistrationService
                 'no_hp_ibu' => $phoneIbu,
                 'email' => $email,
                 'asal_sekolah_id' => $asalSekolahId,
-                'asal_sekolah_lainnya' => $data['asal_sekolah_lainnya'] ?? null,
+                'asal_sekolah_lainnya' => $asalSekolahLainnya,
                 'referensi_jenis' => $data['referensi_jenis'] ?? null,
                 'referensi_nama' => $data['referensi_nama'] ?? null,
                 'referensi_rayon' => $data['referensi_rayon'] ?? null,
                 'referensi_nomor_seleksi' => $data['referensi_nomor_seleksi'] ?? null,
                 'program_id' => $data['program_id'],
                 'jurusan_id' => $data['jurusan_id'],
+                'jurusan_id_2' => $data['jurusan_id_2'] ?? null,
                 'gelombang_id' => $gelombangId,
                 'status_spmb' => SpmbStatus::REGISTRASI,
                 'status_data' => 'BELUM_LENGKAP',

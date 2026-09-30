@@ -123,7 +123,7 @@
                             <span class="text-xs font-bold text-slate-900">Guru</span>
                         </div>
                         <p class="text-[11px] text-slate-500 leading-relaxed pl-5">
-                            Akses Dashboard Utama, Direktori Calon Siswa (detail & cetak PDF), Ekspor CSV/PDF, serta Laporan Rekapitulasi.
+                            Akses Dashboard Utama, Direktori Calon Murid (detail & cetak PDF), Ekspor CSV/PDF, serta Laporan Rekapitulasi.
                         </p>
                     </label>
 
@@ -162,7 +162,7 @@
                             <span class="text-xs font-bold text-slate-900">Pewawancara</span>
                         </div>
                         <p class="text-[11px] text-slate-500 leading-relaxed pl-5">
-                            Penilaian antrean wawancara calon siswa & orang tua, pengisian rubrik instrumen, dan penentuan rekomendasi.
+                            Penilaian antrean wawancara Calon Murid & orang tua, pengisian rubrik instrumen, dan penentuan rekomendasi.
                         </p>
                     </label>
 
@@ -183,10 +183,10 @@
                         <label class="relative flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-all border-slate-300 bg-slate-50 sm:col-span-2">
                             <div class="flex items-center gap-2.5 mb-1.5">
                                 <input type="radio" name="role" value="calon_siswa" checked class="text-slate-600">
-                                <span class="text-xs font-bold text-slate-900">Calon Siswa</span>
+                                <span class="text-xs font-bold text-slate-900">Calon Murid</span>
                             </div>
                             <p class="text-[11px] text-slate-500 leading-relaxed pl-5">
-                                Akun calon siswa terikat dengan data pendaftaran SPMB.
+                                Akun Calon Murid terikat dengan data pendaftaran SPMB.
                             </p>
                         </label>
                     @endif

@@ -81,7 +81,7 @@
                     Garut, {{ now()->translatedFormat('d F Y') }}<br>
                     Panitia SPMB SMK Wikrama 1 Garut,
                     <div class="signature-space"></div>
-                    <strong>( Panitia Penerimaan Murid Baru )</strong>
+                    <strong>( Panitia SPMB )</strong>
                 </td>
             </tr>
         </table>

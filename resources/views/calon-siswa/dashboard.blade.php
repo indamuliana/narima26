@@ -1,5 +1,5 @@
 <x-layouts.app>
-    <x-slot name="title">Portal Calon Siswa</x-slot>
+    <x-slot name="title">Portal Calon Murid</x-slot>
 
     <x-slot name="sidebar">
         @include('calon-siswa.partials.sidebar')
@@ -109,7 +109,7 @@
                         <span>Sesi Wawancara Telah Selesai Dilaksanakan</span>
                     </div>
                     <p class="text-xs text-emerald-800">
-                        Penilaian wawancara calon siswa dan orang tua telah selesai diinput oleh pewawancara. Saat ini hasil evaluasi sedang menunggu penetapan keputusan kelulusan oleh Kepala Sekolah dan Komite Seleksi.
+                        Penilaian wawancara calon murid dan orang tua telah selesai diinput oleh pewawancara. Saat ini hasil evaluasi sedang menunggu penetapan keputusan kelulusan oleh Kepala Sekolah dan Komite Seleksi.
                     </p>
                 </div>
                 <div>

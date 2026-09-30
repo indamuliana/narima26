@@ -50,13 +50,24 @@
                             {{ $calonSiswa->nomor_pendaftaran }}
                         </span>
                         <h2 class="text-xl font-black text-white mt-0.5">{{ $calonSiswa->nama_lengkap }}</h2>
-                        <p class="text-xs text-slate-300 mt-0.5 font-mono">NISN: {{ $calonSiswa->nisn }} • Asal: {{ $calonSiswa->sekolahAsal?->nama_sekolah ?? $calonSiswa->sekolah_asal_text ?? '-' }}</p>
+                        <p class="text-xs text-slate-300 mt-0.5 font-mono">NISN: {{ $calonSiswa->nisn }} • Asal: {{ $calonSiswa->sekolah_asal_text }}</p>
                         <div class="mt-2 flex flex-wrap gap-2">
                             <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">
-                                Jurusan: {{ $calonSiswa->jurusan?->nama_jurusan ?? '-' }}
+                                Pil 1: {{ $calonSiswa->jurusan?->nama_jurusan ?? '-' }}
                             </span>
+                            @if($calonSiswa->jurusan2)
+                            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-500/20 text-slate-300 border border-slate-400/30">
+                                Pil 2: {{ $calonSiswa->jurusan2?->nama_jurusan ?? '-' }}
+                            </span>
+                            @endif
                             <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-purple-500/20 text-purple-300 border border-purple-400/30">
                                 Program: {{ $calonSiswa->programBelajar?->nama_program ?? '-' }}
+                            </span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
+                                Beasiswa: {{ $calonSiswa->tag_beasiswa ?? 'Normal' }}
+                            </span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-pink-500/20 text-pink-300 border border-pink-400/30">
+                                Jalur: {{ $calonSiswa->tag_jalur ?? 'Normal' }}
                             </span>
                         </div>
                     </div>

@@ -1,5 +1,5 @@
 <x-layouts.app>
-    <x-slot name="title">Direktori Data Calon Siswa - Eksekutif Kepala Sekolah</x-slot>
+    <x-slot name="title">Direktori Data Calon Murid - Eksekutif Kepala Sekolah</x-slot>
 
     <x-slot name="sidebar">
         @include('kepala-sekolah.partials.sidebar')
@@ -9,7 +9,7 @@
         <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-                <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Direktori Data Calon Siswa</h1>
+                <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Direktori Data Calon Murid</h1>
                 <p class="text-xs sm:text-sm text-slate-500 mt-1">
                     Akses komprehensif data 360° seluruh pendaftar, hasil wawancara, verifikasi bendahara, dan berkas dokumen.
                 </p>
@@ -107,7 +107,7 @@
                 <table class="w-full text-left text-xs text-slate-600">
                     <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 uppercase tracking-wider text-[11px]">
                         <tr>
-                            <th class="py-3 px-4">Calon Siswa</th>
+                            <th class="py-3 px-4">Calon Murid</th>
                             <th class="py-3 px-4">Jurusan & Program</th>
                             <th class="py-3 px-4 text-center">Biaya Seleksi</th>
                             <th class="py-3 px-4 text-center">Wawancara</th>
@@ -145,7 +145,7 @@
                                     </div>
                                 </td>
                                 <td class="py-3.5 px-4">
-                                    <span class="font-bold text-slate-800 block">{{ $cs->jurusan?->nama_jurusan ?? $cs->jurusan?->nama ?? '-' }}</span>
+                                    <span class="font-bold text-slate-800 block">{{ $cs->jurusan_pilihan_text }}</span>
                                     <div class="mt-1 flex items-center gap-1.5 flex-wrap">
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold {{ str_contains(strtolower($cs->program?->nama ?? $cs->program?->nama_program ?? ''), 'unggul') ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-blue-50 text-blue-700 border border-blue-200' }}">
                                             {{ $cs->program?->nama ?? $cs->program?->nama_program ?? 'Reguler' }}
@@ -237,7 +237,7 @@
                                         <svg class="w-12 h-12 text-slate-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                         </svg>
-                                        <p class="font-medium text-xs">Tidak ada data calon siswa yang sesuai dengan filter.</p>
+                                        <p class="font-medium text-xs">Tidak ada data calon murid yang sesuai dengan filter.</p>
                                     </div>
                                 </td>
                             </tr>

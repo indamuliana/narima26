@@ -10,7 +10,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
                 <h1 class="text-2xl font-black text-slate-800">Manajemen Pembayaran Daftar Ulang</h1>
-                <p class="text-xs text-slate-400 mt-0.5">Monitoring transaksi cicilan dan pelunasan biaya daftar ulang calon siswa</p>
+                <p class="text-xs text-slate-400 mt-0.5">Monitoring transaksi cicilan dan pelunasan biaya daftar ulang Calon Murid</p>
             </div>
             <div class="flex items-center gap-2">
                 <a href="{{ route('admin.pembayaran.seleksi') }}"
@@ -67,7 +67,7 @@
                 <table class="w-full text-left text-xs text-slate-600">
                     <thead class="bg-slate-50/80 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase">
                         <tr>
-                            <th class="px-5 py-3.5">Calon Siswa</th>
+                            <th class="px-5 py-3.5">Calon Murid</th>
                             <th class="px-4 py-3.5">Jurusan</th>
                             <th class="px-4 py-3.5 text-right">Nominal Bayar</th>
                             <th class="px-4 py-3.5">Metode Bayar</th>

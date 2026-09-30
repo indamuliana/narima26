@@ -54,7 +54,9 @@ class RegistrationTest extends TestCase
     public function test_calon_siswa_can_register_successfully(): void
     {
         $program = MasterProgram::first();
-        $jurusan = MasterJurusan::first();
+        $jurusans = MasterJurusan::take(2)->get();
+        $jurusan = $jurusans[0];
+        $jurusan2 = $jurusans[1] ?? $jurusans[0];
         $gelombang = MasterGelombang::first();
         $sekolah = MasterSekolahAsal::firstOrCreate(
             ['nama_sekolah' => 'SMPN 1 Garut'],
@@ -73,6 +75,7 @@ class RegistrationTest extends TestCase
             'email' => 'fathir@example.com',
             'program_id' => $program->id,
             'jurusan_id' => $jurusan->id,
+            'jurusan_id_2' => $jurusan2->id,
             'gelombang_id' => $gelombang->id,
             'asal_sekolah_id' => $sekolah->id,
         ];
@@ -125,7 +128,7 @@ class RegistrationTest extends TestCase
     public function test_duplicate_nisn_is_rejected(): void
     {
         $program = MasterProgram::first();
-        $jurusan = MasterJurusan::first();
+        $jurusans = MasterJurusan::take(2)->get();
 
         // Buat calon siswa pertama
         CalonSiswa::factory()->create(['nisn' => '0011223344']);
@@ -141,7 +144,8 @@ class RegistrationTest extends TestCase
             'no_hp_ayah' => '081398765432',
             'email' => 'nama.lain@example.com',
             'program_id' => $program->id,
-            'jurusan_id' => $jurusan->id,
+            'jurusan_id' => $jurusans[0]->id,
+            'jurusan_id_2' => $jurusans[1]->id,
         ];
 
         $response = $this->post('/daftar', $postData);
@@ -154,7 +158,7 @@ class RegistrationTest extends TestCase
     public function test_invalid_phone_number_is_rejected(): void
     {
         $program = MasterProgram::first();
-        $jurusan = MasterJurusan::first();
+        $jurusans = MasterJurusan::take(2)->get();
 
         $postData = [
             'nisn' => '0055667788',
@@ -166,7 +170,8 @@ class RegistrationTest extends TestCase
             'no_hp_ayah' => '081398765432',
             'email' => 'hp.salah@example.com',
             'program_id' => $program->id,
-            'jurusan_id' => $jurusan->id,
+            'jurusan_id' => $jurusans[0]->id,
+            'jurusan_id_2' => $jurusans[1]->id,
         ];
 
         $response = $this->post('/daftar', $postData);
@@ -230,7 +235,7 @@ class RegistrationTest extends TestCase
     public function test_registration_with_parent_phones_and_referensi_succeeds(): void
     {
         $program = MasterProgram::first();
-        $jurusan = MasterJurusan::first();
+        $jurusans = MasterJurusan::take(2)->get();
         $gelombang = MasterGelombang::first();
 
         $postData = [
@@ -244,7 +249,8 @@ class RegistrationTest extends TestCase
             'no_hp_ibu' => '081334455667',
             'email' => 'putra.m@example.com',
             'program_id' => $program->id,
-            'jurusan_id' => $jurusan->id,
+            'jurusan_id' => $jurusans[0]->id,
+            'jurusan_id_2' => $jurusans[1]->id,
             'gelombang_id' => $gelombang->id,
             'referensi_jenis' => 'GURU_WIKRAMA_GARUT',
             'referensi_nama' => 'Pak Budi Santoso',
@@ -273,7 +279,7 @@ class RegistrationTest extends TestCase
     public function test_registration_requires_email(): void
     {
         $program = MasterProgram::first();
-        $jurusan = MasterJurusan::first();
+        $jurusans = MasterJurusan::take(2)->get();
 
         $postData = [
             'nisn' => '0012345679',
@@ -285,11 +291,46 @@ class RegistrationTest extends TestCase
             'no_hp_ayah' => '081223344999',
             'email' => '', // kosong
             'program_id' => $program->id,
-            'jurusan_id' => $jurusan->id,
+            'jurusan_id' => $jurusans[0]->id,
+            'jurusan_id_2' => $jurusans[1]->id,
         ];
 
         $response = $this->post('/daftar', $postData);
         $response->assertSessionHasErrors(['email']);
     }
+
+    /**
+     * Test 11: Registrasi dengan input manual asal sekolah tersimpan ke database.
+     */
+    public function test_registration_with_manual_school_name_saves_to_database(): void
+    {
+        $program = MasterProgram::first();
+        $jurusans = MasterJurusan::take(2)->get();
+        $gelombang = MasterGelombang::first();
+
+        $postData = [
+            'nisn' => '0099112233',
+            'nama_lengkap' => 'Santika Dewi',
+            'jenis_kelamin' => 'P',
+            'tempat_lahir' => 'Garut',
+            'tanggal_lahir' => '2009-07-20',
+            'no_hp_siswa' => '085211223344',
+            'no_hp_ayah' => '085299887766',
+            'email' => 'santika@example.com',
+            'program_id' => $program->id,
+            'jurusan_id' => $jurusans[0]->id,
+            'jurusan_id_2' => $jurusans[1]->id,
+            'gelombang_id' => $gelombang->id,
+            'asal_sekolah_lainnya' => 'SMP Negeri 1 Tarogong Kidul',
+        ];
+
+        $response = $this->post('/daftar', $postData);
+        $response->assertSessionHasNoErrors();
+
+        $calonSiswa = CalonSiswa::where('nisn', '0099112233')->first();
+        $this->assertNotNull($calonSiswa);
+        $this->assertEquals('SMP Negeri 1 Tarogong Kidul', $calonSiswa->asal_sekolah_lainnya);
+    }
 }
+
 

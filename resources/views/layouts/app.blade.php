@@ -27,6 +27,8 @@
 </head>
 <body class="h-full antialiased text-slate-800 bg-slate-50 selection:bg-nampi-orange selection:text-white overflow-x-hidden">
 
+    @include('components.impersonation-banner')
+
     <div class="min-h-screen flex flex-col lg:flex-row overflow-x-hidden">
 
         <!-- Mobile Sidebar Backdrop -->
@@ -84,6 +86,13 @@
                             </p>
                         </div>
                     </div>
+                    @auth
+                        <a href="{{ route('logout') }}" class="p-2 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition-colors" title="Keluar dari akun">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                        </a>
+                    @endauth
                 </div>
             </div>
         </aside>
@@ -107,8 +116,21 @@
 
                 <div class="flex items-center gap-3">
                     <span class="hidden sm:inline-flex text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-                        <a href="https://wa.me/628112232880">Bantuan CS</a>
+                        <a href="https://wa.me/628112232880" target="_blank" rel="noopener noreferrer">Bantuan CS</a>
                     </span>
+                    @auth
+                        <div class="flex items-center gap-2 pl-3 border-l border-slate-200">
+                            <span class="hidden md:inline-block text-xs font-semibold text-slate-700">
+                                {{ auth()->user()->name }}
+                            </span>
+                            <a href="{{ route('logout') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-colors" title="Keluar dari sistem">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                                <span>Keluar</span>
+                            </a>
+                        </div>
+                    @endauth
                 </div>
             </header>
 

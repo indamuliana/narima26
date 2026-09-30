@@ -53,7 +53,7 @@
                 <p class="text-2xl font-black text-emerald-600 mt-1">{{ $jurusanList->where('aktif', true)->count() }}</p>
             </div>
             <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
-                <span class="text-[11px] font-bold text-nampi-orange uppercase">Total Calon Siswa Terdaftar</span>
+                <span class="text-[11px] font-bold text-nampi-orange uppercase">Total Calon Murid Terdaftar</span>
                 <p class="text-2xl font-black text-nampi-orange mt-1">{{ $jurusanList->sum('calon_siswa_count') }}</p>
             </div>
         </div>
