@@ -19,7 +19,7 @@ class Phase1SetupTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('NAMPI');
         $response->assertSee('SMK WIKRAMA 1 GARUT');
-        $response->assertSee('https://wa.me/6281323314430', false);
+        $response->assertSee('https://wa.me/628112232880', false);
         $response->assertSee('images/logo.png');
     }
 

@@ -80,7 +80,7 @@
                 @php
                     $programNama = $sessionData['program_nama'] ?? ($calonSiswa->program?->nama_program ?? $calonSiswa->program?->nama ?? '');
                     $isUnggulan = str_contains(strtolower($programNama), 'unggul');
-                    $waNumber = $isUnggulan ? '6281386978355' : '628971064617';
+                    $waNumber = $isUnggulan ? '628112232880' : '628112232880';
                     $username = $calonSiswa->nisn;
                     $password = $sessionData['password_plain'] ?? $calonSiswa->nomor_pendaftaran;
                     $namaCalon = $calonSiswa->nama_lengkap;

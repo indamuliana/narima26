@@ -131,70 +131,8 @@
                     </div>
                 </form>
 
-                <!-- Demo Credentials Helper -->
-                <div class="mt-8 pt-6 border-t border-slate-100">
-                    <div class="text-center mb-3">
-                        <button type="button" 
-                                onclick="toggleDemoHelper()" 
-                                class="text-xs font-semibold text-nampi-orange hover:text-nampi-orange-hover flex items-center justify-center gap-1 mx-auto cursor-pointer">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            <span>Lihat Akun Demo (5 Role Pengujian)</span>
-                        </button>
-                    </div>
-
-                    <div id="demo-helper" class="hidden text-xs bg-slate-50 p-3.5 rounded-xl border border-slate-200/80 space-y-2">
-                        <div class="flex justify-between items-center py-1.5 border-b border-slate-200/60">
-                            <div>
-                                <span class="font-bold text-slate-800">Admin</span>
-                                <span class="block font-mono text-[11px] text-slate-500">admin@wikrama.sch.id</span>
-                            </div>
-                            <button type="button" onclick="fillDemo('admin@wikrama.sch.id', 'admin123')" class="px-2.5 py-1 text-[11px] font-semibold text-nampi-orange bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 cursor-pointer transition">
-                                Isi Otomatis
-                            </button>
-                        </div>
-                        <div class="flex justify-between items-center py-1.5 border-b border-slate-200/60">
-                            <div>
-                                <span class="font-bold text-slate-800">Bendahara</span>
-                                <span class="block font-mono text-[11px] text-slate-500">bendahara@wikrama.sch.id</span>
-                            </div>
-                            <button type="button" onclick="fillDemo('bendahara@wikrama.sch.id', 'bendahara123')" class="px-2.5 py-1 text-[11px] font-semibold text-nampi-orange bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 cursor-pointer transition">
-                                Isi Otomatis
-                            </button>
-                        </div>
-                        <div class="flex justify-between items-center py-1.5 border-b border-slate-200/60">
-                            <div>
-                                <span class="font-bold text-slate-800">Pewawancara</span>
-                                <span class="block font-mono text-[11px] text-slate-500">pewawancara@wikrama.sch.id</span>
-                            </div>
-                            <button type="button" onclick="fillDemo('pewawancara@wikrama.sch.id', 'pewawancara123')" class="px-2.5 py-1 text-[11px] font-semibold text-nampi-orange bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 cursor-pointer transition">
-                                Isi Otomatis
-                            </button>
-                        </div>
-                        <div class="flex justify-between items-center py-1.5 border-b border-slate-200/60">
-                            <div>
-                                <span class="font-bold text-slate-800">Kepala Sekolah</span>
-                                <span class="block font-mono text-[11px] text-slate-500">kepsek@wikrama.sch.id</span>
-                            </div>
-                            <button type="button" onclick="fillDemo('kepsek@wikrama.sch.id', 'kepsek123')" class="px-2.5 py-1 text-[11px] font-semibold text-nampi-orange bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 cursor-pointer transition">
-                                Isi Otomatis
-                            </button>
-                        </div>
-                        <div class="flex justify-between items-center py-1.5">
-                            <div>
-                                <span class="font-bold text-slate-800">Calon Siswa</span>
-                                <span class="block font-mono text-[11px] text-slate-500">0012345678 (NISN)</span>
-                            </div>
-                            <button type="button" onclick="fillDemo('0012345678', 'siswa123')" class="px-2.5 py-1 text-[11px] font-semibold text-nampi-orange bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 cursor-pointer transition">
-                                Isi Otomatis
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Registration link -->
-                <div class="mt-6 text-center text-xs text-slate-500">
+                <div class="mt-8 pt-6 border-t border-slate-100 text-center text-xs text-slate-500">
                     Belum mendaftar sebagai calon peserta didik?
                     <a href="{{ url('/register') }}" class="font-bold text-nampi-orange hover:underline ml-1">
                         Daftar Baru di Sini
@@ -203,23 +141,4 @@
             </div>
         </div>
     </div>
-
-    <script>
-        function toggleDemoHelper() {
-            const el = document.getElementById('demo-helper');
-            if (el) el.classList.toggle('hidden');
-        }
-
-        function fillDemo(login, password) {
-            const loginEl = document.getElementById('login');
-            const passEl = document.getElementById('password');
-            if (loginEl) {
-                loginEl.value = login;
-                loginEl.focus();
-            }
-            if (passEl) {
-                passEl.value = password;
-            }
-        }
-    </script>
 </x-layouts.guest>

@@ -169,7 +169,7 @@
                         Jl. Otto Iskandardinata, Garut, Jawa Barat.
                     </p>
                     <p class="text-sm text-slate-400">
-                        WhatsApp: <a href="https://wa.me/6281323314430" class="text-nampi-orange hover:underline font-medium">+62 813-2331-4430</a>
+                        WhatsApp: <a href="https://wa.me/628112232880" class="text-nampi-orange hover:underline font-medium">+62 811-2232-880</a>
                     </p>
                     <p class="text-sm text-slate-400">
                         Website: <a href="https://smkwikrama1garut.sch.id" target="_blank" class="hover:underline">smkwikrama1garut.sch.id</a>
