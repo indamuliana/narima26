@@ -148,10 +148,20 @@ if ($action === 'sync') {
                     $zip->close();
                     @unlink($tempZip);
 
+                    // Bersihkan cache view Laravel agar perubahan Blade langsung tampil
+                    $clearedViews = 0;
+                    $viewFiles = glob($repoPath . '/storage/framework/views/*.php');
+                    if ($viewFiles) {
+                        foreach ($viewFiles as $vf) {
+                            if (@unlink($vf)) $clearedViews++;
+                        }
+                    }
+
                     $result = "✅ <b>UPDATE BERHASIL!</b>\n\n" .
                               "• Total $extracted file kode (PHP, Blade, Assets, .cpanel.yml) berhasil disinkronkan ke server!\n" .
                               "• $skipped file/folder penting (.env dan public/storage berkas pendaftar) 100% AMAN dan TIDAK TERSENTUH.\n" .
-                              "• Seluruh fitur baru (Feeder Schools, Role Guru, Timeline Mingguan, Statistik Unggulan/Reguler) sekarang sudah AKTIF di website Anda!";
+                              "• $clearedViews file cache tampilan Laravel berhasil dibersihkan otomatis.\n" .
+                              "• Seluruh fitur baru (Feeder Schools, Role Guru, Timeline Mingguan, Statistik Unggulan/Reguler) dan penghapusan akun demo login sekarang sudah AKTIF di website Anda!";
                 } else {
                     $result = "<b>Error:</b> Gagal mengekstrak berkas ZIP.";
                 }
