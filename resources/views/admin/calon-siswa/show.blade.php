@@ -9,7 +9,15 @@
         @endif
     </x-slot>
 
-    <div x-data="{ showTagsModal: false }" class="space-y-6 print:space-y-4">
+    <div x-data="{
+        showTagsModal: false,
+        showDeleteModal: false,
+        deleteActionUrl: '{{ route('admin.calon-siswa.destroy', $calonSiswa) }}',
+        candidateName: '{{ addslashes($calonSiswa->nama_lengkap) }}',
+        candidateNomor: '{{ $calonSiswa->nomor_pendaftaran }}',
+        candidateNisn: '{{ $calonSiswa->nisn }}',
+        confirmText: ''
+    }" class="space-y-6 print:space-y-4">
         <!-- Top Action Bar (Hidden on Print) -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:hidden">
             @if(auth()->user()->isKepalaSekolah())
@@ -61,6 +69,15 @@
                             </button>
                         </form>
                     @endif
+                    <button type="button"
+                            @click="showDeleteModal = true; confirmText = ''"
+                            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
+                            title="Hapus permanen calon siswa ini">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        <span>Hapus Pendaftar</span>
+                    </button>
                 @endif
                 <a href="{{ auth()->user()->isKepalaSekolah() ? route('kepala-sekolah.calon-siswa.cetak-pdf', $calonSiswa) : route('admin.calon-siswa.cetak-pdf', $calonSiswa) }}" target="_blank"
                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-700 text-white text-xs font-bold hover:from-red-700 hover:to-rose-800 transition-all shadow-sm">
@@ -1519,6 +1536,10 @@
                 </div>
             </div>
         </div>
+        @endif
+
+        @if(auth()->user()->isAdmin())
+            @include('admin.calon-siswa.partials.modal-delete')
         @endif
     </div>
 </x-layouts.app>

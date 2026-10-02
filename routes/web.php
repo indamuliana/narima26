@@ -108,6 +108,10 @@ Route::middleware(['auth', 'role:admin'])
         Route::put('/calon-siswa/{calonSiswa}/tags', [\App\Http\Controllers\Admin\CalonSiswaController::class, 'updateTags'])
             ->name('calon-siswa.update-tags');
 
+        // Hapus Calon Siswa (Admin Only - Hard Delete)
+        Route::delete('/calon-siswa/{calonSiswa}', [\App\Http\Controllers\Admin\CalonSiswaController::class, 'destroy'])
+            ->name('calon-siswa.destroy');
+
         // Impersonasi Calon Siswa (Masuk Sebagai Calon Siswa)
         Route::post('/calon-siswa/{calonSiswa}/impersonate', [\App\Http\Controllers\Auth\ImpersonateController::class, 'start'])
             ->name('calon-siswa.impersonate');

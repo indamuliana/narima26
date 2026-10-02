@@ -5,7 +5,22 @@
         @include('admin.partials.sidebar')
     </x-slot>
 
-    <div class="space-y-6">
+    <div class="space-y-6" x-data="{
+        showDeleteModal: false,
+        deleteActionUrl: '',
+        candidateName: '',
+        candidateNomor: '',
+        candidateNisn: '',
+        confirmText: '',
+        openDeleteModal(id, name, nomor, nisn, url) {
+            this.candidateName = name;
+            this.candidateNomor = nomor;
+            this.candidateNisn = nisn;
+            this.deleteActionUrl = url;
+            this.confirmText = '';
+            this.showDeleteModal = true;
+        }
+    }">
         <!-- Header & Action Bar -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -259,6 +274,16 @@
                                             <span>Detail</span>
                                             <span>&rarr;</span>
                                         </a>
+                                        @if(auth()->user()->isAdmin())
+                                            <button type="button"
+                                                    @click="openDeleteModal('{{ $cs->id }}', '{{ addslashes($cs->nama_lengkap) }}', '{{ $cs->nomor_pendaftaran }}', '{{ $cs->nisn }}', '{{ route('admin.calon-siswa.destroy', $cs) }}')"
+                                                    class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                                    title="Hapus Calon Siswa (Admin Only)">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -279,5 +304,9 @@
                 </div>
             @endif
         </div>
+
+        @if(auth()->user()->isAdmin())
+            @include('admin.calon-siswa.partials.modal-delete')
+        @endif
     </div>
 </x-layouts.app>

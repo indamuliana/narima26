@@ -11,6 +11,8 @@ use App\Models\MasterProgram;
 use App\Services\PdfService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -799,5 +801,78 @@ class CalonSiswaController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Tag/Flag siswa berhasil diperbarui.');
+    }
+
+    /**
+     * Delete candidate record permanently (Admin only).
+     */
+    public function destroy(Request $request, CalonSiswa $calonSiswa)
+    {
+        abort_unless(auth()->user()->isAdmin(), 403, 'Hanya Administrator yang memiliki wewenang menghapus data pendaftar.');
+
+        $request->validate([
+            'konfirmasi' => ['required', 'string', 'in:HAPUS'],
+            'alasan' => ['nullable', 'string', 'max:500'],
+        ], [
+            'konfirmasi.in' => 'Konfirmasi gagal. Anda harus mengetikkan kata "HAPUS" dengan tepat (huruf kapital).',
+            'konfirmasi.required' => 'Ketikkan kata "HAPUS" untuk mengonfirmasi penghapusan data pendaftar.',
+        ]);
+
+        $nama = $calonSiswa->nama_lengkap;
+        $nomor = $calonSiswa->nomor_pendaftaran;
+        $nisn = $calonSiswa->nisn;
+        $alasan = $request->input('alasan');
+
+        DB::transaction(function () use ($calonSiswa, $nama, $nomor, $nisn, $alasan) {
+            // 1. Delete physical files from storage
+            if ($calonSiswa->dokumenPendaftaran) {
+                $doc = $calonSiswa->dokumenPendaftaran;
+                $fileFields = [
+                    'pas_foto_path', 'kk_path', 'akta_path',
+                    'ijazah_skl_path', 'dokumen_pendukung_path'
+                ];
+                foreach ($fileFields as $field) {
+                    if (!empty($doc->$field)) {
+                        Storage::disk('public')->delete($doc->$field);
+                    }
+                }
+            }
+
+            if ($calonSiswa->pembayaranSeleksi && !empty($calonSiswa->pembayaranSeleksi->bukti_transfer_path)) {
+                Storage::disk('public')->delete($calonSiswa->pembayaranSeleksi->bukti_transfer_path);
+            }
+
+            foreach ($calonSiswa->pembayaranDaftarUlang as $pdu) {
+                if (!empty($pdu->bukti_transfer_path)) {
+                    Storage::disk('public')->delete($pdu->bukti_transfer_path);
+                }
+            }
+
+            // 2. Identify associated user account
+            $user = $calonSiswa->user;
+
+            // 3. Force delete CalonSiswa record (cascading child records via DB foreign keys)
+            $calonSiswa->forceDelete();
+
+            // 4. Delete user account if it is a calon_siswa account
+            if ($user && $user->role === 'calon_siswa') {
+                $user->delete();
+            }
+
+            // 5. Activity log
+            activity('calon_siswa')
+                ->causedBy(auth()->user())
+                ->withProperties([
+                    'nama_lengkap' => $nama,
+                    'nomor_pendaftaran' => $nomor,
+                    'nisn' => $nisn,
+                    'alasan' => $alasan,
+                    'deleted_by' => auth()->user()->name,
+                ])
+                ->log("Menghapus permanen calon siswa: {$nama} ({$nomor})");
+        });
+
+        return redirect()->route('admin.calon-siswa.index')
+            ->with('success', "Data calon siswa {$nama} ({$nomor}) berhasil dihapus secara permanen dari sistem.");
     }
 }
