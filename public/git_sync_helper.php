@@ -83,6 +83,81 @@ if ($action === 'sync') {
         $log[] = "<b>$ " . htmlspecialchars($cmd) . "</b>\n" . htmlspecialchars($res['output']);
     }
     $result = implode("\n\n", $log);
+} elseif ($action === 'zip_update') {
+    $zipUrl = 'https://github.com/indamuliana/narima26/archive/refs/heads/main.zip';
+    $tempZip = sys_get_temp_dir() . '/narima26_update_' . time() . '.zip';
+
+    $fp = fopen($tempZip, 'w+');
+    if (!$fp) {
+        $result = "<b>Error:</b> Tidak dapat membuat file sementara di temp directory server.";
+    } else {
+        $ch = curl_init($zipUrl);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 90);
+        curl_setopt($ch, CURLOPT_FILE, $fp);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)');
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        $success = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        fclose($fp);
+
+        if (!$success || $httpCode !== 200 || !file_exists($tempZip) || filesize($tempZip) < 1000) {
+            $result = "<b>Error:</b> Gagal mengunduh berkas ZIP dari GitHub (HTTP Status: $httpCode). Pastikan repositori dapat diakses.";
+        } else {
+            if (!class_exists('ZipArchive')) {
+                $result = "<b>Error:</b> Ekstensi PHP ZipArchive tidak aktif di hosting ini.";
+            } else {
+                $zip = new ZipArchive();
+                if ($zip->open($tempZip) === TRUE) {
+                    $extracted = 0;
+                    $skipped = 0;
+                    $prefix = $zip->getNameIndex(0); // Biasanya 'narima26-main/'
+
+                    for ($i = 0; $i < $zip->numFiles; $i++) {
+                        $entryName = $zip->getNameIndex($i);
+                        $relative = substr($entryName, strlen($prefix));
+                        if (empty($relative)) continue;
+
+                        // PROTEKSI MUTLAK: JANGAN PERNAH MENIMPA .env ATAU FOLDER storage/
+                        if (
+                            $relative === '.env' ||
+                            str_starts_with($relative, 'storage/') ||
+                            str_starts_with($relative, 'public/storage/') ||
+                            $relative === 'public/storage'
+                        ) {
+                            $skipped++;
+                            continue;
+                        }
+
+                        $target = $repoPath . '/' . $relative;
+
+                        if (str_ends_with($relative, '/')) {
+                            if (!is_dir($target)) {
+                                mkdir($target, 0755, true);
+                            }
+                        } else {
+                            $parentDir = dirname($target);
+                            if (!is_dir($parentDir)) {
+                                mkdir($parentDir, 0755, true);
+                            }
+                            file_put_contents($target, $zip->getFromIndex($i));
+                            $extracted++;
+                        }
+                    }
+                    $zip->close();
+                    @unlink($tempZip);
+
+                    $result = "✅ <b>UPDATE BERHASIL!</b>\n\n" .
+                              "• Total $extracted file kode (PHP, Blade, Assets, .cpanel.yml) berhasil disinkronkan ke server!\n" .
+                              "• $skipped file/folder penting (.env dan public/storage berkas pendaftar) 100% AMAN dan TIDAK TERSENTUH.\n" .
+                              "• Seluruh fitur baru (Feeder Schools, Role Guru, Timeline Mingguan, Statistik Unggulan/Reguler) sekarang sudah AKTIF di website Anda!";
+                } else {
+                    $result = "<b>Error:</b> Gagal mengekstrak berkas ZIP.";
+                }
+            }
+        }
+    }
 } elseif ($action === 'status') {
     $resGit = run_cmd('git status');
     $resRemote = run_cmd('git remote -v');
@@ -127,9 +202,10 @@ if ($action === 'sync') {
     </div>
 
     <div style="margin-bottom: 20px;">
+        <a href="?token=<?= $secret_token ?>&action=zip_update" class="btn btn-success" style="background:#16a34a;font-size:14px;padding:12px 20px;" onclick="return confirm('Mulai update file website dari GitHub sekarang? File .env dan public/storage TIDAK akan ditimpa/dihapus.');">📥 UPDATE KODE DARI GITHUB SEKARANG (Rekomendasi)</a>
         <a href="?token=<?= $secret_token ?>&action=status" class="btn btn-secondary">🔍 Cek Status Git</a>
-        <a href="?token=<?= $secret_token ?>&action=sync" class="btn btn-primary" onclick="return confirm('Mulai sinkronisasi repository ke branch main GitHub? File .env dan public/storage TIDAK akan terhapus.');">⚡ Jalankan Sinkronisasi Awal</a>
-        <a href="?token=<?= $secret_token ?>&action=migrate" class="btn btn-success" onclick="return confirm('Jalankan php artisan migrate pada database?');">🗄️ Jalankan Database Migration</a>
+        <a href="?token=<?= $secret_token ?>&action=sync" class="btn btn-primary" onclick="return confirm('Mulai sinkronisasi repository ke branch main GitHub? File .env dan public/storage TIDAK akan terhapus.');">⚡ Jalankan Git CLI (Jika aktif)</a>
+        <a href="?token=<?= $secret_token ?>&action=migrate" class="btn btn-secondary" onclick="return confirm('Jalankan php artisan migrate pada database?');">🗄️ Database Migration</a>
         <a href="?token=<?= $secret_token ?>&action=delete" class="btn btn-danger" onclick="return confirm('PERINGATAN: Apakah Anda yakin ingin menghapus file helper ini dari server sekarang?');">🗑️ Hapus Helper Ini</a>
     </div>
 
