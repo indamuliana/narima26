@@ -12,7 +12,7 @@
             <div class="space-y-2 max-w-2xl">
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-xs font-semibold text-slate-200 backdrop-blur-xs">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>Panel Administrator &bull; SPMB SMK Wikrama 1 Garut T.A. 2027/2028</span>
+                    <span>{{ auth()->user()->isGuru() ? 'Panel Guru' : 'Panel Administrator' }} &bull; SPMB SMK Wikrama 1 Garut T.A. 2027/2028</span>
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-white">
                     Selamat Datang, {{ auth()->user()->name }}
@@ -285,12 +285,14 @@
                     </div>
                 </div>
 
-                <div class="pt-4 border-t border-slate-100">
-                    <a href="{{ route('bendahara.dashboard') }}"
-                       class="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer">
-                        <span>Buka Manajemen Kas & Keuangan &rarr;</span>
-                    </a>
-                </div>
+                @if(auth()->user()->isAdmin())
+                    <div class="pt-4 border-t border-slate-100">
+                        <a href="{{ route('bendahara.dashboard') }}"
+                           class="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer">
+                            <span>Buka Manajemen Kas & Keuangan &rarr;</span>
+                        </a>
+                    </div>
+                @endif
             </div>
         </div>
 

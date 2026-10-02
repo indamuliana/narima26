@@ -118,6 +118,8 @@ enum SpmbStatus: string
             ],
             self::DITERIMA => [
                 self::MENUNGGU_DAFTAR_ULANG,
+                self::DAFTAR_ULANG_DIVERIFIKASI,
+                self::RESMI_TERDAFTAR,
                 self::MENGUNDURKAN_DIRI,
             ],
             self::DITOLAK => [
@@ -125,6 +127,7 @@ enum SpmbStatus: string
             ],
             self::MENUNGGU_DAFTAR_ULANG => [
                 self::DAFTAR_ULANG_DIVERIFIKASI,
+                self::RESMI_TERDAFTAR,
                 self::MENGUNDURKAN_DIRI,
             ],
             self::DAFTAR_ULANG_DIVERIFIKASI => [

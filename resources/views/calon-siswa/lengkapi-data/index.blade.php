@@ -63,47 +63,61 @@
                 </div>
             </div>
 
-            <!-- Status Badges Checklist -->
-            <div class="grid grid-cols-2 sm:grid-cols-6 gap-3 pt-2">
-                <div class="p-3 rounded-2xl border {{ $completion['biodata']['is_complete'] ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-600' }}">
+            <!-- Status Badges Checklist (Dapat diklik untuk beralih antar tahap) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-2">
+                <button type="button" onclick="switchTab('biodata')" id="badgeStep-biodata"
+                    class="step-badge-card text-left p-3 rounded-2xl border transition duration-150 cursor-pointer hover:shadow-xs {{ $completion['biodata']['is_complete'] ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-600' }}">
                     <div class="flex items-center justify-between text-xs font-bold">
                         <span>1. Biodata</span>
                         <span>{{ $completion['biodata']['is_complete'] ? '✓' : $completion['biodata']['percent'].'%' }}</span>
                     </div>
                     <p class="text-[11px] mt-1 text-slate-500">{{ $completion['biodata']['filled'] }}/{{ $completion['biodata']['total'] }} field</p>
-                </div>
+                </button>
 
-                <div class="p-3 rounded-2xl border {{ $completion['orang_tua']['is_complete'] ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-600' }}">
+                <button type="button" onclick="switchTab('orang_tua')" id="badgeStep-orang_tua"
+                    class="step-badge-card text-left p-3 rounded-2xl border transition duration-150 cursor-pointer hover:shadow-xs {{ $completion['orang_tua']['is_complete'] ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-600' }}">
                     <div class="flex items-center justify-between text-xs font-bold">
                         <span>2. Orang Tua</span>
                         <span>{{ $completion['orang_tua']['is_complete'] ? '✓' : $completion['orang_tua']['percent'].'%' }}</span>
                     </div>
                     <p class="text-[11px] mt-1 text-slate-500">{{ $completion['orang_tua']['filled'] }}/{{ $completion['orang_tua']['total'] }} field</p>
-                </div>
+                </button>
 
-                <div class="p-3 rounded-2xl border {{ $completion['akademik']['is_complete'] ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-600' }}">
+                <button type="button" onclick="switchTab('akademik')" id="badgeStep-akademik"
+                    class="step-badge-card text-left p-3 rounded-2xl border transition duration-150 cursor-pointer hover:shadow-xs {{ $completion['akademik']['is_complete'] ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-600' }}">
                     <div class="flex items-center justify-between text-xs font-bold">
                         <span>3. Akademik</span>
                         <span>{{ $completion['akademik']['is_complete'] ? '✓' : $completion['akademik']['percent'].'%' }}</span>
                     </div>
                     <p class="text-[11px] mt-1 text-slate-500">{{ $completion['akademik']['filled'] }}/{{ $completion['akademik']['total'] }} nilai</p>
-                </div>
+                </button>
 
-                <div class="p-3 rounded-2xl border {{ $completion['seragam']['is_complete'] ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-600' }}">
+                <button type="button" onclick="switchTab('seragam')" id="badgeStep-seragam"
+                    class="step-badge-card text-left p-3 rounded-2xl border transition duration-150 cursor-pointer hover:shadow-xs {{ $completion['seragam']['is_complete'] ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-600' }}">
                     <div class="flex items-center justify-between text-xs font-bold">
                         <span>4. Seragam</span>
                         <span>{{ $completion['seragam']['is_complete'] ? '✓' : $completion['seragam']['percent'].'%' }}</span>
                     </div>
                     <p class="text-[11px] mt-1 text-slate-500">{{ $completion['seragam']['filled'] }}/{{ $completion['seragam']['total'] }} jenis</p>
-                </div>
+                </button>
 
-                <div class="p-3 rounded-2xl border col-span-2 sm:col-span-1 {{ $completion['dokumen']['is_complete'] ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-600' }}">
+                <button type="button" onclick="switchTab('dokumen')" id="badgeStep-dokumen"
+                    class="step-badge-card text-left p-3 rounded-2xl border transition duration-150 cursor-pointer hover:shadow-xs {{ $completion['dokumen']['is_complete'] ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-600' }}">
                     <div class="flex items-center justify-between text-xs font-bold">
                         <span>5. Dokumen</span>
                         <span>{{ $completion['dokumen']['is_complete'] ? '✓' : $completion['dokumen']['percent'].'%' }}</span>
                     </div>
                     <p class="text-[11px] mt-1 text-slate-500">{{ $completion['dokumen']['filled'] }}/{{ $completion['dokumen']['total'] }} berkas</p>
-                </div>
+                </button>
+
+                <button type="button" onclick="switchTab('kesehatan')" id="badgeStep-kesehatan"
+                    class="step-badge-card text-left p-3 rounded-2xl border transition duration-150 cursor-pointer hover:shadow-xs {{ $completion['kesehatan']['is_complete'] ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-600' }}">
+                    <div class="flex items-center justify-between text-xs font-bold">
+                        <span>6. Kesehatan</span>
+                        <span>{{ $completion['kesehatan']['is_complete'] ? '✓' : $completion['kesehatan']['percent'].'%' }}</span>
+                    </div>
+                    <p class="text-[11px] mt-1 text-slate-500">{{ $completion['kesehatan']['filled'] }}/{{ $completion['kesehatan']['total'] }} data</p>
+                </button>
             </div>
 
             <!-- Tombol Finalisasi Jika Sudah Lengkap -->
@@ -136,55 +150,130 @@
             $currentTab = request('tab', 'biodata');
         @endphp
 
-        <!-- Navigasi Tab Formulir -->
-        <div class="flex overflow-x-auto border-b border-slate-200 bg-white rounded-2xl p-1.5 shadow-xs gap-1.5 text-xs font-bold scrollbar-none" id="tabsNav">
-            <button type="button" onclick="switchTab('biodata')" id="tabBtn-biodata"
-                class="tab-btn px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 whitespace-nowrap {{ $currentTab === 'biodata' ? 'bg-orange-500 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100' }}">
-                <span>1. Biodata & Wilayah</span>
-                @if($completion['biodata']['is_complete'])
-                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                @endif
-            </button>
+        <!-- Navigasi Khusus Tampilan HP / Mobile (Pilihan Cepat & Stepper) -->
+        <div class="block md:hidden bg-white rounded-2xl p-4 border border-slate-200 shadow-xs space-y-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span id="mobileStepBadge" class="w-6 h-6 rounded-full bg-orange-500 text-white text-xs font-black inline-flex items-center justify-center">1</span>
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Tahap Aktif (1-6)</span>
+                        <span id="mobileStepTitle" class="text-xs font-black text-slate-800">1. Biodata & Wilayah</span>
+                    </div>
+                </div>
+                <div id="mobileStepStatusBadge">
+                    @if($completion[$currentTab]['is_complete'] ?? false)
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            ✓ Lengkap
+                        </span>
+                    @else
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">
+                            Belum Selesai
+                        </span>
+                    @endif
+                </div>
+            </div>
 
-            <button type="button" onclick="switchTab('orang_tua')" id="tabBtn-orang_tua"
-                class="tab-btn px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 whitespace-nowrap {{ $currentTab === 'orang_tua' ? 'bg-orange-500 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100' }}">
-                <span>2. Data Orang Tua / Wali</span>
-                @if($completion['orang_tua']['is_complete'])
-                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                @endif
-            </button>
+            <!-- Dropdown Pilihan Tahap Cepat -->
+            <div class="relative">
+                <label for="mobileTabSelect" class="sr-only">Pilih Tahap Formulir</label>
+                <select id="mobileTabSelect" onchange="switchTab(this.value)"
+                    class="w-full appearance-none bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 pr-10 text-xs font-bold text-slate-800 focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none cursor-pointer">
+                    <option value="biodata" {{ $currentTab === 'biodata' ? 'selected' : '' }}>
+                        Tahap 1: Biodata & Domisili {{ $completion['biodata']['is_complete'] ? '(✓ Lengkap)' : '('.$completion['biodata']['percent'].'%)' }}
+                    </option>
+                    <option value="orang_tua" {{ $currentTab === 'orang_tua' ? 'selected' : '' }}>
+                        Tahap 2: Data Orang Tua / Wali {{ $completion['orang_tua']['is_complete'] ? '(✓ Lengkap)' : '('.$completion['orang_tua']['percent'].'%)' }}
+                    </option>
+                    <option value="akademik" {{ $currentTab === 'akademik' ? 'selected' : '' }}>
+                        Tahap 3: Akademik & Rapor {{ $completion['akademik']['is_complete'] ? '(✓ Lengkap)' : '('.$completion['akademik']['percent'].'%)' }}
+                    </option>
+                    <option value="seragam" {{ $currentTab === 'seragam' ? 'selected' : '' }}>
+                        Tahap 4: Ukuran Seragam {{ $completion['seragam']['is_complete'] ? '(✓ Lengkap)' : '('.$completion['seragam']['percent'].'%)' }}
+                    </option>
+                    <option value="dokumen" {{ $currentTab === 'dokumen' ? 'selected' : '' }}>
+                        Tahap 5: Unggah Berkas {{ $completion['dokumen']['is_complete'] ? '(✓ Lengkap)' : '('.$completion['dokumen']['percent'].'%)' }}
+                    </option>
+                    <option value="kesehatan" {{ $currentTab === 'kesehatan' ? 'selected' : '' }}>
+                        Tahap 6: Data Kesehatan {{ $completion['kesehatan']['is_complete'] ? '(✓ Lengkap)' : '('.$completion['kesehatan']['percent'].'%)' }}
+                    </option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+            </div>
 
-            <button type="button" onclick="switchTab('akademik')" id="tabBtn-akademik"
-                class="tab-btn px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 whitespace-nowrap {{ $currentTab === 'akademik' ? 'bg-orange-500 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100' }}">
-                <span>3. Akademik & Prestasi</span>
-                @if($completion['akademik']['is_complete'])
-                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                @endif
-            </button>
+            <!-- Tombol Navigasi Sebelumnya & Selanjutnya -->
+            <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100">
+                <button type="button" id="mobilePrevBtn" onclick="navPrevTab()"
+                    class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    <span>Sebelumnya</span>
+                </button>
+                <button type="button" id="mobileNextBtn" onclick="navNextTab()"
+                    class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-orange-700 bg-orange-50 hover:bg-orange-100 border border-orange-200 transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer">
+                    <span>Selanjutnya</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+        </div>
 
-            <button type="button" onclick="switchTab('seragam')" id="tabBtn-seragam"
-                class="tab-btn px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 whitespace-nowrap {{ $currentTab === 'seragam' ? 'bg-orange-500 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100' }}">
-                <span>4. Ukuran Seragam</span>
-                @if($completion['seragam']['is_complete'])
-                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                @endif
-            </button>
+        <!-- Navigasi Tab Formulir (Horizontal Scrollable dengan Auto-Center) -->
+        <div class="relative">
+            <div class="flex overflow-x-auto border-b border-slate-200 bg-white rounded-2xl p-1.5 shadow-xs gap-1.5 text-xs font-bold scroll-smooth" id="tabsNav">
+                <button type="button" onclick="switchTab('biodata')" id="tabBtn-biodata"
+                    class="tab-btn shrink-0 px-3.5 sm:px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 whitespace-nowrap {{ $currentTab === 'biodata' ? 'bg-orange-500 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100' }}">
+                    <span class="tab-num w-5 h-5 rounded-full inline-flex items-center justify-center text-[10px] font-black {{ $currentTab === 'biodata' ? 'bg-white/25 text-white' : 'bg-slate-200 text-slate-700' }}">1</span>
+                    <span>Biodata & Wilayah</span>
+                    @if($completion['biodata']['is_complete'])
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    @endif
+                </button>
 
-            <button type="button" onclick="switchTab('dokumen')" id="tabBtn-dokumen"
-                class="tab-btn px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 whitespace-nowrap {{ $currentTab === 'dokumen' ? 'bg-orange-500 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100' }}">
-                <span>5. Unggah Berkas</span>
-                @if($completion['dokumen']['is_complete'])
-                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                @endif
-            </button>
-            
-            <button type="button" onclick="switchTab('kesehatan')" id="tabBtn-kesehatan"
-                class="tab-btn px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 whitespace-nowrap {{ $currentTab === 'kesehatan' ? 'bg-orange-500 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100' }}">
-                <span>6. Kesehatan</span>
-                @if($completion['kesehatan']['is_complete'])
-                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                @endif
-            </button>
+                <button type="button" onclick="switchTab('orang_tua')" id="tabBtn-orang_tua"
+                    class="tab-btn shrink-0 px-3.5 sm:px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 whitespace-nowrap {{ $currentTab === 'orang_tua' ? 'bg-orange-500 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100' }}">
+                    <span class="tab-num w-5 h-5 rounded-full inline-flex items-center justify-center text-[10px] font-black {{ $currentTab === 'orang_tua' ? 'bg-white/25 text-white' : 'bg-slate-200 text-slate-700' }}">2</span>
+                    <span>Data Orang Tua / Wali</span>
+                    @if($completion['orang_tua']['is_complete'])
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    @endif
+                </button>
+
+                <button type="button" onclick="switchTab('akademik')" id="tabBtn-akademik"
+                    class="tab-btn shrink-0 px-3.5 sm:px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 whitespace-nowrap {{ $currentTab === 'akademik' ? 'bg-orange-500 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100' }}">
+                    <span class="tab-num w-5 h-5 rounded-full inline-flex items-center justify-center text-[10px] font-black {{ $currentTab === 'akademik' ? 'bg-white/25 text-white' : 'bg-slate-200 text-slate-700' }}">3</span>
+                    <span>Akademik & Rapor</span>
+                    @if($completion['akademik']['is_complete'])
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    @endif
+                </button>
+
+                <button type="button" onclick="switchTab('seragam')" id="tabBtn-seragam"
+                    class="tab-btn shrink-0 px-3.5 sm:px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 whitespace-nowrap {{ $currentTab === 'seragam' ? 'bg-orange-500 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100' }}">
+                    <span class="tab-num w-5 h-5 rounded-full inline-flex items-center justify-center text-[10px] font-black {{ $currentTab === 'seragam' ? 'bg-white/25 text-white' : 'bg-slate-200 text-slate-700' }}">4</span>
+                    <span>Ukuran Seragam</span>
+                    @if($completion['seragam']['is_complete'])
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    @endif
+                </button>
+
+                <button type="button" onclick="switchTab('dokumen')" id="tabBtn-dokumen"
+                    class="tab-btn shrink-0 px-3.5 sm:px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 whitespace-nowrap {{ $currentTab === 'dokumen' ? 'bg-orange-500 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100' }}">
+                    <span class="tab-num w-5 h-5 rounded-full inline-flex items-center justify-center text-[10px] font-black {{ $currentTab === 'dokumen' ? 'bg-white/25 text-white' : 'bg-slate-200 text-slate-700' }}">5</span>
+                    <span>Unggah Berkas</span>
+                    @if($completion['dokumen']['is_complete'])
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    @endif
+                </button>
+                
+                <button type="button" onclick="switchTab('kesehatan')" id="tabBtn-kesehatan"
+                    class="tab-btn shrink-0 px-3.5 sm:px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 whitespace-nowrap {{ $currentTab === 'kesehatan' ? 'bg-orange-500 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100' }}">
+                    <span class="tab-num w-5 h-5 rounded-full inline-flex items-center justify-center text-[10px] font-black {{ $currentTab === 'kesehatan' ? 'bg-white/25 text-white' : 'bg-slate-200 text-slate-700' }}">6</span>
+                    <span>Kesehatan</span>
+                    @if($completion['kesehatan']['is_complete'])
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    @endif
+                </button>
+            </div>
         </div>
 
         <!-- ========================================== -->
@@ -724,17 +813,24 @@
                         </div>
                     </div>
 
-                    <div class="pt-4 flex flex-col sm:flex-row items-center justify-end gap-3">
-                        <button type="submit" name="action" value="save"
-                            class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 shadow-xs transition text-xs cursor-pointer">
-                            <svg class="w-4 h-4 mr-1.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-                            <span>Simpan Progress</span>
+                    <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <button type="button" onclick="switchTab('biodata')"
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 shadow-xs transition text-xs cursor-pointer">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                            <span>Kembali ke Biodata</span>
                         </button>
-                        <button type="submit" name="action" value="next"
-                            class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-sm transition text-xs cursor-pointer">
-                            <span>Lanjutkan ke Tahap Berikutnya</span>
-                            <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                        </button>
+                        <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto justify-end">
+                            <button type="submit" name="action" value="save"
+                                class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 shadow-xs transition text-xs cursor-pointer">
+                                <svg class="w-4 h-4 mr-1.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                                <span>Simpan Progress</span>
+                            </button>
+                            <button type="submit" name="action" value="next"
+                                class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-sm transition text-xs cursor-pointer">
+                                <span>Lanjutkan ke Tahap Berikutnya</span>
+                                <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -970,17 +1066,24 @@
                         </div>
                     </div>
 
-                    <div class="pt-4 flex flex-col sm:flex-row items-center justify-end gap-3">
-                        <button type="submit" name="action" value="save"
-                            class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 shadow-xs transition text-xs cursor-pointer">
-                            <svg class="w-4 h-4 mr-1.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-                            <span>Simpan Progress</span>
+                    <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <button type="button" onclick="switchTab('orang_tua')"
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 shadow-xs transition text-xs cursor-pointer">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                            <span>Kembali ke Data Orang Tua</span>
                         </button>
-                        <button type="submit" name="action" value="next"
-                            class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-sm transition text-xs cursor-pointer">
-                            <span>Lanjutkan ke Tahap Berikutnya</span>
-                            <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                        </button>
+                        <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto justify-end">
+                            <button type="submit" name="action" value="save"
+                                class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 shadow-xs transition text-xs cursor-pointer">
+                                <svg class="w-4 h-4 mr-1.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                                <span>Simpan Progress</span>
+                            </button>
+                            <button type="submit" name="action" value="next"
+                                class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-sm transition text-xs cursor-pointer">
+                                <span>Lanjutkan ke Tahap Berikutnya</span>
+                                <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -1333,17 +1436,24 @@
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="pt-4 flex flex-col sm:flex-row items-center justify-end gap-3">
-                        <button type="submit" name="action" value="save"
-                            class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 shadow-xs transition text-xs cursor-pointer">
-                            <svg class="w-4 h-4 mr-1.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-                            <span>Simpan Pilihan Seragam</span>
+                    <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <button type="button" onclick="switchTab('akademik')"
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 shadow-xs transition text-xs cursor-pointer">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                            <span>Kembali ke Akademik</span>
                         </button>
-                        <button type="submit" name="action" value="next"
-                            class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-sm transition text-xs cursor-pointer">
-                            <span>Lanjutkan ke Tahap Berikutnya</span>
-                            <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                        </button>
+                        <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto justify-end">
+                            <button type="submit" name="action" value="save"
+                                class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 shadow-xs transition text-xs cursor-pointer">
+                                <svg class="w-4 h-4 mr-1.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                                <span>Simpan Pilihan Seragam</span>
+                            </button>
+                            <button type="submit" name="action" value="next"
+                                class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-sm transition text-xs cursor-pointer">
+                                <span>Lanjutkan ke Tahap Berikutnya</span>
+                                <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -1524,23 +1634,28 @@
 
                     </div>
 
-                    <div class="pt-4 flex flex-col sm:flex-row items-center justify-end gap-3">
-                        <button type="submit" name="action" value="save"
-                            class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 shadow-xs transition text-xs cursor-pointer">
-                            <svg class="w-4 h-4 mr-1.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-                            <span>Simpan Progress</span>
+                    <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <button type="button" onclick="switchTab('seragam')"
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 shadow-xs transition text-xs cursor-pointer">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                            <span>Kembali ke Ukuran Seragam</span>
                         </button>
-                        <button type="submit" name="action" value="next"
-                            class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-sm transition text-xs cursor-pointer">
-                            <span>Simpan & Unggah Berkas</span>
-                            <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                        </button>
+                        <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto justify-end">
+                            <button type="submit" name="action" value="save"
+                                class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 shadow-xs transition text-xs cursor-pointer">
+                                <svg class="w-4 h-4 mr-1.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                                <span>Simpan Progress</span>
+                            </button>
+                            <button type="submit" name="action" value="next"
+                                class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-sm transition text-xs cursor-pointer">
+                                <span>Lanjutkan ke Tahap Berikutnya</span>
+                                <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
-
-    </div>
 
         <!-- ========================================== -->
         <!-- TAB 6: KESEHATAN                           -->
@@ -1651,7 +1766,12 @@
                         </div>
                     </div>
 
-                    <div class="border-t border-slate-200 pt-5 flex flex-col sm:flex-row gap-3 justify-end items-center">
+                    <div class="border-t border-slate-200 pt-5 flex flex-col sm:flex-row gap-3 justify-between items-center">
+                        <button type="button" onclick="switchTab('dokumen')"
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 shadow-xs transition text-xs cursor-pointer">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                            <span>Kembali ke Unggah Berkas</span>
+                        </button>
                         <button type="submit"
                             class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-xl font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-sm transition text-xs cursor-pointer">
                             <span>Simpan Data Kesehatan</span>
@@ -1662,23 +1782,81 @@
             </div>
         </div>
 
+    </div>
+
     <!-- SCRIPT TABS, CASCADING WILAYAH & PRESTASI DYNAMIC -->
     <script>
+        const tabSteps = [
+            { id: 'biodata', num: 1, title: '1. Biodata & Wilayah', complete: {{ $completion['biodata']['is_complete'] ? 'true' : 'false' }} },
+            { id: 'orang_tua', num: 2, title: '2. Data Orang Tua / Wali', complete: {{ $completion['orang_tua']['is_complete'] ? 'true' : 'false' }} },
+            { id: 'akademik', num: 3, title: '3. Akademik & Prestasi', complete: {{ $completion['akademik']['is_complete'] ? 'true' : 'false' }} },
+            { id: 'seragam', num: 4, title: '4. Ukuran Seragam', complete: {{ $completion['seragam']['is_complete'] ? 'true' : 'false' }} },
+            { id: 'dokumen', num: 5, title: '5. Unggah Berkas', complete: {{ $completion['dokumen']['is_complete'] ? 'true' : 'false' }} },
+            { id: 'kesehatan', num: 6, title: '6. Data Kesehatan', complete: {{ $completion['kesehatan']['is_complete'] ? 'true' : 'false' }} }
+        ];
+
         // Tab Switcher
         function switchTab(tabId) {
             document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('bg-orange-500', 'text-white', 'shadow-xs');
                 btn.classList.add('text-slate-600', 'hover:bg-slate-100');
+                const numBadge = btn.querySelector('.tab-num');
+                if (numBadge) {
+                    numBadge.classList.remove('bg-white/25', 'text-white');
+                    numBadge.classList.add('bg-slate-200', 'text-slate-700');
+                }
             });
 
             const activeContent = document.getElementById('tabContent-' + tabId);
             const activeBtn = document.getElementById('tabBtn-' + tabId);
 
-            if(activeContent) activeContent.classList.remove('hidden');
-            if(activeBtn) {
+            if (activeContent) activeContent.classList.remove('hidden');
+            if (activeBtn) {
                 activeBtn.classList.remove('text-slate-600', 'hover:bg-slate-100');
                 activeBtn.classList.add('bg-orange-500', 'text-white', 'shadow-xs');
+                const numBadge = activeBtn.querySelector('.tab-num');
+                if (numBadge) {
+                    numBadge.classList.remove('bg-slate-200', 'text-slate-700');
+                    numBadge.classList.add('bg-white/25', 'text-white');
+                }
+
+                // Smooth scroll active button to center for horizontal mobile view
+                activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+
+            // Highlight corresponding checklist badge at the top
+            document.querySelectorAll('.step-badge-card').forEach(b => {
+                b.classList.remove('ring-2', 'ring-orange-500', 'ring-offset-2');
+            });
+            const activeBadge = document.getElementById('badgeStep-' + tabId);
+            if (activeBadge) {
+                activeBadge.classList.add('ring-2', 'ring-orange-500', 'ring-offset-2');
+            }
+
+            // Update Mobile Stepper Controls
+            const currentStepIdx = tabSteps.findIndex(s => s.id === tabId);
+            if (currentStepIdx !== -1) {
+                const step = tabSteps[currentStepIdx];
+                const mobileBadge = document.getElementById('mobileStepBadge');
+                const mobileTitle = document.getElementById('mobileStepTitle');
+                const mobileSelect = document.getElementById('mobileTabSelect');
+                const mobileStatus = document.getElementById('mobileStepStatusBadge');
+                const prevBtn = document.getElementById('mobilePrevBtn');
+                const nextBtn = document.getElementById('mobileNextBtn');
+
+                if (mobileBadge) mobileBadge.textContent = step.num;
+                if (mobileTitle) mobileTitle.textContent = step.title;
+                if (mobileSelect) mobileSelect.value = tabId;
+
+                if (mobileStatus) {
+                    mobileStatus.innerHTML = step.complete
+                        ? '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">✓ Lengkap</span>'
+                        : '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">Belum Selesai</span>';
+                }
+
+                if (prevBtn) prevBtn.disabled = currentStepIdx === 0;
+                if (nextBtn) nextBtn.disabled = currentStepIdx === tabSteps.length - 1;
             }
 
             // Update URL hash/query without reload
@@ -1686,6 +1864,27 @@
             url.searchParams.set('tab', tabId);
             window.history.replaceState({}, '', url);
         }
+
+        function navPrevTab() {
+            const currentTab = new URL(window.location).searchParams.get('tab') || 'biodata';
+            const idx = tabSteps.findIndex(s => s.id === currentTab);
+            if (idx > 0) {
+                switchTab(tabSteps[idx - 1].id);
+            }
+        }
+
+        function navNextTab() {
+            const currentTab = new URL(window.location).searchParams.get('tab') || 'biodata';
+            const idx = tabSteps.findIndex(s => s.id === currentTab);
+            if (idx < tabSteps.length - 1) {
+                switchTab(tabSteps[idx + 1].id);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const initialTab = new URL(window.location).searchParams.get('tab') || '{{ $currentTab }}';
+            switchTab(initialTab);
+        });
 
         // Domisili Mode Switcher (Dalam Negeri vs Luar Negeri)
         function setDomisiliMode(isLuar) {
@@ -1870,5 +2069,3 @@
         });
     </script>
 </x-layouts.app>
-
-

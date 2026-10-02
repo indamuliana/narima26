@@ -106,18 +106,36 @@ class PembayaranDaftarUlangController extends Controller
             // Sync invoice balance and status (BELUM_LUNAS / CICILAN / LUNAS)
             $tagihan = $this->invoiceService->syncPaymentStatus($pembayaranDaftarUlang->tagihan);
 
-            // Advance candidate SPMB status if currently MENUNGGU_DAFTAR_ULANG
+            // Advance candidate SPMB status if currently MENUNGGU_DAFTAR_ULANG or DITERIMA
             $calonSiswa = $pembayaranDaftarUlang->calonSiswa;
             $currentStatus = is_string($calonSiswa->status_spmb)
                 ? SpmbStatus::from($calonSiswa->status_spmb)
                 : $calonSiswa->status_spmb;
 
-            if ($currentStatus === SpmbStatus::MENUNGGU_DAFTAR_ULANG) {
+            if (in_array($currentStatus, [SpmbStatus::MENUNGGU_DAFTAR_ULANG, SpmbStatus::DITERIMA], true)) {
+                if ($currentStatus === SpmbStatus::DITERIMA) {
+                    $this->spmbStatusService->changeStatus(
+                        calonSiswa: $calonSiswa,
+                        targetStatus: SpmbStatus::MENUNGGU_DAFTAR_ULANG,
+                        alasan: 'Tagihan daftar ulang aktif dan telah dibayar oleh calon siswa',
+                        catatan: "Nomor Tagihan: {$tagihan->nomor_tagihan}",
+                        changedBy: auth()->user()
+                    );
+                }
+
                 $this->spmbStatusService->changeStatus(
                     calonSiswa: $calonSiswa,
                     targetStatus: SpmbStatus::DAFTAR_ULANG_DIVERIFIKASI,
                     alasan: 'Pembayaran daftar ulang telah diverifikasi oleh Bendahara',
                     catatan: "Nomor Tagihan: {$tagihan->nomor_tagihan}, Nominal: Rp " . number_format($pembayaranDaftarUlang->nominal_dibayar, 0, ',', '.'),
+                    changedBy: auth()->user()
+                );
+
+                $this->spmbStatusService->changeStatus(
+                    calonSiswa: $calonSiswa,
+                    targetStatus: SpmbStatus::RESMI_TERDAFTAR,
+                    alasan: 'Calon siswa resmi terdaftar setelah pembayaran daftar ulang pertama diverifikasi',
+                    catatan: "Status diaktifkan otomatis ke RESMI_TERDAFTAR.",
                     changedBy: auth()->user()
                 );
             }

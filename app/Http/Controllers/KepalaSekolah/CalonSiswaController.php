@@ -36,6 +36,7 @@ class CalonSiswaController extends Controller
                 'jurusan2',
                 'program',
                 'gelombang',
+                'sekolahAsal',
                 'pembayaranSeleksi',
                 'wawancaraSiswa',
                 'wawancaraOrangTua',
@@ -49,7 +50,11 @@ class CalonSiswaController extends Controller
                   ->orWhere('nomor_pendaftaran', 'like', "%{$search}%")
                   ->orWhere('nisn', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('no_hp', 'like', "%{$search}%");
+                  ->orWhere('no_hp_siswa', 'like', "%{$search}%")
+                  ->orWhere('asal_sekolah_lainnya', 'like', "%{$search}%")
+                  ->orWhereHas('sekolahAsal', function ($sub) use ($search) {
+                      $sub->where('nama_sekolah', 'like', "%{$search}%");
+                  });
             });
         }
 

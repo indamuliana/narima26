@@ -212,18 +212,23 @@
 
                 <div class="space-y-2.5">
                     @forelse ($topSchools as $idx => $sch)
+                        @php
+                            $schNama = is_array($sch) ? ($sch['nama'] ?? '') : ($sch->nama_sekolah ?? $sch->nama ?? '');
+                            $schKota = is_array($sch) ? ($sch['kota'] ?? 'Garut') : ($sch->kabupaten ?? $sch->kokab ?? 'Garut');
+                            $schCount = is_array($sch) ? ($sch['total_siswa'] ?? 0) : ($sch->calon_siswa_count ?? $sch->total_siswa ?? 0);
+                        @endphp
                         <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs">
                             <div class="flex items-center gap-2.5">
                                 <span class="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[11px]">
                                     {{ $idx + 1 }}
                                 </span>
                                 <div>
-                                    <span class="font-bold text-slate-800 block">{{ $sch->nama_sekolah }}</span>
-                                    <span class="text-[10px] text-slate-400">{{ $sch->kabupaten ?? 'Garut' }}</span>
+                                    <span class="font-bold text-slate-800 block">{{ $schNama }}</span>
+                                    <span class="text-[10px] text-slate-400">{{ $schKota }}</span>
                                 </div>
                             </div>
                             <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-nampi-orange/10 text-nampi-orange">
-                                {{ $sch->calon_siswa_count }} Siswa
+                                {{ $schCount }} Siswa
                             </span>
                         </div>
                     @empty

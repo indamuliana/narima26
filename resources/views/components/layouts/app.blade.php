@@ -82,7 +82,7 @@
                                 {{ auth()->check() ? auth()->user()->name : 'Tamu / Calon Siswa' }}
                             </p>
                             <p class="text-[10px] text-slate-400 truncate">
-                                {{ auth()->check() ? (auth()->user()->role ?? 'User') : 'Calon Siswa' }}
+                                {{ auth()->check() ? (auth()->user()->role_label ?? auth()->user()->role ?? 'User') : 'Calon Siswa' }}
                             </p>
                         </div>
                     </div>

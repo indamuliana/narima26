@@ -69,7 +69,6 @@ Route::middleware(['auth', 'role:admin,guru'])
                 Route::get('/export/xls', 'exportXls')->name('export.xls');
                 Route::get('/export/pdf', 'exportPdf')->name('export.pdf');
                 Route::get('/{calonSiswa}/cetak-pdf', 'cetakPdf')->name('cetak-pdf');
-                Route::put('/{calonSiswa}/tags', 'updateTags')->name('update-tags');
                 Route::get('/{calonSiswa}', 'show')->name('show');
             });
 
@@ -104,6 +103,10 @@ Route::middleware(['auth', 'role:admin'])
                 Route::put('/update-kesehatan', 'updateKesehatan')->name('update-kesehatan');
                 Route::put('/update-seragam', 'updateSeragam')->name('update-seragam');
             });
+
+        // Tagging Calon Siswa (Admin Only)
+        Route::put('/calon-siswa/{calonSiswa}/tags', [\App\Http\Controllers\Admin\CalonSiswaController::class, 'updateTags'])
+            ->name('calon-siswa.update-tags');
 
         // Impersonasi Calon Siswa (Masuk Sebagai Calon Siswa)
         Route::post('/calon-siswa/{calonSiswa}/impersonate', [\App\Http\Controllers\Auth\ImpersonateController::class, 'start'])

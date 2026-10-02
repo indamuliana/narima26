@@ -15,37 +15,46 @@ class DashboardMetricsService
      * Define the official academic year SPMB months: Sep 2026 - Jun 2027 (10 months).
      */
     public const TIMELINE_MONTHS = [
-        ['year' => 2026, 'month' => 9,  'ym' => '2026-09', 'label' => 'Sep 2026'],
-        ['year' => 2026, 'month' => 10, 'ym' => '2026-10', 'label' => 'Okt 2026'],
-        ['year' => 2026, 'month' => 11, 'ym' => '2026-11', 'label' => 'Nov 2026'],
-        ['year' => 2026, 'month' => 12, 'ym' => '2026-12', 'label' => 'Des 2026'],
-        ['year' => 2027, 'month' => 1,  'ym' => '2027-01', 'label' => 'Jan 2027'],
-        ['year' => 2027, 'month' => 2,  'ym' => '2027-02', 'label' => 'Feb 2027'],
-        ['year' => 2027, 'month' => 3,  'ym' => '2027-03', 'label' => 'Mar 2027'],
-        ['year' => 2027, 'month' => 4,  'ym' => '2027-04', 'label' => 'Apr 2027'],
-        ['year' => 2027, 'month' => 5,  'ym' => '2027-05', 'label' => 'Mei 2027'],
-        ['year' => 2027, 'month' => 6,  'ym' => '2027-06', 'label' => 'Jun 2027'],
+        ['year' => 2026, 'month' => 9,  'ym' => '2026-09', 'label' => 'Sep 2026', 'short' => 'Sep', 'days' => 30],
+        ['year' => 2026, 'month' => 10, 'ym' => '2026-10', 'label' => 'Okt 2026', 'short' => 'Okt', 'days' => 31],
+        ['year' => 2026, 'month' => 11, 'ym' => '2026-11', 'label' => 'Nov 2026', 'short' => 'Nov', 'days' => 30],
+        ['year' => 2026, 'month' => 12, 'ym' => '2026-12', 'label' => 'Des 2026', 'short' => 'Des', 'days' => 31],
+        ['year' => 2027, 'month' => 1,  'ym' => '2027-01', 'label' => 'Jan 2027', 'short' => 'Jan', 'days' => 31],
+        ['year' => 2027, 'month' => 2,  'ym' => '2027-02', 'label' => 'Feb 2027', 'short' => 'Feb', 'days' => 28],
+        ['year' => 2027, 'month' => 3,  'ym' => '2027-03', 'label' => 'Mar 2027', 'short' => 'Mar', 'days' => 31],
+        ['year' => 2027, 'month' => 4,  'ym' => '2027-04', 'label' => 'Apr 2027', 'short' => 'Apr', 'days' => 30],
+        ['year' => 2027, 'month' => 5,  'ym' => '2027-05', 'label' => 'Mei 2027', 'short' => 'Mei', 'days' => 31],
+        ['year' => 2027, 'month' => 6,  'ym' => '2027-06', 'label' => 'Jun 2027', 'short' => 'Jun', 'days' => 30],
     ];
 
     /**
-     * Get registration monthly timeline metrics for September 2026 to June 2027.
+     * Get registration weekly & monthly timeline metrics for September 2026 to June 2027.
      */
     public function getTimelinePendaftar(): array
     {
         $startDate = Carbon::create(2026, 9, 1, 0, 0, 0);
         $endDate   = Carbon::create(2027, 6, 30, 23, 59, 59);
 
-        $isSqlite = DB::getDriverName() === 'sqlite';
-        $formatExpr = $isSqlite ? "strftime('%Y-%m', created_at)" : "DATE_FORMAT(created_at, '%Y-%m')";
+        // Build 49 weekly intervals
+        $weeks = [];
+        $weekIndexMap = [];
+        $index = 0;
+        foreach (self::TIMELINE_MONTHS as $m) {
+            $numWeeks = (int) ceil($m['days'] / 7);
+            for ($w = 1; $w <= $numWeeks; $w++) {
+                $startDay = ($w - 1) * 7 + 1;
+                $endDay   = min($w * 7, $m['days']);
+                $key      = "{$m['ym']}-w{$w}";
 
-        // Fetch monthly registrations grouped by YYYY-MM
-        $registeredByMonth = CalonSiswa::whereBetween('created_at', [$startDate, $endDate])
-            ->selectRaw("{$formatExpr} as ym, count(*) as total")
-            ->groupBy('ym')
-            ->pluck('total', 'ym')
-            ->toArray();
+                $weeks[] = [
+                    'key'   => $key,
+                    'label' => "M{$w} {$m['short']}",
+                    'range' => "{$startDay} - {$endDay} {$m['short']} {$m['year']}",
+                ];
+                $weekIndexMap[$key] = $index++;
+            }
+        }
 
-        // Fetch accepted/verified students grouped by YYYY-MM (using updated_at or created_at)
         $acceptedStatuses = [
             SpmbStatus::DITERIMA->value,
             SpmbStatus::MENUNGGU_DAFTAR_ULANG->value,
@@ -53,61 +62,164 @@ class DashboardMetricsService
             SpmbStatus::RESMI_TERDAFTAR->value,
         ];
 
-        $acceptedByMonth = CalonSiswa::whereIn('status_spmb', $acceptedStatuses)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->selectRaw("{$formatExpr} as ym, count(*) as total")
-            ->groupBy('ym')
-            ->pluck('total', 'ym')
-            ->toArray();
+        $candidates = CalonSiswa::whereBetween('created_at', [$startDate, $endDate])
+            ->select(['id', 'status_spmb', 'created_at'])
+            ->get();
 
-        $labels     = [];
-        $pendaftar  = [];
-        $diterima   = [];
-        $kumulatif  = [];
-        $runningSum = 0;
+        $registeredByMonth = [];
+        $acceptedByMonth   = [];
+        $registeredByWeek  = [];
+        $acceptedByWeek    = [];
 
-        $peakValue = 0;
-        $peakMonth = '-';
+        foreach ($candidates as $cs) {
+            $date = $cs->created_at;
+            $ym   = $date->format('Y-m');
+            $d    = (int) $date->format('j');
+            $daysInMonth = (int) $date->daysInMonth;
+            $w    = min((int) ceil($d / 7), (int) ceil($daysInMonth / 7));
+            $weekKey = "{$ym}-w{$w}";
 
-        $currentYm = now()->format('Y-m');
-        $bulanIniCount = 0;
+            $registeredByMonth[$ym]     = ($registeredByMonth[$ym] ?? 0) + 1;
+            $registeredByWeek[$weekKey] = ($registeredByWeek[$weekKey] ?? 0) + 1;
 
-        foreach (self::TIMELINE_MONTHS as $m) {
-            $ym = $m['ym'];
-            $countPendaftar = (int) ($registeredByMonth[$ym] ?? 0);
-            $countDiterima  = (int) ($acceptedByMonth[$ym] ?? 0);
-
-            $runningSum += $countPendaftar;
-
-            $labels[]    = $m['label'];
-            $pendaftar[] = $countPendaftar;
-            $diterima[]  = $countDiterima;
-            $kumulatif[] = $runningSum;
-
-            if ($countPendaftar > $peakValue) {
-                $peakValue = $countPendaftar;
-                $peakMonth = $m['label'];
-            }
-
-            if ($ym === $currentYm) {
-                $bulanIniCount = $countPendaftar;
+            $statusVal = is_string($cs->status_spmb) ? $cs->status_spmb : ($cs->status_spmb?->value ?? '');
+            if (in_array($statusVal, $acceptedStatuses, true)) {
+                $acceptedByMonth[$ym]   = ($acceptedByMonth[$ym] ?? 0) + 1;
+                $acceptedByWeek[$weekKey] = ($acceptedByWeek[$weekKey] ?? 0) + 1;
             }
         }
 
-        $totalPendaftar = array_sum($pendaftar);
-        $averageMonthly = count($pendaftar) > 0 ? round($totalPendaftar / count($pendaftar), 1) : 0;
+        // Build Weekly Timeline dataset
+        $weeklyLabels     = [];
+        $weeklyRanges     = [];
+        $weeklyPendaftar  = [];
+        $weeklyDiterima   = [];
+        $weeklyKumulatif  = [];
+        $weeklyRunningSum = 0;
+        $weeklyPeakValue  = 0;
+        $weeklyPeakLabel  = '-';
+
+        foreach ($weeks as $wItem) {
+            $key    = $wItem['key'];
+            $countP = (int) ($registeredByWeek[$key] ?? 0);
+            $countD = (int) ($acceptedByWeek[$key] ?? 0);
+
+            $weeklyRunningSum += $countP;
+
+            $weeklyLabels[]    = $wItem['label'];
+            $weeklyRanges[]    = $wItem['range'];
+            $weeklyPendaftar[] = $countP;
+            $weeklyDiterima[]  = $countD;
+            $weeklyKumulatif[] = $weeklyRunningSum;
+
+            if ($countP > $weeklyPeakValue) {
+                $weeklyPeakValue = $countP;
+                $weeklyPeakLabel = "{$wItem['label']} ({$countP})";
+            }
+        }
+
+        $weeklyTotal   = array_sum($weeklyPendaftar);
+        $weeklyAverage = count($weeklyPendaftar) > 0 ? round($weeklyTotal / count($weeklyPendaftar), 1) : 0;
+
+        // Build Monthly Timeline dataset
+        $monthlyLabels     = [];
+        $monthlyPendaftar  = [];
+        $monthlyDiterima   = [];
+        $monthlyKumulatif  = [];
+        $monthlyRunningSum = 0;
+        $monthlyPeakValue  = 0;
+        $monthlyPeakLabel  = '-';
+
+        foreach (self::TIMELINE_MONTHS as $m) {
+            $ym     = $m['ym'];
+            $countP = (int) ($registeredByMonth[$ym] ?? 0);
+            $countD = (int) ($acceptedByMonth[$ym] ?? 0);
+
+            $monthlyRunningSum += $countP;
+
+            $monthlyLabels[]    = $m['label'];
+            $monthlyPendaftar[] = $countP;
+            $monthlyDiterima[]  = $countD;
+            $monthlyKumulatif[] = $monthlyRunningSum;
+
+            if ($countP > $monthlyPeakValue) {
+                $monthlyPeakValue = $countP;
+                $monthlyPeakLabel = "{$m['label']} ({$countP})";
+            }
+        }
+
+        $monthlyTotal   = array_sum($monthlyPendaftar);
+        $monthlyAverage = count($monthlyPendaftar) > 0 ? round($monthlyTotal / count($monthlyPendaftar), 1) : 0;
+
+        // Static Milestones for Vertical Marker Lines
+        $milestones = [
+            [
+                'title'         => 'Pembukaan',
+                'date_label'    => '1 Okt 2026',
+                'color'         => '#10b981', // emerald
+                'weekly_index'  => $weekIndexMap['2026-10-w1'] ?? 5,
+                'monthly_index' => 1,
+            ],
+            [
+                'title'         => 'Gelombang 1',
+                'date_label'    => '31 Des 2026',
+                'color'         => '#3b82f6', // blue
+                'weekly_index'  => $weekIndexMap['2026-12-w5'] ?? 19,
+                'monthly_index' => 3,
+            ],
+            [
+                'title'         => 'Gelombang 2',
+                'date_label'    => '28 Feb 2027',
+                'color'         => '#8b5cf6', // purple
+                'weekly_index'  => $weekIndexMap['2027-02-w4'] ?? 28,
+                'monthly_index' => 5,
+            ],
+            [
+                'title'         => 'Gelombang 3',
+                'date_label'    => '30 Jun 2027',
+                'color'         => '#ea580c', // orange
+                'weekly_index'  => $weekIndexMap['2027-06-w5'] ?? 48,
+                'monthly_index' => 9,
+            ],
+        ];
 
         return [
-            'labels'          => $labels,
-            'pendaftar'       => $pendaftar,
-            'diterima'        => $diterima,
-            'kumulatif'       => $kumulatif,
-            'total_periode'   => $totalPendaftar,
-            'total_diterima'  => array_sum($diterima),
-            'bulan_tertinggi' => $peakMonth !== '-' ? "{$peakMonth} ({$peakValue})" : 'Belum Ada',
-            'peak_value'      => $peakValue,
-            'rata_rata'       => $averageMonthly,
-            'bulan_ini'       => $bulanIniCount,
+            'mingguan' => [
+                'labels'         => $weeklyLabels,
+                'ranges'         => $weeklyRanges,
+                'pendaftar'      => $weeklyPendaftar,
+                'diterima'       => $weeklyDiterima,
+                'kumulatif'      => $weeklyKumulatif,
+                'total_periode'  => $weeklyTotal,
+                'total_diterima' => array_sum($weeklyDiterima),
+                'puncak_label'   => $weeklyPeakLabel !== '-' ? $weeklyPeakLabel : 'Belum Ada',
+                'peak_value'     => $weeklyPeakValue,
+                'rata_rata'      => $weeklyAverage,
+            ],
+            'bulanan' => [
+                'labels'          => $monthlyLabels,
+                'pendaftar'       => $monthlyPendaftar,
+                'diterima'        => $monthlyDiterima,
+                'kumulatif'       => $monthlyKumulatif,
+                'total_periode'   => $monthlyTotal,
+                'total_diterima'  => array_sum($monthlyDiterima),
+                'bulan_tertinggi' => $monthlyPeakLabel !== '-' ? $monthlyPeakLabel : 'Belum Ada',
+                'peak_value'      => $monthlyPeakValue,
+                'rata_rata'       => $monthlyAverage,
+            ],
+            'milestones' => $milestones,
+
+            // Root backwards-compatibility aliases (defaulting to weekly):
+            'labels'          => $weeklyLabels,
+            'ranges'          => $weeklyRanges,
+            'pendaftar'       => $weeklyPendaftar,
+            'diterima'        => $weeklyDiterima,
+            'kumulatif'       => $weeklyKumulatif,
+            'total_periode'   => $weeklyTotal,
+            'total_diterima'  => array_sum($weeklyDiterima),
+            'bulan_tertinggi' => $weeklyPeakLabel !== '-' ? $weeklyPeakLabel : 'Belum Ada',
+            'peak_value'      => $weeklyPeakValue,
+            'rata_rata'       => $weeklyAverage,
         ];
     }
 
@@ -291,27 +403,38 @@ class DashboardMetricsService
 
     /**
      * Top Origin Junior High Schools (SMP / MTs Feeder Schools).
+     * Mendukung sekolah dari master_sekolah_asal maupun input mandiri (asal_sekolah_lainnya).
      */
     public function getTopAsalSekolah(int $limit = 5): array
     {
         $total = CalonSiswa::count();
 
-        $topSekolah = CalonSiswa::whereNotNull('asal_sekolah_id')
-            ->select('asal_sekolah_id', DB::raw('count(*) as total_siswa'))
-            ->with('asalSekolah')
-            ->groupBy('asal_sekolah_id')
+        $nameExpr = "TRIM(COALESCE(master_sekolah_asal.nama_sekolah, calon_siswa.asal_sekolah_lainnya))";
+        $cityExpr = "MAX(COALESCE(master_sekolah_asal.kokab, calon_siswa.kabupaten_nama, 'Garut'))";
+
+        $topSekolah = CalonSiswa::query()
+            ->leftJoin('master_sekolah_asal', 'calon_siswa.asal_sekolah_id', '=', 'master_sekolah_asal.id')
+            ->where(function ($q) {
+                $q->whereNotNull('calon_siswa.asal_sekolah_id')
+                  ->orWhere(function ($sub) {
+                      $sub->whereNotNull('calon_siswa.asal_sekolah_lainnya')
+                          ->where('calon_siswa.asal_sekolah_lainnya', '!=', '');
+                  });
+            })
+            ->selectRaw("{$nameExpr} as nama, {$cityExpr} as kota, count(*) as total_siswa")
+            ->groupBy('nama')
             ->orderByDesc('total_siswa')
             ->limit($limit)
             ->get()
             ->map(function ($row) use ($total) {
-                $nama = $row->asalSekolah?->nama_sekolah ?? 'Sekolah Tidak Terdaftar';
-                $kota = $row->asalSekolah?->kabupaten_kota ?? 'Garut';
+                $nama = $row->nama ?: 'Sekolah Tidak Terdaftar';
+                $kota = $row->kota ?: 'Garut';
                 $pct  = $total > 0 ? round(($row->total_siswa / $total) * 100, 1) : 0;
 
                 return [
                     'nama'        => $nama,
                     'kota'        => $kota,
-                    'total_siswa' => $row->total_siswa,
+                    'total_siswa' => (int) $row->total_siswa,
                     'persentase'  => $pct,
                 ];
             })

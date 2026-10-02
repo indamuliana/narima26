@@ -56,7 +56,7 @@ class RegistrationController extends Controller
             })
             ->orderBy('nama_sekolah')
             ->limit(50)
-            ->get(['id', 'npsn', 'nama_sekolah', 'kokab', 'kabupaten']);
+            ->get(['id', 'npsn', 'nama_sekolah', 'kokab']);
 
         return response()->json($sekolahs);
     }

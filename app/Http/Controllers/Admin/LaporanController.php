@@ -13,6 +13,7 @@ use App\Models\MasterSekolahAsal;
 use App\Models\PembayaranDaftarUlang;
 use App\Models\PembayaranSeleksi;
 use App\Models\Tagihan;
+use App\Services\DashboardMetricsService;
 use App\Services\PdfService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -22,7 +23,8 @@ use Illuminate\View\View;
 class LaporanController extends Controller
 {
     public function __construct(
-        protected PdfService $pdfService
+        protected PdfService $pdfService,
+        protected DashboardMetricsService $metricsService
     ) {}
 
     /**
@@ -119,10 +121,7 @@ class LaporanController extends Controller
         ];
 
         // 4. Asal Sekolah Terbanyak (Top 5 Feeder Schools)
-        $topSchools = MasterSekolahAsal::withCount('calonSiswa')
-            ->orderByDesc('calon_siswa_count')
-            ->take(5)
-            ->get();
+        $topSchools = $this->metricsService->getTopAsalSekolah(5)['top'];
 
         return view('admin.laporan.index', compact(
             'funnel',

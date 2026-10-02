@@ -13,6 +13,8 @@
       AddHandler application/x-httpd-alt-php82___lsphp .php .php8 .phtml
     </IfModule>
 
+    Options +FollowSymLinks
+
     RewriteEngine On
 
     # Handle Authorization Header

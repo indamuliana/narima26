@@ -7,6 +7,7 @@ use App\Models\CalonSiswa;
 use App\Models\MasterGelombang;
 use App\Models\MasterJurusan;
 use App\Models\MasterProgram;
+use App\Models\MasterSekolahAsal;
 use App\Models\PembayaranSeleksi;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -279,5 +280,163 @@ class AdminDashboardTest extends TestCase
             'calon_siswa_id' => $this->calonSiswa->id,
             'pewawancara_id' => $pewawancaraUser->id,
         ]);
+    }
+
+    public function test_feeder_schools_aggregates_master_and_manual_input(): void
+    {
+        $sekolahMaster = MasterSekolahAsal::firstOrCreate(
+            ['npsn' => '20209999'],
+            [
+                'nama_sekolah' => 'SMP Negeri 1 Garut',
+                'kokab' => 'Garut',
+                'jenis' => 'SMP',
+                'status' => 'NEGERI',
+            ]
+        );
+
+        // Siswa 1 dengan master sekolah
+        $this->calonSiswa->update([
+            'asal_sekolah_id' => $sekolahMaster->id,
+            'asal_sekolah_lainnya' => null,
+        ]);
+
+        // Siswa 2 dengan input manual
+        $user2 = User::factory()->create(['role' => User::ROLE_CALON_SISWA]);
+        CalonSiswa::factory()->create([
+            'user_id' => $user2->id,
+            'nomor_pendaftaran' => '26AAY0002',
+            'nisn' => '0099887755',
+            'nama_lengkap' => 'Ahmad Fauzi',
+            'program_id' => $this->program->id,
+            'jurusan_id' => $this->jurusan->id,
+            'gelombang_id' => $this->gelombang->id,
+            'asal_sekolah_id' => null,
+            'asal_sekolah_lainnya' => 'SMP Plus Al-Hikmah Tarogong',
+            'kabupaten_nama' => 'Garut',
+        ]);
+
+        // Siswa 3 dengan nama manual yang sama
+        $user3 = User::factory()->create(['role' => User::ROLE_CALON_SISWA]);
+        CalonSiswa::factory()->create([
+            'user_id' => $user3->id,
+            'nomor_pendaftaran' => '26AAY0003',
+            'nisn' => '0099887744',
+            'nama_lengkap' => 'Budi Santoso',
+            'program_id' => $this->program->id,
+            'jurusan_id' => $this->jurusan->id,
+            'gelombang_id' => $this->gelombang->id,
+            'asal_sekolah_id' => null,
+            'asal_sekolah_lainnya' => 'SMP Plus Al-Hikmah Tarogong',
+            'kabupaten_nama' => 'Garut',
+        ]);
+
+        $metricsService = app(\App\Services\DashboardMetricsService::class);
+        $topSchools = $metricsService->getTopAsalSekolah(5);
+
+        $this->assertNotEmpty($topSchools['top']);
+        $this->assertEquals('SMP Plus Al-Hikmah Tarogong', $topSchools['top'][0]['nama']);
+        $this->assertEquals(2, $topSchools['top'][0]['total_siswa']);
+
+        // Check Admin Dashboard sees both
+        $dashboardResponse = $this->actingAs($this->adminUser)->get(route('admin.dashboard'));
+        $dashboardResponse->assertOk();
+        $dashboardResponse->assertSee('SMP Plus Al-Hikmah Tarogong');
+        $dashboardResponse->assertSee('SMP Negeri 1 Garut');
+
+        // Check Laporan index sees both
+        $laporanResponse = $this->actingAs($this->adminUser)->get(route('admin.laporan.index'));
+        $laporanResponse->assertOk();
+        $laporanResponse->assertSee('SMP Plus Al-Hikmah Tarogong');
+        $laporanResponse->assertSee('SMP Negeri 1 Garut');
+    }
+
+    public function test_referensi_sekolah_endpoint_works_without_sql_errors(): void
+    {
+        MasterSekolahAsal::firstOrCreate(
+            ['npsn' => '20208888'],
+            [
+                'nama_sekolah' => 'SMP IT Cendekia',
+                'kokab' => 'Garut',
+                'jenis' => 'SMP',
+                'status' => 'SWASTA',
+            ]
+        );
+
+        $response = $this->getJson(route('referensi.sekolah', ['q' => 'Cendekia']));
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            'nama_sekolah' => 'SMP IT Cendekia',
+            'kokab' => 'Garut',
+        ]);
+    }
+
+    public function test_calon_siswa_search_handles_school_and_no_hp_without_sql_error(): void
+    {
+        $this->calonSiswa->update([
+            'no_hp_siswa' => '081234567890',
+            'asal_sekolah_lainnya' => 'SMP Pasundan Garut',
+        ]);
+
+        // Admin search by no_hp_siswa
+        $adminHpSearch = $this->actingAs($this->adminUser)->get(route('admin.calon-siswa.index', ['q' => '081234']));
+        $adminHpSearch->assertOk();
+        $adminHpSearch->assertSee($this->calonSiswa->nama_lengkap);
+
+        // Admin search by school
+        $adminSchoolSearch = $this->actingAs($this->adminUser)->get(route('admin.calon-siswa.index', ['q' => 'Pasundan']));
+        $adminSchoolSearch->assertOk();
+        $adminSchoolSearch->assertSee($this->calonSiswa->nama_lengkap);
+
+        // Kepala Sekolah search by no_hp_siswa
+        $kepsekHpSearch = $this->actingAs($this->kepalaSekolahUser)->get(route('kepala-sekolah.calon-siswa.index', ['q' => '081234']));
+        $kepsekHpSearch->assertOk();
+        $kepsekHpSearch->assertSee($this->calonSiswa->nama_lengkap);
+
+        // Kepala Sekolah search by school
+        $kepsekSchoolSearch = $this->actingAs($this->kepalaSekolahUser)->get(route('kepala-sekolah.calon-siswa.index', ['q' => 'Pasundan']));
+        $kepsekSchoolSearch->assertOk();
+        $kepsekSchoolSearch->assertSee($this->calonSiswa->nama_lengkap);
+    }
+
+    public function test_timeline_metrics_returns_weekly_and_monthly_with_milestones(): void
+    {
+        $metricsService = app(\App\Services\DashboardMetricsService::class);
+        $timeline = $metricsService->getTimelinePendaftar();
+
+        // 1. Weekly dataset checks
+        $this->assertArrayHasKey('mingguan', $timeline);
+        $this->assertCount(49, $timeline['mingguan']['labels']);
+        $this->assertCount(49, $timeline['mingguan']['ranges']);
+        $this->assertCount(49, $timeline['mingguan']['pendaftar']);
+        $this->assertEquals('M1 Sep', $timeline['mingguan']['labels'][0]);
+        $this->assertEquals('M5 Jun', $timeline['mingguan']['labels'][48]);
+
+        // 2. Monthly dataset checks
+        $this->assertArrayHasKey('bulanan', $timeline);
+        $this->assertCount(10, $timeline['bulanan']['labels']);
+        $this->assertEquals('Sep 2026', $timeline['bulanan']['labels'][0]);
+        $this->assertEquals('Jun 2027', $timeline['bulanan']['labels'][9]);
+
+        // 3. Milestones checks
+        $this->assertArrayHasKey('milestones', $timeline);
+        $this->assertCount(4, $timeline['milestones']);
+        $this->assertEquals('Pembukaan', $timeline['milestones'][0]['title']);
+        $this->assertEquals('Gelombang 1', $timeline['milestones'][1]['title']);
+        $this->assertEquals('Gelombang 2', $timeline['milestones'][2]['title']);
+        $this->assertEquals('Gelombang 3', $timeline['milestones'][3]['title']);
+
+        // 4. View renders timeline and milestones
+        $response = $this->actingAs($this->adminUser)->get(route('admin.dashboard'));
+        $response->assertOk();
+        $response->assertSee('Timeline Tren Mingguan');
+        $response->assertSee('Siklus 10 Bulan (49 Minggu)');
+        $response->assertSee('Pembukaan');
+        $response->assertSee('Gelombang 1');
+        $response->assertSee('Gelombang 2');
+        $response->assertSee('Gelombang 3');
+        $response->assertSee('31 Des 2026');
+        $response->assertSee('28 Feb 2027');
+        $response->assertSee('30 Jun 2027');
     }
 }

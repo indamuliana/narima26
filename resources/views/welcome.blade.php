@@ -254,7 +254,7 @@
                                 <span class="text-xl">📄</span>
                                 <div>
                                     <h4 class="font-bold text-white text-sm">Brosur Resmi</h4>
-                                    <p class="text-xs text-white mt-0.5">Download Gratis (PDF)</p>
+                                    <p class="text-xs text-white mt-0.5">Download (PDF)</p>
                                 </div>
                             </div>
                         </div>

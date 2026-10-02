@@ -62,7 +62,7 @@
                     <div class="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-[#FCF1D0]/40 via-white to-[#FCF1D0]/20 border-2 border-[#22396F]/30 shadow-sm">
                         <div class="flex items-center justify-between pb-3 border-b border-[#22396F]/15">
                             <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full bg-[#0D1C42] text-[#FCF1D0] flex items-center justify-center font-black text-sm shadow-sm">★</div>
+                                <!--<div class="w-8 h-8 rounded-full bg-[#0D1C42] text-[#FCF1D0] flex items-center justify-center font-black text-sm shadow-sm">★</div>-->
                                 <div>
                                     <h2 class="text-base font-black text-[#010736] tracking-tight">Pilih Program Pendidikan</h2>
                                     <p class="text-xs text-slate-600">Tentukan jalur program pendidikan yang ingin Anda tempuh di SMK Wikrama 1 Garut</p>
@@ -91,9 +91,9 @@
                                             <span class="program-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider transition"
                                                   :class="selectedProgram == '{{ $program->id }}' ? 'bg-[#010736] text-[#FCF1D0]' : 'bg-slate-100 text-slate-700'">
                                                 @if($isUnggulan)
-                                                    ⭐ Program Unggulan
+                                                    ⭐ Asrama Tahfidz
                                                 @else
-                                                    📘 Program Reguler
+                                                    📘 Non-Asrama
                                                 @endif
                                             </span>
                                             <div class="program-check-circle w-6 h-6 rounded-full border-2 flex items-center justify-center transition"
@@ -131,7 +131,7 @@
                                 <label for="nisn" class="block text-sm font-bold text-[#010736]">NISN (Nomor Induk Siswa Nasional) <span class="text-red-500">*</span></label>
                                 <input type="text" name="nisn" id="nisn" value="{{ old('nisn') }}" maxlength="10" placeholder="10 digit nomor NISN resmi dari Kemdikbud" required
                                     class="mt-1.5 w-full rounded-xl border border-slate-300 bg-white text-slate-900 px-4 py-2.5 text-sm focus:border-[#22396F] focus:ring-4 focus:ring-[#22396F]/15 outline-none transition placeholder:text-slate-400 @error('nisn') border-red-500 @enderror">
-                                <p class="text-xs text-slate-600 mt-1">NISN akan digunakan sebagai <strong class="text-[#010736]">Username login</strong> portal SPMB Anda.</p>
+                                <p class="text-xs text-slate-600 mt-1">NISN dapat di lihat di ijazah/rapor.</p>
                                 @error('nisn') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
 
@@ -168,7 +168,7 @@
                                 <label for="tanggal_lahir" class="block text-sm font-bold text-[#010736]">Tanggal Lahir <span class="text-red-500">*</span></label>
                                 <input type="date" name="tanggal_lahir" id="tanggal_lahir" value="{{ old('tanggal_lahir') }}" required
                                     class="mt-1.5 w-full rounded-xl border border-slate-300 bg-white text-slate-900 px-4 py-2.5 text-sm focus:border-[#22396F] focus:ring-4 focus:ring-[#22396F]/15 outline-none transition @error('tanggal_lahir') border-red-500 @enderror">
-                                <p class="text-xs text-slate-600 mt-1">Nomor Pendaftaran akan menjadi <strong class="text-[#010736]">Password awal</strong> login akun Anda dan tercantum pada Kartu Peserta.</p>
+                                <!--<p class="text-xs text-slate-600 mt-1">Nomor Pendaftaran akan menjadi <strong class="text-[#010736]">Password awal</strong> login akun Anda dan tercantum pada Kartu Peserta.</p>-->
                                 @error('tanggal_lahir') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
@@ -347,7 +347,7 @@
                                 <select name="referensi_rayon" id="referensi_rayon"
                                     class="mt-1.5 w-full rounded-xl border border-slate-300 bg-white text-slate-900 px-4 py-2.5 text-sm focus:border-[#22396F] focus:ring-4 focus:ring-[#22396F]/15 outline-none transition @error('referensi_rayon') border-red-500 @enderror">
                                     <option value="">-- Pilih Rayon Siswa --</option>
-                                    @foreach(['Ciawitali', 'Tarogong Kaler', 'Tarogong Kidul 1', 'Tarogong Kidul 2', 'Garut Kota 1', 'Garut Kota 2', 'Samarang', 'Leles', 'Kadungora', 'Bayongbong', 'Cilawu', 'Karangpawitan', 'Wanaraja', 'Cibatu', 'Limbangan', 'Banyuresmi', 'Cikajang', 'Cisurupan', 'Rayon Wikrama Bogor', 'Lainnya'] as $rayon)
+                                    @foreach(['Tarogong Kaler 1', 'Tarogong Kaler 2', 'Tarogong Kaler 3', 'Kadungora', 'Banyuresmi/Leles', 'Garut Tengah', 'Al Ikrom 1', 'Al Ikrom 2', 'Al Ikrom 3', 'Al Ikrom 4', 'Al Ikrom 5', 'Al Ikrom 6', 'Al Ikrom 7', 'Tidak Tahu'] as $rayon)
                                         <option value="{{ $rayon }}" {{ old('referensi_rayon') == $rayon ? 'selected' : '' }}>Rayon {{ $rayon }}</option>
                                     @endforeach
                                 </select>

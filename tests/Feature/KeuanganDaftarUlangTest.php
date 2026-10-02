@@ -302,7 +302,8 @@ class KeuanganDaftarUlangTest extends TestCase
 
         $this->assertEquals(PaymentStatus::DIVERIFIKASI->value, $pembayaran->status);
         $this->assertEquals('CICILAN', $tagihan->status);
-        $this->assertEquals(SpmbStatus::DAFTAR_ULANG_DIVERIFIKASI, $this->calonSiswa->status_spmb);
+        $this->assertEquals(SpmbStatus::RESMI_TERDAFTAR, $this->calonSiswa->status_spmb);
+        $this->assertTrue($this->calonSiswa->riwayatStatus()->where('status_baru', SpmbStatus::DAFTAR_ULANG_DIVERIFIKASI->value)->exists());
     }
 
     public function test_full_payment_transitions_tagihan_to_lunas(): void

@@ -42,7 +42,10 @@ class CalonSiswaController extends Controller
                   ->orWhere('nomor_pendaftaran', 'like', "%{$search}%")
                   ->orWhere('nisn', 'like', "%{$search}%")
                   ->orWhere('no_hp_siswa', 'like', "%{$search}%")
-                  ->orWhere('asal_sekolah_lainnya', 'like', "%{$search}%");
+                  ->orWhere('asal_sekolah_lainnya', 'like', "%{$search}%")
+                  ->orWhereHas('sekolahAsal', function ($sub) use ($search) {
+                      $sub->where('nama_sekolah', 'like', "%{$search}%");
+                  });
             });
         }
 
@@ -783,6 +786,8 @@ class CalonSiswaController extends Controller
      */
     public function updateTags(Request $request, CalonSiswa $calonSiswa)
     {
+        abort_unless(auth()->user()->isAdmin(), 403, 'Hanya Administrator yang memiliki wewenang mengubah tag siswa.');
+
         $validated = $request->validate([
             'tag_beasiswa' => ['nullable', 'string', 'max:255'],
             'tag_jalur' => ['nullable', 'string', 'max:255'],

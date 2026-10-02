@@ -25,6 +25,11 @@ class MasterSekolahAsal extends Model
         'kabupaten_kota',
     ];
 
+    protected $appends = [
+        'kabupaten',
+        'kabupaten_kota',
+    ];
+
     public function calonSiswa(): HasMany
     {
         return $this->hasMany(CalonSiswa::class, 'asal_sekolah_id');

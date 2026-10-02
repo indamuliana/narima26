@@ -23,7 +23,7 @@ class UpdateBiodataRequest extends FormRequest
             'nisn' => ['nullable', 'string', 'digits:10'],
             'jurusan_id' => ['nullable', 'exists:master_jurusan,id'],
             'jurusan_id_2' => ['nullable', 'exists:master_jurusan,id'],
-            'asal_sekolah_id' => ['nullable', 'exists:sekolah_asal,id'],
+            'asal_sekolah_id' => ['nullable', 'exists:master_sekolah_asal,id'],
             'asal_sekolah_lainnya' => ['nullable', 'string', 'max:255'],
             'nik' => ['required', 'string', 'digits:16'],
             'no_kk' => ['required', 'string', 'digits:16'],

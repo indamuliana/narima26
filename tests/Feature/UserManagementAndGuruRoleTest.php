@@ -289,4 +289,57 @@ class UserManagementAndGuruRoleTest extends TestCase
         $response->assertDontSee('Alokasi Pewawancara');
         $response->assertDontSee('Audit Trail Sistem');
     }
+
+    public function test_guru_dashboard_shows_panel_guru_and_hides_bendahara_link(): void
+    {
+        $response = $this->actingAs($this->guru)->get(route('admin.dashboard'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Panel Guru');
+        $response->assertDontSee('Panel Administrator');
+        $response->assertDontSee('Buka Manajemen Kas & Keuangan');
+    }
+
+    public function test_guru_detail_page_does_not_show_edit_or_impersonate_buttons(): void
+    {
+        $jurusan = MasterJurusan::first();
+        $gelombang = MasterGelombang::first();
+        $program = MasterProgram::first();
+
+        $calonSiswa = CalonSiswa::factory()->create([
+            'jurusan_id' => $jurusan->id,
+            'gelombang_id' => $gelombang->id,
+            'program_id' => $program->id,
+            'nama_lengkap' => 'Siswa Tes Hak Akses Guru',
+        ]);
+
+        $response = $this->actingAs($this->guru)->get(route('admin.calon-siswa.show', $calonSiswa));
+
+        $response->assertStatus(200);
+        $response->assertSee('Siswa Tes Hak Akses Guru');
+        $response->assertDontSee('Edit Data Siswa');
+        $response->assertDontSee('Masuk Sebagai Siswa');
+    }
+
+    public function test_guru_cannot_update_student_tags(): void
+    {
+        $jurusan = MasterJurusan::first();
+        $gelombang = MasterGelombang::first();
+        $program = MasterProgram::first();
+
+        $calonSiswa = CalonSiswa::factory()->create([
+            'jurusan_id' => $jurusan->id,
+            'gelombang_id' => $gelombang->id,
+            'program_id' => $program->id,
+            'tag_beasiswa' => 'Normal',
+        ]);
+
+        // Guru attempts to update tag -> blocked by middleware
+        $response = $this->actingAs($this->guru)->put(route('admin.calon-siswa.update-tags', $calonSiswa), [
+            'tag_beasiswa' => 'Yatim',
+        ]);
+
+        $response->assertRedirect(route('admin.dashboard'));
+        $this->assertEquals('Normal', $calonSiswa->fresh()->tag_beasiswa);
+    }
 }

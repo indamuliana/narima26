@@ -19,6 +19,7 @@ class UploadDokumenRequest extends FormRequest
             'file_ijazah_atau_skl' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
             'file_pas_foto' => ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:2048'],
             'file_dokumen_pendukung' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
+            'action' => ['nullable', 'string', 'in:save,next'],
         ];
     }
 

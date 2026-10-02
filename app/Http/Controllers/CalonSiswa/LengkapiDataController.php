@@ -194,7 +194,9 @@ class LengkapiDataController extends Controller
         $calonSiswa = auth()->user()->calonSiswa;
         $this->lengkapiDataService->uploadDokumen($calonSiswa, $request->allFiles());
 
-        return redirect()->route('calon-siswa.lengkapi-data.index', ['tab' => 'dokumen'])
+        $tab = $request->input('action') === 'next' ? 'kesehatan' : 'dokumen';
+
+        return redirect()->route('calon-siswa.lengkapi-data.index', ['tab' => $tab])
             ->with('success', 'Berkas dokumen persyaratan berhasil diunggah!');
     }
 
