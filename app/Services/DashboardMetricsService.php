@@ -397,7 +397,46 @@ class DashboardMetricsService
                 'belum_isi'       => $belumIsiGender,
             ],
             'programs'        => $programs,
+            'program_gender'  => $this->getProgramGenderStats(),
             'referensi_stats' => $referensiStats,
+        ];
+    }
+
+    /**
+     * Total Pendaftar Program Unggulan & Reguler (All, Laki-laki, Perempuan).
+     */
+    public function getProgramGenderStats(): array
+    {
+        $raw = CalonSiswa::selectRaw("
+            COALESCE(SUM(CASE WHEN master_program.kode = 'UGG' OR master_program.nama LIKE '%Unggulan%' THEN 1 ELSE 0 END), 0) as unggulan_all,
+            COALESCE(SUM(CASE WHEN (master_program.kode = 'UGG' OR master_program.nama LIKE '%Unggulan%') AND calon_siswa.jenis_kelamin = 'L' THEN 1 ELSE 0 END), 0) as unggulan_laki,
+            COALESCE(SUM(CASE WHEN (master_program.kode = 'UGG' OR master_program.nama LIKE '%Unggulan%') AND calon_siswa.jenis_kelamin = 'P' THEN 1 ELSE 0 END), 0) as unggulan_perempuan,
+            COALESCE(SUM(CASE WHEN master_program.kode = 'REG' OR master_program.nama LIKE '%Reguler%' THEN 1 ELSE 0 END), 0) as reguler_all,
+            COALESCE(SUM(CASE WHEN (master_program.kode = 'REG' OR master_program.nama LIKE '%Reguler%') AND calon_siswa.jenis_kelamin = 'L' THEN 1 ELSE 0 END), 0) as reguler_laki,
+            COALESCE(SUM(CASE WHEN (master_program.kode = 'REG' OR master_program.nama LIKE '%Reguler%') AND calon_siswa.jenis_kelamin = 'P' THEN 1 ELSE 0 END), 0) as reguler_perempuan
+        ")
+        ->leftJoin('master_program', 'calon_siswa.program_id', '=', 'master_program.id')
+        ->first();
+
+        $uAll  = (int) ($raw->unggulan_all ?? 0);
+        $uLaki = (int) ($raw->unggulan_laki ?? 0);
+        $uPer  = (int) ($raw->unggulan_perempuan ?? 0);
+
+        $rAll  = (int) ($raw->reguler_all ?? 0);
+        $rLaki = (int) ($raw->reguler_laki ?? 0);
+        $rPer  = (int) ($raw->reguler_perempuan ?? 0);
+
+        return [
+            'unggulan_all'           => $uAll,
+            'unggulan_laki'          => $uLaki,
+            'unggulan_perempuan'     => $uPer,
+            'reguler_all'            => $rAll,
+            'reguler_laki'           => $rLaki,
+            'reguler_perempuan'      => $rPer,
+            'unggulan_laki_pct'      => $uAll > 0 ? round(($uLaki / $uAll) * 100, 1) : 0,
+            'unggulan_perempuan_pct' => $uAll > 0 ? round(($uPer / $uAll) * 100, 1) : 0,
+            'reguler_laki_pct'       => $rAll > 0 ? round(($rLaki / $rAll) * 100, 1) : 0,
+            'reguler_perempuan_pct'  => $rAll > 0 ? round(($rPer / $rAll) * 100, 1) : 0,
         ];
     }
 

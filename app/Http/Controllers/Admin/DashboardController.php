@@ -26,6 +26,7 @@ class DashboardController extends Controller
         $funnel         = $metricsService->getFunnelKonversi();
         $demografi      = $metricsService->getDemografiData();
         $topSekolah     = $metricsService->getTopAsalSekolah(5);
+        $programStats   = $metricsService->getProgramGenderStats();
 
         // Status Counts
         $stats = [
@@ -125,7 +126,8 @@ class DashboardController extends Controller
             'timeline',
             'funnel',
             'demografi',
-            'topSekolah'
+            'topSekolah',
+            'programStats'
         ));
     }
 }

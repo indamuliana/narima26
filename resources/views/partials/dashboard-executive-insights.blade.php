@@ -95,19 +95,30 @@
                 <span class="text-xs font-bold text-slate-700 block">Peminatan Program Sekolah</span>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     @foreach ($demografi['programs'] as $prg)
-                        <div class="p-3.5 rounded-2xl border {{ strtolower($prg['nama']) === 'unggulan' ? 'border-amber-200 bg-amber-50/40' : 'border-blue-200 bg-blue-50/40' }} flex items-center justify-between">
-                            <div>
-                                <div class="flex items-center gap-1.5">
-                                    <span class="text-xs font-black text-slate-900">Program {{ $prg['nama'] }}</span>
-                                    @if (strtolower($prg['nama']) === 'unggulan')
-                                        <span class="px-1.5 py-0.2 rounded text-[9px] font-black bg-amber-200 text-amber-900">+ Asrama</span>
-                                    @endif
+                        @php
+                            $isUnggulan = strtolower($prg['nama']) === 'unggulan';
+                            $pLaki = $isUnggulan ? ($demografi['program_gender']['unggulan_laki'] ?? 0) : ($demografi['program_gender']['reguler_laki'] ?? 0);
+                            $pPer = $isUnggulan ? ($demografi['program_gender']['unggulan_perempuan'] ?? 0) : ($demografi['program_gender']['reguler_perempuan'] ?? 0);
+                        @endphp
+                        <div class="p-3.5 rounded-2xl border {{ $isUnggulan ? 'border-amber-200 bg-amber-50/40' : 'border-blue-200 bg-blue-50/40' }} flex flex-col justify-between gap-2">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-xs font-black text-slate-900">Program {{ $prg['nama'] }}</span>
+                                        @if ($isUnggulan)
+                                            <span class="px-1.5 py-0.2 rounded text-[9px] font-black bg-amber-200 text-amber-900">+ Asrama</span>
+                                        @endif
+                                    </div>
+                                    <span class="text-[11px] text-slate-500 mt-0.5 block">{{ $prg['pct'] }}% dari total</span>
                                 </div>
-                                <span class="text-[11px] text-slate-500 mt-0.5 block">{{ $prg['pct'] }}% dari total</span>
+                                <div class="text-right">
+                                    <span class="text-xl font-black text-slate-900">{{ $prg['count'] }}</span>
+                                    <span class="text-[10px] text-slate-400 block">Siswa</span>
+                                </div>
                             </div>
-                            <div class="text-right">
-                                <span class="text-xl font-black text-slate-900">{{ $prg['count'] }}</span>
-                                <span class="text-[10px] text-slate-400 block">Siswa</span>
+                            <div class="pt-2 border-t {{ $isUnggulan ? 'border-amber-200/60' : 'border-blue-200/60' }} flex items-center justify-between text-[11px] font-semibold text-slate-600">
+                                <span>👨 Laki: <strong>{{ $pLaki }}</strong></span>
+                                <span>👩 Perempuan: <strong>{{ $pPer }}</strong></span>
                             </div>
                         </div>
                     @endforeach

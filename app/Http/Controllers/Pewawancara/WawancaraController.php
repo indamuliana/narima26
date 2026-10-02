@@ -28,8 +28,9 @@ class WawancaraController extends Controller
         $stats = $this->wawancaraService->getStatistics(auth()->user());
         $recentAntrian = $this->wawancaraService->getAntrian(statusWawancara: 'BELUM', perPage: 5);
         $recentRiwayat = $this->wawancaraService->getRiwayat(perPage: 5);
+        $programStats = app(\App\Services\DashboardMetricsService::class)->getProgramGenderStats();
 
-        return view('pewawancara.dashboard', compact('stats', 'recentAntrian', 'recentRiwayat'));
+        return view('pewawancara.dashboard', compact('stats', 'recentAntrian', 'recentRiwayat', 'programStats'));
     }
 
     /**

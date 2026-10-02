@@ -439,4 +439,46 @@ class AdminDashboardTest extends TestCase
         $response->assertSee('28 Feb 2027');
         $response->assertSee('30 Jun 2027');
     }
+
+    public function test_dashboard_displays_unggulan_and_reguler_gender_statistics(): void
+    {
+        $metricsService = app(\App\Services\DashboardMetricsService::class);
+        $programStats = $metricsService->getProgramGenderStats();
+
+        // 1. Verify metrics array structure
+        $this->assertArrayHasKey('unggulan_all', $programStats);
+        $this->assertArrayHasKey('unggulan_laki', $programStats);
+        $this->assertArrayHasKey('unggulan_perempuan', $programStats);
+        $this->assertArrayHasKey('reguler_all', $programStats);
+        $this->assertArrayHasKey('reguler_laki', $programStats);
+        $this->assertArrayHasKey('reguler_perempuan', $programStats);
+
+        // 2. Admin & Guru Dashboard
+        $responseAdmin = $this->actingAs($this->adminUser)->get(route('admin.dashboard'));
+        $responseAdmin->assertOk();
+        $responseAdmin->assertSee('Statistik Peminatan Program');
+        $responseAdmin->assertSee('Total Pendaftar Unggulan All');
+        $responseAdmin->assertSee('Total Pendaftar Reguler All');
+
+        // 3. Kepala Sekolah Dashboard
+        $kepsekUser = \App\Models\User::factory()->create(['role' => 'kepala_sekolah']);
+        $responseKepsek = $this->actingAs($kepsekUser)->get(route('kepala-sekolah.dashboard'));
+        $responseKepsek->assertOk();
+        $responseKepsek->assertSee('Total Pendaftar Unggulan All');
+        $responseKepsek->assertSee('Total Pendaftar Reguler All');
+
+        // 4. Bendahara Dashboard
+        $bendaharaUser = \App\Models\User::factory()->create(['role' => 'bendahara']);
+        $responseBendahara = $this->actingAs($bendaharaUser)->get(route('bendahara.dashboard'));
+        $responseBendahara->assertOk();
+        $responseBendahara->assertSee('Total Pendaftar Unggulan All');
+        $responseBendahara->assertSee('Total Pendaftar Reguler All');
+
+        // 5. Pewawancara Dashboard
+        $pewawancaraUser = \App\Models\User::factory()->create(['role' => 'pewawancara']);
+        $responsePewawancara = $this->actingAs($pewawancaraUser)->get(route('pewawancara.dashboard'));
+        $responsePewawancara->assertOk();
+        $responsePewawancara->assertSee('Total Pendaftar Unggulan All');
+        $responsePewawancara->assertSee('Total Pendaftar Reguler All');
+    }
 }

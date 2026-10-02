@@ -89,6 +89,9 @@
             </div>
         </div>
 
+        <!-- Statistik Program Unggulan vs Reguler & Gender -->
+        @include('partials.dashboard-program-stats')
+
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Recent Seleksi Payments -->
             <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">

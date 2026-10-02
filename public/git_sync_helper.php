@@ -71,6 +71,18 @@ if ($action === 'sync') {
         $log[] = "<b>$ " . htmlspecialchars($cmd) . "</b>\n" . htmlspecialchars($res['output']);
     }
     $result = implode("\n\n", $log);
+} elseif ($action === 'migrate') {
+    $commands = [
+        'php artisan migrate --force',
+        'php artisan config:clear',
+        'php artisan view:clear',
+    ];
+    $log = [];
+    foreach ($commands as $cmd) {
+        $res = run_cmd($cmd);
+        $log[] = "<b>$ " . htmlspecialchars($cmd) . "</b>\n" . htmlspecialchars($res['output']);
+    }
+    $result = implode("\n\n", $log);
 } elseif ($action === 'status') {
     $resGit = run_cmd('git status');
     $resRemote = run_cmd('git remote -v');
@@ -85,13 +97,16 @@ if ($action === 'sync') {
     <title>Git Sync Helper - cPanel Nampi26</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; padding: 30px; }
-        .card { max-width: 800px; margin: 0 auto; background: #1e293b; border-radius: 12px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .card { max-width: 850px; margin: 0 auto; background: #1e293b; border-radius: 12px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         h1 { font-size: 20px; margin-top: 0; color: #38bdf8; }
         .alert { background: #334155; border-left: 4px solid #38bdf8; padding: 12px; border-radius: 4px; font-size: 14px; margin-bottom: 20px; line-height: 1.5; }
         .alert-warning { border-left-color: #f59e0b; background: #451a03; color: #fef3c7; }
-        .btn { display: inline-block; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px; margin-right: 10px; cursor: pointer; border: none; }
+        .alert-info { border-left-color: #10b981; background: #064e3b; color: #d1fae5; }
+        .btn { display: inline-block; padding: 10px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; margin-right: 8px; margin-bottom: 8px; cursor: pointer; border: none; }
         .btn-primary { background: #0284c7; color: white; }
         .btn-primary:hover { background: #0369a1; }
+        .btn-success { background: #059669; color: white; }
+        .btn-success:hover { background: #047857; }
         .btn-danger { background: #dc2626; color: white; }
         .btn-danger:hover { background: #b91c1c; }
         .btn-secondary { background: #475569; color: white; }
@@ -107,9 +122,14 @@ if ($action === 'sync') {
         <strong>Target Remote GitHub:</strong> <code>https://github.com/indamuliana/narima26.git</code> (Branch: <code>main</code>)
     </div>
 
+    <div class="alert alert-info">
+        💡 <strong>Catatan Database:</strong> Git hanya mengupdate kode program (PHP/Blade/CSS). Database tidak akan berubah otomatis saat Git pull. Untuk update saat ini tidak ada perubahan struktur tabel. Jika di masa depan ada migrasi database baru, Anda cukup klik tombol <strong>"🗄️ Jalankan Database Migration"</strong> di bawah.
+    </div>
+
     <div style="margin-bottom: 20px;">
         <a href="?token=<?= $secret_token ?>&action=status" class="btn btn-secondary">🔍 Cek Status Git</a>
         <a href="?token=<?= $secret_token ?>&action=sync" class="btn btn-primary" onclick="return confirm('Mulai sinkronisasi repository ke branch main GitHub? File .env dan public/storage TIDAK akan terhapus.');">⚡ Jalankan Sinkronisasi Awal</a>
+        <a href="?token=<?= $secret_token ?>&action=migrate" class="btn btn-success" onclick="return confirm('Jalankan php artisan migrate pada database?');">🗄️ Jalankan Database Migration</a>
         <a href="?token=<?= $secret_token ?>&action=delete" class="btn btn-danger" onclick="return confirm('PERINGATAN: Apakah Anda yakin ingin menghapus file helper ini dari server sekarang?');">🗑️ Hapus Helper Ini</a>
     </div>
 

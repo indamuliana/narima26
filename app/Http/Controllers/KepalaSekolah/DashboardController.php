@@ -22,6 +22,7 @@ class DashboardController extends Controller
         $funnel         = $metricsService->getFunnelKonversi();
         $demografi      = $metricsService->getDemografiData();
         $topSekolah     = $metricsService->getTopAsalSekolah(5);
+        $programStats   = $metricsService->getProgramGenderStats();
 
         $stats = [
             'total_pendaftar' => $totalPendaftar,
@@ -72,7 +73,8 @@ class DashboardController extends Controller
             'timeline',
             'funnel',
             'demografi',
-            'topSekolah'
+            'topSekolah',
+            'programStats'
         ));
     }
 }

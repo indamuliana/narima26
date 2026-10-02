@@ -145,6 +145,9 @@
             </div>
         </div>
 
+        <!-- Statistik Program Unggulan vs Reguler & Gender -->
+        @include('partials.dashboard-program-stats')
+
         <!-- Timeline Trend Chart (September 2026 - Juni 2027) -->
         @include('partials.dashboard-timeline-chart')
 

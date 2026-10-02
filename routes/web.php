@@ -175,7 +175,8 @@ Route::middleware(['auth', 'role:bendahara,admin'])
             ];
             $recentSeleksi = \App\Models\PembayaranSeleksi::with('calonSiswa')->latest('id')->take(5)->get();
             $recentDaftarUlang = \App\Models\PembayaranDaftarUlang::with(['calonSiswa', 'tagihan'])->latest('id')->take(5)->get();
-            return view('bendahara.dashboard', compact('stats', 'recentSeleksi', 'recentDaftarUlang'));
+            $programStats = app(\App\Services\DashboardMetricsService::class)->getProgramGenderStats();
+            return view('bendahara.dashboard', compact('stats', 'recentSeleksi', 'recentDaftarUlang', 'programStats'));
         })->name('dashboard');
 
         // Pembayaran Seleksi (Fase 7)
