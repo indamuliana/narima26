@@ -597,7 +597,7 @@
 
                 @php
                     $akademik = $calonSiswa->dataAkademik;
-                    $rapor = $calonSiswa->nilaiRapor?->keyBy('semester') ?? collect();
+                    $rapor = $calonSiswa->nilaiRapor;
                     $prestasiList = $calonSiswa->prestasi ?? collect();
                 @endphp
 
@@ -626,7 +626,7 @@
                                     @for($i=1; $i<=5; $i++)
                                         <td class="p-2 text-center">
                                             <input type="number" step="0.01" min="0" max="100" id="mtk_sem{{ $i }}" name="mtk_sem{{ $i }}"
-                                                value="{{ old('mtk_sem'.$i, $rapor->get($i)?->nilai_matematika) }}"
+                                                value="{{ old('mtk_sem'.$i, $rapor?->{'mtk_sem'.$i}) }}"
                                                 oninput="calculateMatrixRow('mtk')"
                                                 class="w-20 text-center rounded-lg border border-slate-300 p-1.5 font-mono focus:border-indigo-600 outline-none">
                                         </td>
@@ -640,7 +640,7 @@
                                     @for($i=1; $i<=5; $i++)
                                         <td class="p-2 text-center">
                                             <input type="number" step="0.01" min="0" max="100" id="ind_sem{{ $i }}" name="ind_sem{{ $i }}"
-                                                value="{{ old('ind_sem'.$i, $rapor->get($i)?->nilai_bahasa_indonesia) }}"
+                                                value="{{ old('ind_sem'.$i, $rapor?->{'ind_sem'.$i}) }}"
                                                 oninput="calculateMatrixRow('ind')"
                                                 class="w-20 text-center rounded-lg border border-slate-300 p-1.5 font-mono focus:border-indigo-600 outline-none">
                                         </td>
@@ -654,7 +654,7 @@
                                     @for($i=1; $i<=5; $i++)
                                         <td class="p-2 text-center">
                                             <input type="number" step="0.01" min="0" max="100" id="eng_sem{{ $i }}" name="eng_sem{{ $i }}"
-                                                value="{{ old('eng_sem'.$i, $rapor->get($i)?->nilai_bahasa_inggris) }}"
+                                                value="{{ old('eng_sem'.$i, $rapor?->{'eng_sem'.$i}) }}"
                                                 oninput="calculateMatrixRow('eng')"
                                                 class="w-20 text-center rounded-lg border border-slate-300 p-1.5 font-mono focus:border-indigo-600 outline-none">
                                         </td>
@@ -668,7 +668,7 @@
                                     @for($i=1; $i<=5; $i++)
                                         <td class="p-2 text-center">
                                             <input type="number" step="0.01" min="0" max="100" id="pai_sem{{ $i }}" name="pai_sem{{ $i }}"
-                                                value="{{ old('pai_sem'.$i, $rapor->get($i)?->nilai_pai) }}"
+                                                value="{{ old('pai_sem'.$i, $rapor?->{'pai_sem'.$i}) }}"
                                                 oninput="calculateMatrixRow('pai')"
                                                 class="w-20 text-center rounded-lg border border-slate-300 p-1.5 font-mono focus:border-indigo-600 outline-none">
                                         </td>
