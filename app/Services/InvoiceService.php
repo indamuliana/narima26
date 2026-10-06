@@ -157,7 +157,11 @@ class InvoiceService
         ?User $actor = null
     ): Tagihan {
         return DB::transaction(function () use ($calonSiswa, $diskon, $actor) {
-            $diskon = $diskon ?? $calonSiswa->diskon()->where('status_persetujuan', 'DISETUJUI')->whereNull('tagihan_id')->first();
+            $diskon = $diskon ?? $calonSiswa->diskon()
+                ->whereNotIn('id', function ($query) {
+                    $query->select('diskon_id')->from('tagihan')->whereNotNull('diskon_id');
+                })
+                ->first();
 
             // 1. Tagihan Daftar Ulang (DSP + SPP)
             $tagihanDU = $this->generateRegistrationInvoice($calonSiswa, $diskon, $actor);
