@@ -84,7 +84,7 @@
                     $username = $calonSiswa->nisn;
                     $password = $sessionData['password_plain'] ?? $calonSiswa->nomor_pendaftaran;
                     $namaCalon = $calonSiswa->nama_lengkap;
-                    $waText = "Assalamualaikum, saya {$namaCalon} barusaja mendaftar di web SPMB SMK Wikrama 1 Garut dengan username {$username} dan password {$password}, mohon bantuannya, terima kasih";
+                    $waText = "Assalamualaikum, saya {$namaCalon} baru saja mendaftar di web SPMB SMK Wikrama 1 Garut dengan username {$username} dan password {$password}, mohon bantuannya, terima kasih";
                     $waUrl = "https://wa.me/{$waNumber}?text=" . urlencode($waText);
                 @endphp
 

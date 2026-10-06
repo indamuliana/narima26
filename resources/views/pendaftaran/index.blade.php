@@ -211,7 +211,7 @@
                                 <label for="email" class="block text-sm font-bold text-[#010736]">Alamat Email Aktif <span class="text-red-500">*</span></label>
                                 <input type="email" name="email" id="email" value="{{ old('email') }}" placeholder="nama@gmail.com" required
                                     class="mt-1.5 w-full rounded-xl border border-slate-300 bg-white text-slate-900 px-4 py-2.5 text-sm focus:border-[#22396F] focus:ring-4 focus:ring-[#22396F]/15 outline-none transition placeholder:text-slate-400 @error('email') border-red-500 @enderror">
-                                <p class="text-xs text-slate-600 mt-1">Alamat email aktif untuk menerima informasi akun login dan berkas bukti pendaftaran.</p>
+                                <!-- <p class="text-xs text-slate-600 mt-1">Alamat email aktif untuk menerima informasi akun login dan berkas bukti pendaftaran.</p> -->
                                 @error('email') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
