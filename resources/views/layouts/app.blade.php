@@ -114,7 +114,21 @@
                     @endif
                 </div>
 
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2.5">
+                    @if (auth()->check() && !auth()->user()->isCalonSiswa())
+                        @php
+                            $dashboardRoute = auth()->user()->getDashboardRoute();
+                        @endphp
+                        <a href="{{ route($dashboardRoute) }}"
+                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-2xs {{ request()->routeIs($dashboardRoute) ? 'bg-orange-50 text-nampi-orange border border-orange-200' : 'bg-slate-100 text-slate-700 hover:bg-orange-500 hover:text-white border border-slate-200' }}"
+                           title="Kembali ke Dashboard">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
+                            <span>Dashboard Admin</span>
+                        </a>
+                    @endif
+
                     <span class="hidden sm:inline-flex text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
                         <a href="https://wa.me/628112232880" target="_blank" rel="noopener noreferrer">Bantuan CS</a>
                     </span>
@@ -161,6 +175,11 @@
 
                 {{ $slot }}
             </main>
+
+            <!-- Footer -->
+            <footer class="bg-white border-t border-slate-200/80 px-4 py-3.5 sm:px-6 text-center text-xs text-slate-500">
+                <span>Nampi 2026 V2.2 - by SMK Wikrama 1 Garut</span>
+            </footer>
         </div>
     </div>
 

@@ -27,7 +27,7 @@ class SubmitBuktiBayarSeleksiRequest extends FormRequest
             'nomor_referensi' => ['nullable', 'string', 'max:100'],
             'tanggal_bayar' => ['required', 'date', 'before_or_equal:today'],
             'nominal_dibayar' => ['required', 'numeric', 'min:10000'],
-            'bukti_transfer' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
+            'bukti_transfer' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:10240'],
         ];
     }
 
@@ -47,7 +47,7 @@ class SubmitBuktiBayarSeleksiRequest extends FormRequest
             'nominal_dibayar.numeric' => 'Nominal harus berupa angka.',
             'bukti_transfer.required' => 'File bukti transfer (struk ATM / tangkapan layar m-banking) wajib diunggah.',
             'bukti_transfer.mimes' => 'Bukti transfer harus berformat JPG, JPEG, PNG, atau PDF.',
-            'bukti_transfer.max' => 'Ukuran file bukti transfer maksimal 2 MB.',
+            'bukti_transfer.max' => 'Ukuran file bukti transfer maksimal 10 MB.',
         ];
     }
 }

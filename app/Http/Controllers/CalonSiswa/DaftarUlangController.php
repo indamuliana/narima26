@@ -103,7 +103,7 @@ class DaftarUlangController extends Controller
 
         if ($remainingBalance <= 0) {
             return redirect()->route('calon-siswa.daftar-ulang.index')
-                ->with('info', "Tagihan #{$tagihan->nomor_tagihan} Anda sudah lunas.");
+                ->with('info', "Tagihan #{$tagihan->nomor_tagihan} Ananda sudah lunas.");
         }
 
         $tagihan->load('diskon');
@@ -137,10 +137,10 @@ class DaftarUlangController extends Controller
             'bank_pengirim' => ['required', 'string', 'max:100'],
             'nama_pengirim' => ['required', 'string', 'max:150'],
             'nomor_referensi' => ['nullable', 'string', 'max:100'],
-            'bukti_transfer' => ['required', 'file', 'mimes:jpeg,jpg,png,pdf', 'max:2048'],
+            'bukti_transfer' => ['required', 'file', 'mimes:jpeg,jpg,png,pdf', 'max:10240'],
         ], [
             'nominal_dibayar.max' => 'Nominal yang dibayarkan tidak boleh melebihi sisa tagihan (Rp ' . number_format($remainingBalance, 0, ',', '.') . ').',
-            'bukti_transfer.max' => 'Ukuran berkas bukti transfer maksimal 2MB.',
+            'bukti_transfer.max' => 'Ukuran berkas bukti transfer maksimal 10MB.',
         ]);
 
         $filePath = $this->fileUploadService->uploadPaymentProof(

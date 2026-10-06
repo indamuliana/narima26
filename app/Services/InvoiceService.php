@@ -34,6 +34,11 @@ class InvoiceService
         while (Tagihan::where('nomor_tagihan', $invoiceNumber)->exists()) {
             $counter++;
             $invoiceNumber = "{$baseNumber}-{$counter}";
+            
+            // Safety break to prevent infinite loops
+            if ($counter > 1000) {
+                throw new RuntimeException("Terlalu banyak iterasi saat membuat nomor tagihan (lebih dari 1000). Harap hubungi administrator.");
+            }
         }
 
         return $invoiceNumber;

@@ -1469,7 +1469,7 @@
             <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
                 <div>
                     <h3 class="text-lg font-black text-slate-900">Upload Berkas Persyaratan Pendaftaran</h3>
-                    <p class="text-xs text-slate-500">Unggah berkas resmi dalam format PDF, JPG, atau PNG (Maks. 10 MB per berkas; Pas foto maks. 2 MB).</p>
+                    <p class="text-xs text-slate-500">Unggah berkas resmi dalam format PDF, JPG, atau PNG (Maks. 10 MB per berkas/foto).</p>
                 </div>
 
                 <form action="{{ route('calon-siswa.lengkapi-data.dokumen') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
@@ -1584,7 +1584,7 @@
                                     </span>
                                 @endif
                             </div>
-                            <p class="text-xs text-slate-500">Pas foto berseragam sekolah dengan latar belakang merah atau biru (JPG/PNG maks. 2MB). atau foto tidak resmi sopan menampilkan wajah</p>
+                            <p class="text-xs text-slate-500">Pas foto berseragam sekolah dengan latar belakang merah atau biru (JPG/PNG maks. 10MB). atau foto tidak resmi sopan menampilkan wajah</p>
 
                             @if($docs?->pas_foto_path)
                                 <div class="flex items-center gap-3 pt-1 text-xs">

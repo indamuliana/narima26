@@ -48,7 +48,7 @@ class LengkapiDataController extends Controller
 
         if (in_array($calonSiswa->status_spmb, $unverifiedStatuses, true)) {
             return redirect()->route('calon-siswa.pembayaran-seleksi.index')
-                ->with('error', 'Formulir Lengkapi Data hanya dapat diakses setelah bukti pembayaran seleksi Anda diverifikasi oleh Bendahara/Panitia SPMB.');
+                ->with('error', 'Formulir Lengkapi Data hanya dapat diakses setelah bukti pembayaran seleksi Ananda diverifikasi oleh Bendahara/Panitia SPMB.');
         }
 
         // Auto transisi dari PEMBAYARAN_SELEKSI_DIVERIFIKASI -> MELENGKAPI_DATA saat membuka halaman
@@ -224,7 +224,7 @@ class LengkapiDataController extends Controller
             $this->lengkapiDataService->finalize($calonSiswa, auth()->user());
 
             return redirect()->route('calon-siswa.lengkapi-data.index')
-                ->with('success', 'Selamat! Seluruh data pendaftaran dan berkas persyaratan Anda telah lengkap (100%). Status SPMB Anda sekarang: Data Lengkap.');
+                ->with('success', 'Selamat! Seluruh data pendaftaran dan berkas persyaratan Ananda  telah lengkap (100%). Status SPMB Ananda sekarang: Data Lengkap.');
         } catch (Exception $e) {
             return redirect()->route('calon-siswa.lengkapi-data.index')
                 ->with('error', $e->getMessage());

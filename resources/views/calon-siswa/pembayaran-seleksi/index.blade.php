@@ -152,7 +152,7 @@
                                     <label for="bukti_transfer" class="block text-xs font-bold text-slate-700 uppercase">Unggah File Bukti Transfer <span class="text-red-500">*</span></label>
                                     <input type="file" name="bukti_transfer" id="bukti_transfer" accept=".jpg,.jpeg,.png,.pdf" required
                                         class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100">
-                                    <p class="text-xs text-slate-500 mt-1">Format: JPG, PNG, atau PDF (Ukuran maksimal 2 MB).</p>
+                                    <p class="text-xs text-slate-500 mt-1">Format: JPG, PNG, atau PDF (Ukuran maksimal 10 MB).</p>
                                     @error('bukti_transfer') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                                 </div>
                             </div>

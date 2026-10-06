@@ -129,7 +129,7 @@ class KesepahamanController extends Controller
         }
 
         return redirect()->route('calon-siswa.kesepahaman.index')
-            ->with('success', 'Lembar Kesepahaman SPMB berhasil disetujui! Status Anda sekarang: Menunggu Wawancara. Anda dapat mencetak Kartu Tanda Peserta dan Surat Kesepahaman.');
+            ->with('success', 'Lembar Kesepahaman SPMB berhasil disetujui! Status Ananda sekarang: Menunggu Wawancara. Ananda dapat mencetak Kartu Tanda Peserta dan Surat Kesepahaman.');
     }
 
     /**

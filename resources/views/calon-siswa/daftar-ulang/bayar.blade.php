@@ -154,7 +154,7 @@
                     <input type="file" name="bukti_transfer" accept=".jpg,.jpeg,.png,.pdf" required
                            class="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 cursor-pointer">
                     <p class="text-[11px] text-slate-400 mt-1">
-                        Format file: JPG, PNG, atau PDF. Ukuran berkas maksimal 2MB. Pastikan gambar tajam dan terbaca jelas.
+                        Format file: JPG, PNG, atau PDF. Ukuran berkas maksimal 10MB. Pastikan gambar tajam dan terbaca jelas.
                     </p>
                 </div>
 

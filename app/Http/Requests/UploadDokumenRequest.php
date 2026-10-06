@@ -17,7 +17,7 @@ class UploadDokumenRequest extends FormRequest
             'file_kartu_keluarga' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
             'file_akta_kelahiran' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
             'file_ijazah_atau_skl' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
-            'file_pas_foto' => ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'file_pas_foto' => ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:10240'],
             'file_dokumen_pendukung' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
             'action' => ['nullable', 'string', 'in:save,next'],
         ];
@@ -33,7 +33,7 @@ class UploadDokumenRequest extends FormRequest
             'file_ijazah_atau_skl.mimes' => 'Ijazah/SKL harus bertipe PDF, JPG, JPEG, atau PNG.',
             'file_ijazah_atau_skl.max' => 'Ukuran berkas Ijazah/SKL maksimal 10 MB.',
             'file_pas_foto.mimes' => 'Pas Foto harus bertipe JPG, JPEG, atau PNG.',
-            'file_pas_foto.max' => 'Ukuran pas foto maksimal 2 MB.',
+            'file_pas_foto.max' => 'Ukuran pas foto maksimal 10 MB.',
         ];
     }
 }

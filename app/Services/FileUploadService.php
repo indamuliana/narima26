@@ -15,8 +15,8 @@ class FileUploadService
     public const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png'];
     public const ALLOWED_DOC_EXTENSIONS = ['jpg', 'jpeg', 'png', 'pdf'];
 
-    public const MAX_SIZE_PAYMENT_KB = 2048; // 2 MB
-    public const MAX_SIZE_DOC_KB = 5120;     // 5 MB
+    public const MAX_SIZE_PAYMENT_KB = 10240; // 10 MB
+    public const MAX_SIZE_DOC_KB = 10240;     // 10 MB
 
     /**
      * Validasi berkas upload terhadap ekstensi dan batasan ukuran.
