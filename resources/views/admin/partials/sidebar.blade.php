@@ -60,17 +60,33 @@
     </a>
 @endif
 
-@if(auth()->user()?->isOperator())
+@if(auth()->user()?->isPewawancara() || auth()->user()?->isOperator())
     <div class="pt-4 pb-2">
         <p class="px-3.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">Wawancara SPMB</p>
     </div>
 
     <a href="{{ route('pewawancara.antrian') }}"
-       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors {{ request()->routeIs('pewawancara.*') ? 'bg-nampi-orange text-white shadow-xs font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-        <svg class="w-5 h-5 {{ request()->routeIs('pewawancara.*') ? 'text-white' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors {{ (request()->routeIs('pewawancara.antrian') || request()->routeIs('pewawancara.wawancara.*')) && !request()->routeIs('pewawancara.riwayat') ? 'bg-nampi-orange text-white shadow-xs font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+        <svg class="w-5 h-5 {{ (request()->routeIs('pewawancara.antrian') || request()->routeIs('pewawancara.wawancara.*')) && !request()->routeIs('pewawancara.riwayat') ? 'text-white' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
         </svg>
-        <span>Wawancara Siswa</span>
+        <span>Antrean Wawancara</span>
+    </a>
+
+    <a href="{{ route('pewawancara.riwayat') }}"
+       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors {{ request()->routeIs('pewawancara.riwayat') ? 'bg-nampi-orange text-white shadow-xs font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+        <svg class="w-5 h-5 {{ request()->routeIs('pewawancara.riwayat') ? 'text-white' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>Riwayat Wawancara</span>
+    </a>
+
+    <a href="{{ route('pewawancara.instrumen') }}"
+       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors {{ request()->routeIs('pewawancara.instrumen') ? 'bg-nampi-orange text-white shadow-xs font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+        <svg class="w-5 h-5 {{ request()->routeIs('pewawancara.instrumen') ? 'text-white' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+        </svg>
+        <span>Instrumen & Rubrik</span>
     </a>
 @endif
 

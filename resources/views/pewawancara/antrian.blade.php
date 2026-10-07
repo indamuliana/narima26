@@ -2,7 +2,7 @@
     <x-slot name="title">Antrian Wawancara</x-slot>
 
     <x-slot name="sidebar">
-        @include('pewawancara.partials.sidebar')
+        @include('admin.partials.sidebar')
     </x-slot>
 
     <div class="space-y-6">

@@ -148,7 +148,7 @@ if ($action === 'sync') {
                     $zip->close();
                     @unlink($tempZip);
 
-                    // Bersihkan cache view Laravel agar perubahan Blade langsung tampil
+                    // Bersihkan cache view dan route/config Laravel agar perubahan langsung aktif
                     $clearedViews = 0;
                     $viewFiles = glob($repoPath . '/storage/framework/views/*.php');
                     if ($viewFiles) {
@@ -156,18 +156,45 @@ if ($action === 'sync') {
                             if (@unlink($vf)) $clearedViews++;
                         }
                     }
+                    $clearedBoot = 0;
+                    $bootFiles = glob($repoPath . '/bootstrap/cache/*.php');
+                    if ($bootFiles) {
+                        foreach ($bootFiles as $bf) {
+                            if (@unlink($bf)) $clearedBoot++;
+                        }
+                    }
 
                     $result = "✅ <b>UPDATE BERHASIL!</b>\n\n" .
                               "• Total $extracted file kode (PHP, Blade, Assets, .cpanel.yml) berhasil disinkronkan ke server!\n" .
                               "• $skipped file/folder penting (.env dan public/storage berkas pendaftar) 100% AMAN dan TIDAK TERSENTUH.\n" .
-                              "• $clearedViews file cache tampilan Laravel berhasil dibersihkan otomatis.\n" .
-                              "• Seluruh fitur baru (Feeder Schools, Role Guru, Timeline Mingguan, Statistik Unggulan/Reguler) dan penghapusan akun demo login sekarang sudah AKTIF di website Anda!";
+                              "• $clearedBoot file cache bootstrap (routes & config) & $clearedViews cache tampilan berhasil dibersihkan otomatis.\n" .
+                              "• Seluruh fitur baru sekarang sudah AKTIF di website Anda!";
                 } else {
                     $result = "<b>Error:</b> Gagal mengekstrak berkas ZIP.";
                 }
             }
         }
     }
+} elseif ($action === 'clear_cache') {
+    $clearedViews = 0;
+    $viewFiles = glob($repoPath . '/storage/framework/views/*.php');
+    if ($viewFiles) {
+        foreach ($viewFiles as $vf) {
+            if (@unlink($vf)) $clearedViews++;
+        }
+    }
+    $clearedBoot = 0;
+    $bootFiles = glob($repoPath . '/bootstrap/cache/*.php');
+    if ($bootFiles) {
+        foreach ($bootFiles as $bf) {
+            if (@unlink($bf)) $clearedBoot++;
+        }
+    }
+    $resArtisan = run_cmd('php artisan optimize:clear');
+    $result = "✅ <b>PEMBERSIHAN CACHE BERHASIL!</b>\n\n" .
+              "• $clearedBoot berkas cache route & config berhasil dibersihkan dari server.\n" .
+              "• $clearedViews berkas cache view Blade berhasil dibersihkan.\n\n" .
+              "<b>Log Artisan (jika CLI aktif):</b>\n" . htmlspecialchars($resArtisan['output']);
 } elseif ($action === 'status') {
     $resGit = run_cmd('git status');
     $resRemote = run_cmd('git remote -v');
@@ -213,6 +240,7 @@ if ($action === 'sync') {
 
     <div style="margin-bottom: 20px;">
         <a href="?token=<?= $secret_token ?>&action=zip_update" class="btn btn-success" style="background:#16a34a;font-size:14px;padding:12px 20px;" onclick="return confirm('Mulai update file website dari GitHub sekarang? File .env dan public/storage TIDAK akan ditimpa/dihapus.');">📥 UPDATE KODE DARI GITHUB SEKARANG (Rekomendasi)</a>
+        <a href="?token=<?= $secret_token ?>&action=clear_cache" class="btn" style="background:#f59e0b;color:#0f172a;font-weight:bold;">🧹 Bersihkan Cache Laravel</a>
         <a href="?token=<?= $secret_token ?>&action=status" class="btn btn-secondary">🔍 Cek Status Git</a>
         <a href="?token=<?= $secret_token ?>&action=sync" class="btn btn-primary" onclick="return confirm('Mulai sinkronisasi repository ke branch main GitHub? File .env dan public/storage TIDAK akan terhapus.');">⚡ Jalankan Git CLI (Jika aktif)</a>
         <a href="?token=<?= $secret_token ?>&action=migrate" class="btn btn-secondary" onclick="return confirm('Jalankan php artisan migrate pada database?');">🗄️ Database Migration</a>

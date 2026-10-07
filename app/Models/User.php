@@ -136,9 +136,8 @@ class User extends Authenticatable
     public function getDashboardRoute(): string
     {
         return match ($this->role) {
-            self::ROLE_ADMIN, self::ROLE_GURU, self::ROLE_OPERATOR => 'admin.dashboard',
+            self::ROLE_ADMIN, self::ROLE_GURU, self::ROLE_OPERATOR, self::ROLE_PEWAWANCARA => 'admin.dashboard',
             self::ROLE_BENDAHARA => 'bendahara.dashboard',
-            self::ROLE_PEWAWANCARA => 'pewawancara.dashboard',
             self::ROLE_KEPALA_SEKOLAH => 'kepala-sekolah.dashboard',
             self::ROLE_CALON_SISWA => 'calon-siswa.dashboard',
             default => 'login',

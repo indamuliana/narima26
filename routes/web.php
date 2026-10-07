@@ -52,8 +52,8 @@ Route::middleware('auth')->get('/dashboard', function () {
     return redirect()->route(auth()->user()->getDashboardRoute());
 })->name('dashboard');
 
-// Admin, Guru & Operator Shared Area (Executive & Read-Only Directory Access)
-Route::middleware(['auth', 'role:admin,guru,operator'])
+// Admin, Guru, Operator & Pewawancara Shared Area (Executive & Read-Only Directory Access)
+Route::middleware(['auth', 'role:admin,guru,operator,pewawancara'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
