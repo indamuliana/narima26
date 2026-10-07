@@ -234,7 +234,7 @@
             <p class="text-slate-300 font-semibold">SMK WIKRAMA 1 GARUT</p>
             <p>www.smkwikrama1garut.sch.id</p>
             <p class="pt-2 text-slate-500">&copy; {{ date('Y') }} SPMB Nampi &bull; Crafted with ♥ by Inda Muliana.</p>
-            <p class="text-slate-400 font-medium">Nampi 2026 V2.3 - by SMK Wikrama 1 Garut</p>
+            <p class="text-slate-400 font-medium">Nampi 2026 2.5</p>
         </div>
     </footer>
 </body>

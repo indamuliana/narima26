@@ -178,7 +178,7 @@
 
             <!-- Footer -->
             <footer class="bg-white border-t border-slate-200/80 px-4 py-3.5 sm:px-6 text-center text-xs text-slate-500">
-                <span>Nampi 2026 V2.3 - by SMK Wikrama 1 Garut</span>
+                <span>Nampi 2026 2.5</span>
             </footer>
         </div>
     </div>

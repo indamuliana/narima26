@@ -42,10 +42,14 @@
         @endif
 
         <!-- Quick Summary Cards -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
             <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Akun</span>
                 <p class="text-xl font-black text-slate-900 mt-1">{{ $stats['total'] }}</p>
+            </div>
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
+                <span class="text-[10px] font-bold text-cyan-600 uppercase tracking-wider">Operator</span>
+                <p class="text-xl font-black text-cyan-700 mt-1">{{ $stats['operator'] ?? 0 }}</p>
             </div>
             <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
                 <span class="text-[10px] font-bold text-teal-600 uppercase tracking-wider">Guru</span>
@@ -145,6 +149,7 @@
                                     <div class="flex items-center gap-3">
                                         <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shrink-0
                                             @if($u->role === 'admin') bg-purple-100 text-purple-700
+                                            @elseif($u->role === 'operator') bg-cyan-100 text-cyan-700
                                             @elseif($u->role === 'guru') bg-teal-100 text-teal-700
                                             @elseif($u->role === 'bendahara') bg-emerald-100 text-emerald-700
                                             @elseif($u->role === 'kepala_sekolah') bg-blue-100 text-blue-700
@@ -178,6 +183,7 @@
                                     @php
                                         $badgeStyles = match ($u->role) {
                                             'admin' => 'bg-purple-50 text-purple-700 border-purple-200',
+                                            'operator' => 'bg-cyan-50 text-cyan-700 border-cyan-200',
                                             'guru' => 'bg-teal-50 text-teal-700 border-teal-200',
                                             'bendahara' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
                                             'kepala_sekolah' => 'bg-blue-50 text-blue-700 border-blue-200',

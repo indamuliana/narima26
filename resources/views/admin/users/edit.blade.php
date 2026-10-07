@@ -166,7 +166,20 @@
                         </p>
                     </label>
 
-                    <label class="relative flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-all hover:border-purple-500 sm:col-span-2
+                    <label class="relative flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-all hover:border-cyan-500
+                        {{ $currRole === 'operator' ? 'border-cyan-500 bg-cyan-50/30' : 'border-slate-200' }}">
+                        <div class="flex items-center gap-2.5 mb-1.5">
+                            <input type="radio" name="role" value="operator" {{ $currRole === 'operator' ? 'checked' : '' }}
+                                   {{ (int) $user->id === (int) auth()->id() ? 'disabled' : '' }} required
+                                   class="text-cyan-600 focus:ring-cyan-500">
+                            <span class="text-xs font-bold text-slate-900">Operator</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 leading-relaxed pl-5">
+                            Operasional SPMB: Master Jurusan, Keuangan, Verifikasi Pembayaran, Alokasi, dan Wawancara Siswa (tanpa Sidang Pleno & Kelola Pengguna).
+                        </p>
+                    </label>
+
+                    <label class="relative flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-all hover:border-purple-500
                         {{ $currRole === 'admin' ? 'border-purple-500 bg-purple-50/30' : 'border-slate-200' }}">
                         <div class="flex items-center gap-2.5 mb-1.5">
                             <input type="radio" name="role" value="admin" {{ $currRole === 'admin' ? 'checked' : '' }}

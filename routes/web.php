@@ -52,8 +52,8 @@ Route::middleware('auth')->get('/dashboard', function () {
     return redirect()->route(auth()->user()->getDashboardRoute());
 })->name('dashboard');
 
-// Admin & Guru Shared Area (Executive & Read-Only Directory Access)
-Route::middleware(['auth', 'role:admin,guru'])
+// Admin, Guru & Operator Shared Area (Executive & Read-Only Directory Access)
+Route::middleware(['auth', 'role:admin,guru,operator'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
@@ -82,16 +82,12 @@ Route::middleware(['auth', 'role:admin,guru'])
             });
     });
 
-// Admin Exclusive Area (Fase 13 - User Management & Master Configurations)
-Route::middleware(['auth', 'role:admin'])
+// Admin & Operator Operational Area (Modul Master & Operasional SPMB)
+Route::middleware(['auth', 'role:admin,operator'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-        // Manajemen Pengguna (User Management)
-        Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except(['show']);
-        Route::patch('/users/{user}/toggle', [\App\Http\Controllers\Admin\UserController::class, 'toggleStatus'])->name('users.toggle');
-
-        // Edit Data Calon Siswa (Admin Direct Edit)
+        // Edit Data Calon Siswa (Direct Edit)
         Route::controller(\App\Http\Controllers\Admin\CalonSiswaDataEditController::class)
             ->prefix('calon-siswa/{calonSiswa}')
             ->name('calon-siswa.')
@@ -104,15 +100,11 @@ Route::middleware(['auth', 'role:admin'])
                 Route::put('/update-seragam', 'updateSeragam')->name('update-seragam');
             });
 
-        // Tagging Calon Siswa (Admin Only)
+        // Tagging Calon Siswa
         Route::put('/calon-siswa/{calonSiswa}/tags', [\App\Http\Controllers\Admin\CalonSiswaController::class, 'updateTags'])
             ->name('calon-siswa.update-tags');
 
-        // Hapus Calon Siswa (Admin Only - Hard Delete)
-        Route::delete('/calon-siswa/{calonSiswa}', [\App\Http\Controllers\Admin\CalonSiswaController::class, 'destroy'])
-            ->name('calon-siswa.destroy');
-
-        // Impersonasi Calon Siswa (Masuk Sebagai Calon Siswa)
+        // Impersonasi Calon Siswa (Masuk Sebagai Calon Siswa untuk Asistensi)
         Route::post('/calon-siswa/{calonSiswa}/impersonate', [\App\Http\Controllers\Auth\ImpersonateController::class, 'start'])
             ->name('calon-siswa.impersonate');
 
@@ -158,6 +150,20 @@ Route::middleware(['auth', 'role:admin'])
                 Route::post('/batch', 'alokasiBatch')->name('batch');
                 Route::post('/{calonSiswa}', 'alokasikan')->name('single');
             });
+    });
+
+// Admin Exclusive Area (Fase 13 - User Management, Audit Trail & Hard Deletion)
+Route::middleware(['auth', 'role:admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        // Manajemen Pengguna (User Management)
+        Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except(['show']);
+        Route::patch('/users/{user}/toggle', [\App\Http\Controllers\Admin\UserController::class, 'toggleStatus'])->name('users.toggle');
+
+        // Hapus Calon Siswa (Admin Only - Hard Delete)
+        Route::delete('/calon-siswa/{calonSiswa}', [\App\Http\Controllers\Admin\CalonSiswaController::class, 'destroy'])
+            ->name('calon-siswa.destroy');
 
         // Log Audit Trail
         Route::get('/audit-trail', [\App\Http\Controllers\Admin\AuditTrailController::class, 'index'])->name('audit-trail.index');
@@ -256,7 +262,7 @@ Route::middleware(['auth', 'role:bendahara,admin'])
     });
 
 // Pewawancara Area (Fase 10)
-Route::middleware(['auth', 'role:pewawancara,admin'])
+Route::middleware(['auth', 'role:pewawancara,admin,operator'])
     ->prefix('pewawancara')
     ->name('pewawancara.')
     ->group(function () {

@@ -55,6 +55,7 @@ class UserController extends Controller
         $stats = [
             'total' => User::count(),
             'admin' => User::where('role', User::ROLE_ADMIN)->count(),
+            'operator' => User::where('role', User::ROLE_OPERATOR)->count(),
             'bendahara' => User::where('role', User::ROLE_BENDAHARA)->count(),
             'kepala_sekolah' => User::where('role', User::ROLE_KEPALA_SEKOLAH)->count(),
             'pewawancara' => User::where('role', User::ROLE_PEWAWANCARA)->count(),
@@ -63,6 +64,7 @@ class UserController extends Controller
         ];
 
         $availableRoles = [
+            User::ROLE_OPERATOR => 'Operator',
             User::ROLE_BENDAHARA => 'Bendahara',
             User::ROLE_KEPALA_SEKOLAH => 'Kepala Sekolah',
             User::ROLE_PEWAWANCARA => 'Pewawancara',
@@ -79,6 +81,7 @@ class UserController extends Controller
     public function create(): View
     {
         $availableRoles = [
+            User::ROLE_OPERATOR => 'Operator',
             User::ROLE_BENDAHARA => 'Bendahara',
             User::ROLE_KEPALA_SEKOLAH => 'Kepala Sekolah',
             User::ROLE_PEWAWANCARA => 'Pewawancara',
@@ -95,6 +98,7 @@ class UserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $allowedRoles = [
+            User::ROLE_OPERATOR,
             User::ROLE_BENDAHARA,
             User::ROLE_KEPALA_SEKOLAH,
             User::ROLE_PEWAWANCARA,
@@ -150,6 +154,7 @@ class UserController extends Controller
     public function edit(User $user): View
     {
         $availableRoles = [
+            User::ROLE_OPERATOR => 'Operator',
             User::ROLE_BENDAHARA => 'Bendahara',
             User::ROLE_KEPALA_SEKOLAH => 'Kepala Sekolah',
             User::ROLE_PEWAWANCARA => 'Pewawancara',
@@ -167,6 +172,7 @@ class UserController extends Controller
     public function update(Request $request, User $user): RedirectResponse
     {
         $allowedRoles = [
+            User::ROLE_OPERATOR,
             User::ROLE_BENDAHARA,
             User::ROLE_KEPALA_SEKOLAH,
             User::ROLE_PEWAWANCARA,

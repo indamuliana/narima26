@@ -1,3 +1,16 @@
+@if(auth()->user()->isAdmin() || auth()->user()->isOperator())
+    <div class="pb-3 mb-2 border-b border-slate-800">
+        <a href="{{ route('admin.dashboard') }}"
+           class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold text-nampi-orange bg-nampi-orange/10 hover:bg-nampi-orange/20 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            <span>&larr; Kembali ke Portal Admin</span>
+        </a>
+    </div>
+@endif
+
+@if(!auth()->user()->isOperator())
 <a href="{{ route('pewawancara.dashboard') }}"
    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('pewawancara.dashboard') ? 'bg-nampi-orange text-white shadow-xs' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
     <svg class="w-5 h-5 {{ request()->routeIs('pewawancara.dashboard') ? 'text-white' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -5,6 +18,7 @@
     </svg>
     <span>Dashboard</span>
 </a>
+@endif
 
 <a href="{{ route('pewawancara.antrian') }}"
    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors {{ (request()->routeIs('pewawancara.antrian') || request()->routeIs('pewawancara.wawancara.*')) && !request()->routeIs('pewawancara.riwayat') ? 'bg-nampi-orange text-white shadow-xs font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">

@@ -14,6 +14,7 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     public const ROLE_ADMIN = 'admin';
+    public const ROLE_OPERATOR = 'operator';
     public const ROLE_BENDAHARA = 'bendahara';
     public const ROLE_PEWAWANCARA = 'pewawancara';
     public const ROLE_KEPALA_SEKOLAH = 'kepala_sekolah';
@@ -65,6 +66,14 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === self::ROLE_ADMIN;
+    }
+
+    /**
+     * Check if user is Operator.
+     */
+    public function isOperator(): bool
+    {
+        return $this->role === self::ROLE_OPERATOR;
     }
 
     /**
@@ -127,7 +136,7 @@ class User extends Authenticatable
     public function getDashboardRoute(): string
     {
         return match ($this->role) {
-            self::ROLE_ADMIN, self::ROLE_GURU => 'admin.dashboard',
+            self::ROLE_ADMIN, self::ROLE_GURU, self::ROLE_OPERATOR => 'admin.dashboard',
             self::ROLE_BENDAHARA => 'bendahara.dashboard',
             self::ROLE_PEWAWANCARA => 'pewawancara.dashboard',
             self::ROLE_KEPALA_SEKOLAH => 'kepala-sekolah.dashboard',
@@ -143,6 +152,7 @@ class User extends Authenticatable
     {
         return match ($this->role) {
             self::ROLE_ADMIN => 'Administrator',
+            self::ROLE_OPERATOR => 'Operator',
             self::ROLE_BENDAHARA => 'Bendahara',
             self::ROLE_PEWAWANCARA => 'Pewawancara',
             self::ROLE_KEPALA_SEKOLAH => 'Kepala Sekolah',

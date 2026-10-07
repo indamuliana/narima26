@@ -23,8 +23,12 @@ class WawancaraController extends Controller
     /**
      * Display Pewawancara Dashboard with summary metrics and active queue.
      */
-    public function dashboard(): View
+    public function dashboard(): View|RedirectResponse
     {
+        if (auth()->user()?->isOperator()) {
+            return redirect()->route('pewawancara.antrian');
+        }
+
         $stats = $this->wawancaraService->getStatistics(auth()->user());
         $recentAntrian = $this->wawancaraService->getAntrian(statusWawancara: 'BELUM', perPage: 5);
         $recentRiwayat = $this->wawancaraService->getRiwayat(perPage: 5);

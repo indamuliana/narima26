@@ -65,7 +65,7 @@ class AlokasiPewawancaraController extends Controller
 
         $calonSiswaList = $query->paginate(20)->withQueryString();
 
-        $pewawancaraList = User::whereIn('role', [User::ROLE_PEWAWANCARA, User::ROLE_ADMIN])
+        $pewawancaraList = User::whereIn('role', [User::ROLE_PEWAWANCARA, User::ROLE_ADMIN, User::ROLE_OPERATOR])
             ->where('is_active', true)
             ->withCount('wawancara')
             ->orderBy('name')

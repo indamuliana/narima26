@@ -175,7 +175,7 @@
             <div class="mt-12 pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
                 <p>&copy; {{ date('Y') }} SMK Wikrama 1 Garut | <strong>Nampi</strong> by Inda Muliana (GNU GPL v3.0)</p>
                 <p class="flex items-center gap-1 font-medium text-slate-400">
-                    Nampi 2026 V2.3 - by SMK Wikrama 1 Garut
+                    Nampi 2026 2.5
                 </p>
             </div>
         </div>
