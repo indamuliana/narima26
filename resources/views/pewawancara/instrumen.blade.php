@@ -77,7 +77,7 @@
                                     @endif
                                 </td>
                                 <td class="px-4 py-4 text-xs text-slate-600">
-                                    {{ $k->keterangan ?: 'Observasi menyeluruh terhadap aspek ini selama sesi interaksi langsung.' }}
+                                    {!! $k->keterangan ? nl2br(e($k->keterangan)) : '<i>Observasi menyeluruh terhadap aspek ini selama sesi interaksi langsung.</i>' !!}
                                 </td>
                                 <td class="px-4 py-4 text-center">
                                     @if ($k->aktif)
