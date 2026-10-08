@@ -120,7 +120,7 @@
     <table class="doc-title-container" align="center">
         <tr>
             <td align="center" style="text-align: center; border: none; padding: 0;">
-                <div class="doc-title-main" align="center">NASKAH PERSETUJUAN<br>MURID SMK WIKRAMA 1 GARUT DAN ORANG TUA<br>TENTANG<br>KETENTUAN UMUM SMK WIKRAMA 1 GARUT<br>PROGRAM {{ strtoupper($programNama ?? 'REGULER') }}</div>
+                <div class="doc-title-main" align="center">NASKAH PERSETUJUAN & KESEPAHAMAN<br>ANTARA<br>ORANG TUA DAN MURID<br>DENGAN<br>SMK WIKRAMA 1 GARUT<br>TENTANG<br>PROSES PENYELENGGARAAN PENDIDIKAN DI SMK WIKRAMA 1 GARUT<br>PROGRAM {{ strtoupper($programNama ?? 'REGULER') }}</div>
             </td>
         </tr>
     </table>
@@ -145,7 +145,10 @@
         <tr>
             <td class="label-col">Nama Murid</td>
             <td class="colon-col">:</td>
-            <td class="val-col"><strong>{{ strtoupper($calonSiswa->nama_lengkap) }}</strong></td>
+            <td class="val-col">
+                <strong>{{ strtoupper($calonSiswa->nama_lengkap) }}</strong><br>
+                <span style="font-size: 8pt; font-style: italic;">Murid Baru SMK Wikrama 1 Garut Tahun Ajaran {{ $tahunPelajaran ?? '2027/2028' }}</span>
+            </td>
         </tr>
         <tr>
             <td class="label-col">Nama Orang Ayah</td>
@@ -187,22 +190,26 @@
     <table class="table-klausul">
         <thead>
             <tr>
-                <th style="width: 6%;">No</th>
-                <th style="width: 79%; text-align: left;">Uraian Ketentuan & Kesepahaman</th>
-                <th style="width: 15%;">Checklis</th>
+                <th style="width: 5%; text-align: center;">No</th>
+                <th style="width: 60%; text-align: left;">Uraian Ketentuan & Kesepahaman</th>
+                <th style="width: 15%; text-align: center;">Checklis</th>
+                <th style="width: 20%; text-align: center;">Paraf Orang Tua</th>
             </tr>
         </thead>
         <tbody>
             @foreach($kelompokList as $kelompok)
                 <tr class="group-header-row">
-                    <td colspan="3">{{ $kelompok['judul'] ?? $kelompok['nama_kelompok'] ?? '' }}</td>
+                    <td colspan="4">{{ $kelompok['judul'] ?? $kelompok['nama_kelompok'] ?? '' }}</td>
                 </tr>
                 @foreach($kelompok['poin'] ?? [] as $poin)
                     <tr>
-                        <td class="col-no">{{ $poin['nomor'] ?? $loop->iteration }}</td>
+                        <td class="col-no" style="text-align: center;">{{ $poin['nomor'] ?? $loop->iteration }}</td>
                         <td class="col-uraian">{!! nl2br(e($poin['uraian'])) !!}</td>
-                        <td class="col-ceklis">
+                        <td class="col-ceklis" style="text-align: center; vertical-align: middle;">
                             <span style="font-family: DejaVu Sans, sans-serif;">[ &#10003; ]</span>
+                        </td>
+                        <td style="text-align: center; vertical-align: bottom; color: #94a3b8; padding-bottom: 5px;">
+                            ....................
                         </td>
                     </tr>
                 @endforeach
@@ -278,16 +285,25 @@
                 </td>
             </tr>
         </table>
+        <div style="font-size: 6.5pt; color: #64748b; font-style: italic; text-align: center; margin-top: 15px;">
+            (*Pastikan tanda tangan siswa dan orang tua menyentuh materai)
+        </div>
     </div>
 @endsection
 
 <!-- Custom Footer: 3 Kotak Paraf Kecil di Setiap Lembar -->
 @section('custom_footer')
+    <style>
+        .page-num::before {
+            content: counter(page) "/" counter(pages) " \2022  ";
+            font-weight: normal;
+        }
+    </style>
     <div class="fixed-footer-paraf">
         <table style="width: 100%; border-collapse: collapse;">
             <tr>
-                <td style="font-size: 7pt; color: #64748b; vertical-align: middle; text-align: left; border: none;">
-                    SPMB Wikrama 1 Garut TP {{ $tahunPelajaran ?? '2027/2028' }} &bull; {{ $calonSiswa->nomor_pendaftaran }} &bull; {{ $calonSiswa->nama_lengkap }} ({{ strtoupper($programNama ?? 'REGULER') }})
+                <td style="font-size: 6.5pt; color: #64748b; vertical-align: middle; text-align: left; border: none;">
+                    <span class="page-num"></span>SPMB Wikrama 1 Garut TP {{ $tahunPelajaran ?? '2027/2028' }} &bull; {{ $calonSiswa->nomor_pendaftaran }} &bull; {{ $calonSiswa->nama_lengkap }} ({{ strtoupper($programNama ?? 'REGULER') }})
                 </td>
                 <td style="text-align: right; vertical-align: middle; width: 220px; border: none;" align="right">
                     <table style="border-collapse: collapse; margin-left: auto; margin-right: 0;" align="right">
