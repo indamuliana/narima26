@@ -423,3 +423,16 @@ Route::prefix('api/wilayah')->group(function () {
     Route::get('/kecamatan/{id}', [\App\Http\Controllers\Api\WilayahController::class, 'kecamatan']);
     Route::get('/desa/{id}', [\App\Http\Controllers\Api\WilayahController::class, 'desa']);
 });
+
+// ROUTE SEMENTARA UNTUK MIGRASI DI CPANEL (Tanpa Terminal)
+// Hapus atau comment route ini setelah selesai digunakan di hosting!
+Route::get('/migrate-wawancara-2026', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', [
+            '--force' => true
+        ]);
+        return "Migrasi berhasil dijalankan! Output: <br><pre>" . \Illuminate\Support\Facades\Artisan::output() . "</pre>";
+    } catch (\Exception $e) {
+        return "Terjadi kesalahan: " . $e->getMessage();
+    }
+});
