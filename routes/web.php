@@ -108,6 +108,21 @@ Route::middleware(['auth', 'role:admin,operator'])
         Route::post('/calon-siswa/{calonSiswa}/impersonate', [\App\Http\Controllers\Auth\ImpersonateController::class, 'start'])
             ->name('calon-siswa.impersonate');
 
+        // 0. Manajemen Butir Kesepahaman Murid
+        Route::controller(\App\Http\Controllers\Admin\MasterKesepahamanController::class)
+            ->prefix('kesepahaman')
+            ->name('kesepahaman.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/preview/{id}', 'preview')->name('preview');
+                Route::post('/kelompok', 'storeKelompok')->name('kelompok.store');
+                Route::put('/kelompok/{id}', 'updateKelompok')->name('kelompok.update');
+                Route::delete('/kelompok/{id}', 'destroyKelompok')->name('kelompok.destroy');
+                Route::post('/poin', 'storePoin')->name('poin.store');
+                Route::put('/poin/{id}', 'updatePoin')->name('poin.update');
+                Route::delete('/poin/{id}', 'destroyPoin')->name('poin.destroy');
+            });
+
         // 1. Manajemen Jurusan (Kompetensi Keahlian)
         Route::controller(\App\Http\Controllers\Admin\JurusanController::class)
             ->prefix('jurusan')
@@ -429,7 +444,8 @@ Route::prefix('api/wilayah')->group(function () {
 Route::get('/migrate-wawancara-2026', function () {
     try {
         \Illuminate\Support\Facades\Artisan::call('migrate', [
-            '--force' => true
+            '--force' => true,
+            '--seed' => true // Tambahkan ini agar seeder Kesepahaman jalan!
         ]);
         return "Migrasi berhasil dijalankan! Output: <br><pre>" . \Illuminate\Support\Facades\Artisan::output() . "</pre>";
     } catch (\Exception $e) {

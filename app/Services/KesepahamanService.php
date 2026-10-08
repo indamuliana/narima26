@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\CalonSiswa;
+use App\Models\KesepahamanProgram;
 
 class KesepahamanService
 {
@@ -18,29 +19,61 @@ class KesepahamanService
         return str_contains($nama, 'UNGGULAN') || in_array($kode, ['UGG', 'UNGGULAN']);
     }
 
-    /**
-     * Ambil data kelompok dan butir klausul sesuai program calon siswa.
-     */
-    public function getKlausulByCalonSiswa(CalonSiswa $calonSiswa): array
+    private function getProgramDataFromDb(string $programKey): array
     {
-        $programKey = $this->isUnggulan($calonSiswa) ? 'unggulan' : 'reguler';
+        $program = KesepahamanProgram::with(['kelompoks' => function($q) {
+            $q->orderBy('urutan');
+        }, 'kelompoks.poins' => function($q) {
+            $q->orderBy('urutan');
+        }])->where('kode', strtolower($programKey))->first();
 
-        $configData = config("spmb_kesepahaman.{$programKey}", []);
-        if (empty($configData)) {
-            // Fallback default
-            $configData = [
+        if (!$program) {
+            return [
                 'program_title' => strtoupper($programKey),
                 'tahun_pelajaran' => '2027/2028',
                 'kelompok' => [],
             ];
         }
 
+        $kelompokArray = [];
+        foreach ($program->kelompoks as $kelompok) {
+            $poinArray = [];
+            foreach ($kelompok->poins as $poin) {
+                $poinArray[] = [
+                    'id' => $poin->kode_poin,
+                    'nomor' => $poin->nomor,
+                    'uraian' => $poin->uraian,
+                ];
+            }
+            $kelompokArray[] = [
+                'kode' => $kelompok->kode,
+                'judul' => $kelompok->judul,
+                'poin' => $poinArray,
+            ];
+        }
+
+        return [
+            'program_title' => $program->nama,
+            'tahun_pelajaran' => $program->tahun_pelajaran,
+            'kelompok' => $kelompokArray,
+        ];
+    }
+
+    /**
+     * Ambil data kelompok dan butir klausul sesuai program calon siswa.
+     */
+    public function getKlausulByCalonSiswa(CalonSiswa $calonSiswa): array
+    {
+        $programKey = $this->isUnggulan($calonSiswa) ? 'unggulan' : 'reguler';
+        
+        $configData = $this->getProgramDataFromDb($programKey);
+
         return [
             'program_key' => $programKey,
             'program_type' => strtoupper($programKey),
-            'program_title' => $configData['program_title'] ?? strtoupper($programKey),
-            'tahun_pelajaran' => $configData['tahun_pelajaran'] ?? '2027/2028',
-            'kelompok' => $configData['kelompok'] ?? [],
+            'program_title' => $configData['program_title'],
+            'tahun_pelajaran' => $configData['tahun_pelajaran'],
+            'kelompok' => $configData['kelompok'],
         ];
     }
 
@@ -49,8 +82,7 @@ class KesepahamanService
      */
     public function getRequiredPointIds(string $programKey): array
     {
-        $programKey = strtolower($programKey);
-        $configData = config("spmb_kesepahaman.{$programKey}", []);
+        $configData = $this->getProgramDataFromDb($programKey);
         $kelompokList = $configData['kelompok'] ?? [];
 
         $pointIds = [];
@@ -70,8 +102,7 @@ class KesepahamanService
      */
     public function getAllPointsFlat(string $programKey): array
     {
-        $programKey = strtolower($programKey);
-        $configData = config("spmb_kesepahaman.{$programKey}", []);
+        $configData = $this->getProgramDataFromDb($programKey);
         $kelompokList = $configData['kelompok'] ?? [];
 
         $flatPoints = [];

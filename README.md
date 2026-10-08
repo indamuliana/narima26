@@ -66,22 +66,8 @@ Ikuti langkah-langkah berikut untuk menjalankan aplikasi secara lokal:
 
 ---
 
-## 🔐 Akun Testing (Seeder)
-
-Anda dapat login menggunakan salah satu akun role berikut dengan password default **`password`** (atau sesuaikan dengan password seeder spesifik Anda, umumnya ditandai dengan `[role]123`):
-
-| Role | Email Login | Password |
-| :--- | :--- | :--- |
-| **Admin** | `admin@wikrama.sch.id` | `admin123` |
-| **Bendahara** | `bendahara@wikrama.sch.id` | `bendahara123` |
-| **Pewawancara** | `pewawancara@wikrama.sch.id` | `pewawancara123` |
-| **Kepala Sekolah** | `kepsek@wikrama.sch.id` | `kepsek123` |
-| **Guru** | `guru@wikrama.sch.id` | `guru123` |
-
----
-
 ## 👨‍💻 Kontribusi
 Jika Anda menemukan *bug* atau ingin melakukan perbaikan, silakan buat *Pull Request* atau ajukan *Issue*.
 
 ## 📄 Lisensi
-Sistem ini bersifat tertutup (Proprietary) dan khusus digunakan oleh lingkungan internal **SMK Wikrama 1 Garut**.
+Sistem ini bersifat tertutup (Proprietary) dan khusus digunakan oleh lingkungan internal **SMK Wikrama 1 Garut**. Gpp mau clone tapi bakal banyak yang beda :)
