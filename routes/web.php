@@ -445,9 +445,16 @@ Route::get('/migrate-wawancara-2026', function () {
     try {
         \Illuminate\Support\Facades\Artisan::call('migrate', [
             '--force' => true,
-            '--seed' => true // Tambahkan ini agar seeder Kesepahaman jalan!
         ]);
-        return "Migrasi berhasil dijalankan! Output: <br><pre>" . \Illuminate\Support\Facades\Artisan::output() . "</pre>";
+        $output = "Migrasi berhasil dijalankan! Output: <br><pre>" . \Illuminate\Support\Facades\Artisan::output() . "</pre><br>";
+        
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => 'KesepahamanSeeder',
+            '--force' => true,
+        ]);
+        $output .= "Seeder berhasil dijalankan! Output: <br><pre>" . \Illuminate\Support\Facades\Artisan::output() . "</pre>";
+        
+        return $output;
     } catch (\Exception $e) {
         return "Terjadi kesalahan: " . $e->getMessage();
     }
