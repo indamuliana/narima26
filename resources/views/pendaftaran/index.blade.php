@@ -51,7 +51,7 @@
             <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden"
                  x-data="{
                      referensiJenis: '{{ old('referensi_jenis', '') }}',
-                     selectedProgram: '{{ old('program_id', $programs->first()?->id) }}'
+                     selectedProgram: '{{ old('program_id', '') }}'
                  }">
                 <form action="{{ route('pendaftaran.store') }}" method="POST" class="p-6 sm:p-10 space-y-9">
                     @csrf
@@ -76,7 +76,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
                             @foreach($programs as $program)
                                 @php
-                                    $isDefaultChecked = old('program_id', $loop->first ? $program->id : '') == $program->id;
+                                    $isDefaultChecked = old('program_id', '') == $program->id;
                                     $isUnggulan = str_contains(strtolower($program->nama_program ?? $program->nama), 'unggul');
                                 @endphp
                                 <label class="program-card group relative p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between"
