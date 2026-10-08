@@ -101,7 +101,7 @@ class MasterKesepahamanController extends Controller
         
         $calonSiswa->setRelation('program', $program);
         
-        $orangTua = new \App\Models\DataOrangTua([
+        $orangTua = new \App\Models\DataOrangtua([
             'nama_ayah' => 'NAMA AYAH CONTOH',
             'nama_ibu' => 'NAMA IBU CONTOH',
             'no_hp_ayah' => '08123456789',
