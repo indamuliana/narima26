@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'whatsapp' => [
+        'cs_reguler' => env('WHATSAPP_CS_REGULER', '628112232880'),
+        'cs_unggulan' => env('WHATSAPP_CS_UNGGULAN', '6281122802880'),
+    ],
+
 ];

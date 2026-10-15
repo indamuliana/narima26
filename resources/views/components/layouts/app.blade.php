@@ -122,8 +122,18 @@
                         </a>
                     @endif
 
-                    <span class="hidden sm:inline-flex text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-                        <a href="https://wa.me/628112232880">Bantuan CS</a>
+                    @php
+                        $appPhoneService = app(\App\Services\PhoneNumberService::class);
+                        $csNumber = $appPhoneService->getCsNumberForUser(auth()->user());
+                        $isCsUnggulan = auth()->user()?->isCalonSiswa() && $appPhoneService->isUnggulan(auth()->user()->calonSiswa);
+                        $csLabel = $isCsUnggulan ? 'CS Asrama' : 'Bantuan CS';
+                        $csMsg = $isCsUnggulan 
+                            ? 'Halo CS Asrama SPMB SMK Wikrama 1 Garut, saya ' . (auth()->user()->calonSiswa?->nama_lengkap ?? auth()->user()->name) . ' ingin bertanya.'
+                            : 'Halo CS SPMB SMK Wikrama 1 Garut, saya ' . (auth()->user()?->name ?? 'Pengguna') . ' memerlukan bantuan.';
+                        $csHeaderUrl = "https://wa.me/{$csNumber}?text=" . urlencode($csMsg);
+                    @endphp
+                    <span class="hidden sm:inline-flex text-xs font-semibold px-3 py-1 rounded-full {{ $isCsUnggulan ? 'bg-amber-50 text-amber-800 border border-amber-200' : 'bg-emerald-50 text-emerald-800 border border-emerald-200' }}">
+                        <a href="{{ $csHeaderUrl }}" target="_blank" rel="noopener noreferrer">{{ $csLabel }}</a>
                     </span>
                 </div>
             </header>
@@ -158,7 +168,7 @@
 
             <!-- Footer -->
             <footer class="bg-white border-t border-slate-200/80 px-4 py-3.5 sm:px-6 text-center text-xs text-slate-500">
-                <span>Nampi 2026 2.5</span>
+                <span>Nampi 2026 2.6</span>
             </footer>
         </div>
     </div>

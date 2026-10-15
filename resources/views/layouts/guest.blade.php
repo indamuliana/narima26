@@ -169,7 +169,10 @@
                         Jl. Otto Iskandardinata, Garut, Jawa Barat.
                     </p>
                     <p class="text-sm text-slate-400">
-                        WhatsApp: <a href="https://wa.me/628112232880" class="text-nampi-orange hover:underline font-medium">+62 811-2232-880</a>
+                        CS Pendaftaran: <a href="https://wa.me/628112232880" class="text-nampi-orange hover:underline font-medium">+62 811-2232-880</a>
+                    </p>
+                    <p class="text-sm text-slate-400">
+                        CS Asrama: <a href="https://wa.me/6281122802880" class="text-amber-400 hover:underline font-medium">+62 811-2280-2880</a>
                     </p>
                     <p class="text-sm text-slate-400">
                         Website: <a href="https://smkwikrama1garut.sch.id" target="_blank" class="hover:underline">smkwikrama1garut.sch.id</a>
@@ -180,7 +183,7 @@
             <div class="mt-12 pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
                 <p>&copy; {{ date('Y') }} SMK Wikrama 1 Garut | <strong>Nampi</strong> by Inda Muliana (GNU GPL v3.0)</p>
                 <p class="flex items-center gap-1 font-medium text-slate-400">
-                    Nampi 2026 2.5
+                    Nampi 2026 2.6
                 </p>
             </div>
         </div>
