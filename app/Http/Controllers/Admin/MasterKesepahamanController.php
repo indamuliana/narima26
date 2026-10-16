@@ -131,6 +131,51 @@ class MasterKesepahamanController extends Controller
         return $pdf->stream("DRAFT_EULA_{$program->kode}.pdf");
     }
 
+    public function downloadTemplate(Request $request, $id, \App\Services\KesepahamanSpreadsheetService $spreadsheetService)
+    {
+        $program = \App\Models\KesepahamanProgram::findOrFail($id);
+        $format = in_array(strtolower($request->query('format')), ['csv', 'xlsx']) ? strtolower($request->query('format')) : 'xlsx';
+
+        return $spreadsheetService->downloadTemplate($program, $format);
+    }
+
+    public function export(Request $request, $id, \App\Services\KesepahamanSpreadsheetService $spreadsheetService)
+    {
+        $program = \App\Models\KesepahamanProgram::findOrFail($id);
+        $format = in_array(strtolower($request->query('format')), ['csv', 'xlsx']) ? strtolower($request->query('format')) : 'xlsx';
+
+        return $spreadsheetService->exportProgram($program, $format);
+    }
+
+    public function import(Request $request, $id, \App\Services\KesepahamanSpreadsheetService $spreadsheetService)
+    {
+        $program = \App\Models\KesepahamanProgram::findOrFail($id);
+
+        $request->validate([
+            'file' => 'required|file|max:5120',
+            'mode' => 'required|in:replace,upsert',
+        ], [
+            'file.required' => 'Pilih file spreadsheet (.xlsx, .xls, .csv) terlebih dahulu.',
+            'file.max' => 'Ukuran file maksimal adalah 5MB.',
+            'mode.required' => 'Pilih mode import data.',
+        ]);
+
+        try {
+            $result = $spreadsheetService->importProgram($program, $request->file('file'), $request->input('mode'));
+
+            $modeLabel = $result['mode'] === 'replace' ? 'Ganti Semua' : 'Tambah/Update';
+            $message = "Berhasil mengimpor {$result['total_poin']} butir poin dalam {$result['total_kelompok']} kelompok untuk Program {$program->nama} (Mode: {$modeLabel}).";
+
+            if (!empty($result['errors'])) {
+                return back()->with('warning', $message . ' Catatan: ' . implode(' ', $result['errors']));
+            }
+
+            return back()->with('success', $message);
+        } catch (\Throwable $e) {
+            return back()->withErrors(['file' => 'Gagal mengimpor file: ' . $e->getMessage()]);
+        }
+    }
+
     public function destroyPoin($id)
     {
         \App\Models\KesepahamanPoin::findOrFail($id)->delete();

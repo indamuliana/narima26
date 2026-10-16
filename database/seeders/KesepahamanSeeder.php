@@ -30,29 +30,32 @@ class KesepahamanSeeder extends Seeder
                 ]
             );
 
+            // Bersihkan kelompok dan butir poin lama agar naskah fresh sesuai draft terbaru
+            foreach ($program->kelompoks as $oldKelompok) {
+                $oldKelompok->poins()->delete();
+                $oldKelompok->delete();
+            }
+
             $kelompokList = $configData['kelompok'] ?? [];
             $urutanKelompok = 1;
 
             foreach ($kelompokList as $kelompokData) {
-                $kelompok = KesepahamanKelompok::updateOrCreate(
-                    ['program_id' => $program->id, 'kode' => $kelompokData['kode']],
-                    [
-                        'judul' => $kelompokData['judul'],
-                        'urutan' => $urutanKelompok++,
-                    ]
-                );
+                $kelompok = KesepahamanKelompok::create([
+                    'program_id' => $program->id,
+                    'kode' => $kelompokData['kode'],
+                    'judul' => $kelompokData['judul'],
+                    'urutan' => $urutanKelompok++,
+                ]);
 
                 $urutanPoin = 1;
                 foreach ($kelompokData['poin'] ?? [] as $poinData) {
-                    KesepahamanPoin::updateOrCreate(
-                        ['kode_poin' => $poinData['id']],
-                        [
-                            'kelompok_id' => $kelompok->id,
-                            'nomor' => $poinData['nomor'],
-                            'uraian' => $poinData['uraian'],
-                            'urutan' => $urutanPoin++,
-                        ]
-                    );
+                    KesepahamanPoin::create([
+                        'kelompok_id' => $kelompok->id,
+                        'kode_poin' => $poinData['id'],
+                        'nomor' => $poinData['nomor'],
+                        'uraian' => $poinData['uraian'],
+                        'urutan' => $urutanPoin++,
+                    ]);
                 }
             }
         }

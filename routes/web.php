@@ -115,6 +115,9 @@ Route::middleware(['auth', 'role:admin,operator'])
             ->group(function () {
                 Route::get('/', 'index')->name('index');
                 Route::get('/preview/{id}', 'preview')->name('preview');
+                Route::get('/template/{id}', 'downloadTemplate')->name('template');
+                Route::get('/export/{id}', 'export')->name('export');
+                Route::post('/import/{id}', 'import')->name('import');
                 Route::post('/kelompok', 'storeKelompok')->name('kelompok.store');
                 Route::put('/kelompok/{id}', 'updateKelompok')->name('kelompok.update');
                 Route::delete('/kelompok/{id}', 'destroyKelompok')->name('kelompok.destroy');

@@ -24,6 +24,7 @@ class KesepahamanPdfTest extends TestCase
         parent::setUp();
         $this->seed(\Database\Seeders\MasterDataSeeder::class);
         $this->seed(\Database\Seeders\UserSeeder::class);
+        $this->seed(\Database\Seeders\KesepahamanSeeder::class);
 
         $this->siswaUser = User::where('role', 'calon_siswa')->first();
         $program = MasterProgram::first();
@@ -64,7 +65,7 @@ class KesepahamanPdfTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Kesepahaman Bersama (EULA)', false);
-        $response->assertSee('Dalam kaitannya dengan penerimaan peserta didik baru', false);
+        $response->assertSee('Dalam kaitannya dengan Sistem Penerimaan Murid Baru', false);
         $response->assertSee('PROGRAM REGULER', false);
     }
 
@@ -80,8 +81,8 @@ class KesepahamanPdfTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('PROGRAM UNGGULAN', false);
-        $response->assertSee('wajib tinggal di Asrama', false);
-        $response->assertSee('Dalam kaitannya dengan Program Unggulan, orang tua bersedia', false);
+        $response->assertSee('Tinggal di Asrama', false);
+        $response->assertSee('Dalam kaitannya dengan Program Unggulan, murid bersedia', false);
     }
 
     public function test_candidate_cannot_agree_without_checking_checkbox(): void
