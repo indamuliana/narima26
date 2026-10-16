@@ -8,12 +8,6 @@ use App\Models\KesepahamanProgram;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Writer\Csv;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class KesepahamanSpreadsheetService
@@ -36,13 +30,6 @@ class KesepahamanSpreadsheetService
      */
     public function downloadTemplate(KesepahamanProgram $program, string $format = 'xlsx'): StreamedResponse
     {
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Template Kesepahaman');
-
-        $this->applyHeaderStyles($sheet);
-
-        // Contoh baris pengisian
         $sampleRows = [
             [
                 'A',
@@ -73,6 +60,19 @@ class KesepahamanSpreadsheetService
             ],
         ];
 
+        $filename = "Template_Kesepahaman_{$program->kode}." . ($format === 'csv' ? 'csv' : 'xlsx');
+
+        // Jika format CSV atau PhpSpreadsheet belum ada di hosting, gunakan native CSV
+        if ($format === 'csv' || !class_exists(\PhpOffice\PhpSpreadsheet\Spreadsheet::class)) {
+            return $this->streamNativeCsv($filename, $sampleRows);
+        }
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Template Kesepahaman');
+
+        $this->applyHeaderStyles($sheet);
+
         $rowNum = 2;
         foreach ($sampleRows as $row) {
             $sheet->fromArray($row, null, 'A' . $rowNum);
@@ -82,7 +82,6 @@ class KesepahamanSpreadsheetService
 
         $this->autoFitColumns($sheet);
 
-        $filename = "Template_Kesepahaman_{$program->kode}." . ($format === 'csv' ? 'csv' : 'xlsx');
         return $this->streamSpreadsheet($spreadsheet, $filename, $format);
     }
 
@@ -91,21 +90,15 @@ class KesepahamanSpreadsheetService
      */
     public function exportProgram(KesepahamanProgram $program, string $format = 'xlsx'): StreamedResponse
     {
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle(substr($program->nama, 0, 30));
-
-        $this->applyHeaderStyles($sheet);
-
         $kelompoks = $program->kelompoks()
             ->with(['poins' => fn($q) => $q->orderBy('urutan')])
             ->orderBy('urutan')
             ->get();
 
-        $rowNum = 2;
+        $rowsData = [];
         foreach ($kelompoks as $kelompok) {
             foreach ($kelompok->poins as $poin) {
-                $rowData = [
+                $rowsData[] = [
                     $kelompok->kode,
                     $kelompok->judul,
                     $kelompok->urutan,
@@ -114,17 +107,32 @@ class KesepahamanSpreadsheetService
                     $poin->kode_poin,
                     $poin->urutan,
                 ];
-
-                $sheet->fromArray($rowData, null, 'A' . $rowNum);
-                $this->applyDataRowStyles($sheet, $rowNum);
-                $rowNum++;
             }
+        }
+
+        $timestamp = date('Ymd_His');
+        $filename = "Export_Kesepahaman_{$program->kode}_{$timestamp}." . ($format === 'csv' ? 'csv' : 'xlsx');
+
+        // Jika format CSV atau PhpSpreadsheet belum terinstal di server hosting, gunakan native CSV
+        if ($format === 'csv' || !class_exists(\PhpOffice\PhpSpreadsheet\Spreadsheet::class)) {
+            return $this->streamNativeCsv($filename, $rowsData);
+        }
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle(substr($program->nama, 0, 30));
+
+        $this->applyHeaderStyles($sheet);
+
+        $rowNum = 2;
+        foreach ($rowsData as $rowData) {
+            $sheet->fromArray($rowData, null, 'A' . $rowNum);
+            $this->applyDataRowStyles($sheet, $rowNum);
+            $rowNum++;
         }
 
         $this->autoFitColumns($sheet);
 
-        $timestamp = date('Ymd_His');
-        $filename = "Export_Kesepahaman_{$program->kode}_{$timestamp}." . ($format === 'csv' ? 'csv' : 'xlsx');
         return $this->streamSpreadsheet($spreadsheet, $filename, $format);
     }
 
@@ -144,47 +152,63 @@ class KesepahamanSpreadsheetService
         }
 
         $filePath = $file->getRealPath();
+        $rawRows = [];
 
         if ($extension === 'csv') {
-            $reader = new \PhpOffice\PhpSpreadsheet\Reader\Csv();
-            // Deteksi otomatis delimiter CSV (, atau ;)
-            $firstLine = fgets(fopen($filePath, 'r'));
-            if ($firstLine !== false && substr_count($firstLine, ';') > substr_count($firstLine, ',')) {
-                $reader->setDelimiter(';');
-            }
-            $spreadsheet = $reader->load($filePath);
+            // Gunakan native PHP CSV parser (tidak memerlukan library eksternal)
+            $rawRows = $this->parseNativeCsv($filePath);
         } else {
+            // Untuk XLSX / XLS, periksa ketersediaan library PhpSpreadsheet
+            if (!class_exists(\PhpOffice\PhpSpreadsheet\IOFactory::class)) {
+                throw new \InvalidArgumentException(
+                    'Library PhpSpreadsheet belum terpasang di hosting. Silakan jalankan `composer install` di terminal cPanel hosting Anda, atau gunakan file berformat CSV (.csv).'
+                );
+            }
+
             $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($filePath);
+            $sheet = $spreadsheet->getActiveSheet();
+            $highestRow = $sheet->getHighestRow();
+
+            for ($row = 2; $row <= $highestRow; $row++) {
+                $rawRows[] = [
+                    (string) $sheet->getCell('A' . $row)->getValue(),
+                    (string) $sheet->getCell('B' . $row)->getValue(),
+                    (string) $sheet->getCell('C' . $row)->getValue(),
+                    (string) $sheet->getCell('D' . $row)->getValue(),
+                    (string) $sheet->getCell('E' . $row)->getValue(),
+                    (string) $sheet->getCell('F' . $row)->getValue(),
+                    (string) $sheet->getCell('G' . $row)->getValue(),
+                ];
+            }
         }
 
-        $sheet = $spreadsheet->getActiveSheet();
-        $highestRow = $sheet->getHighestRow();
-
-        if ($highestRow < 2) {
-            throw new \InvalidArgumentException('File kosong atau hanya berisi baris header.');
+        if (empty($rawRows)) {
+            throw new \InvalidArgumentException('File kosong atau tidak memuat data butir kesepahaman.');
         }
 
         $rows = [];
         $errors = [];
+        $lineNum = 2;
 
-        // Baca data dari baris ke-2 (asumsi baris 1 adalah header)
-        for ($row = 2; $row <= $highestRow; $row++) {
-            $kodeKelompok = trim((string) $sheet->getCell('A' . $row)->getValue());
-            $judulKelompok = trim((string) $sheet->getCell('B' . $row)->getValue());
-            $urutanKelompok = trim((string) $sheet->getCell('C' . $row)->getValue());
-            $nomorPoin = trim((string) $sheet->getCell('D' . $row)->getValue());
-            $uraianPoin = trim((string) $sheet->getCell('E' . $row)->getValue());
-            $kodePoin = trim((string) $sheet->getCell('F' . $row)->getValue());
-            $urutanPoin = trim((string) $sheet->getCell('G' . $row)->getValue());
+        foreach ($rawRows as $item) {
+            $kodeKelompok = trim($item[0] ?? '');
+            $judulKelompok = trim($item[1] ?? '');
+            $urutanKelompok = trim($item[2] ?? '');
+            $nomorPoin = trim($item[3] ?? '');
+            $uraianPoin = trim($item[4] ?? '');
+            $kodePoin = trim($item[5] ?? '');
+            $urutanPoin = trim($item[6] ?? '');
 
             // Lewati baris jika benar-benar kosong
             if (empty($kodeKelompok) && empty($judulKelompok) && empty($nomorPoin) && empty($uraianPoin)) {
+                $lineNum++;
                 continue;
             }
 
             // Validasi kolom wajib
             if (empty($kodeKelompok) || empty($judulKelompok) || empty($nomorPoin) || empty($uraianPoin)) {
-                $errors[] = "Baris {$row}: Kode Kelompok, Judul Kelompok, Nomor Poin, dan Uraian Poin wajib diisi.";
+                $errors[] = "Baris {$lineNum}: Kode Kelompok, Judul Kelompok, Nomor Poin, dan Uraian Poin wajib diisi.";
+                $lineNum++;
                 continue;
             }
 
@@ -196,7 +220,7 @@ class KesepahamanSpreadsheetService
             }
 
             $rows[] = [
-                'row' => $row,
+                'row' => $lineNum,
                 'kode_kelompok' => strtoupper($kodeKelompok),
                 'judul_kelompok' => $judulKelompok,
                 'urutan_kelompok' => is_numeric($urutanKelompok) ? (int) $urutanKelompok : null,
@@ -205,6 +229,8 @@ class KesepahamanSpreadsheetService
                 'kode_poin' => $kodePoin,
                 'urutan_poin' => is_numeric($urutanPoin) ? (int) $urutanPoin : null,
             ];
+
+            $lineNum++;
         }
 
         if (empty($rows)) {
@@ -214,7 +240,6 @@ class KesepahamanSpreadsheetService
         // Jalankan import dalam database transaction
         return DB::transaction(function () use ($program, $rows, $mode, $errors) {
             if ($mode === 'replace') {
-                // Hapus semua poin dan kelompok yang ada pada program ini
                 foreach ($program->kelompoks as $k) {
                     $k->poins()->delete();
                     $k->delete();
@@ -276,7 +301,7 @@ class KesepahamanSpreadsheetService
                     ]);
                     $totalPoin++;
                 } else {
-                    // Mode upsert: cek berdasarkan kode_poin atau kombinasi kelompok_id + nomor
+                    // Mode upsert
                     $poin = KesepahamanPoin::where('kode_poin', $item['kode_poin'])->first();
                     if (!$poin) {
                         $poin = KesepahamanPoin::where('kelompok_id', $kelompok->id)
@@ -316,7 +341,74 @@ class KesepahamanSpreadsheetService
     }
 
     /**
-     * Terapkan styling visual untuk header baris ke-1.
+     * Parser CSV native bawaan PHP (tanpa perlu library tambahan).
+     */
+    protected function parseNativeCsv(string $filePath): array
+    {
+        $handle = fopen($filePath, 'r');
+        if (!$handle) {
+            throw new \InvalidArgumentException('Tidak dapat membaca file CSV.');
+        }
+
+        // Baca baris pertama untuk deteksi delimiter (, atau ;)
+        $firstLine = fgets($handle);
+        if ($firstLine === false) {
+            fclose($handle);
+            throw new \InvalidArgumentException('File CSV kosong.');
+        }
+        rewind($handle);
+
+        $delimiter = ',';
+        if (substr_count($firstLine, ';') > substr_count($firstLine, ',')) {
+            $delimiter = ';';
+        }
+
+        $rows = [];
+        $isHeader = true;
+
+        while (($data = fgetcsv($handle, 0, $delimiter)) !== false) {
+            if ($isHeader) {
+                $isHeader = false;
+                continue; // Lewati baris header
+            }
+
+            // Bersihkan BOM jika ada pada sel pertama
+            if (isset($data[0])) {
+                $data[0] = preg_replace('/^\xEF\xBB\xBF/', '', $data[0]);
+            }
+
+            $rows[] = $data;
+        }
+
+        fclose($handle);
+        return $rows;
+    }
+
+    /**
+     * Stream CSV native langsung ke browser dengan UTF-8 BOM.
+     */
+    protected function streamNativeCsv(string $filename, array $rows): StreamedResponse
+    {
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Cache-Control' => 'max-age=0',
+        ];
+
+        return response()->stream(function () use ($rows) {
+            $output = fopen('php://output', 'w');
+            // Tulis UTF-8 BOM agar Microsoft Excel membuka karakter dengan benar
+            fwrite($output, "\xEF\xBB\xBF");
+            fputcsv($output, array_values(self::HEADERS));
+            foreach ($rows as $row) {
+                fputcsv($output, $row);
+            }
+            fclose($output);
+        }, 200, $headers);
+    }
+
+    /**
+     * Terapkan styling visual untuk header baris ke-1 (jika PhpSpreadsheet tersedia).
      */
     protected function applyHeaderStyles($sheet): void
     {
@@ -331,16 +423,16 @@ class KesepahamanSpreadsheetService
                 'size' => 10,
             ],
             'fill' => [
-                'fillType' => Fill::FILL_SOLID,
-                'startColor' => ['rgb' => '4F46E5'], // Indigo-600
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '4F46E5'],
             ],
             'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_CENTER,
-                'vertical' => Alignment::VERTICAL_CENTER,
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
             ],
             'borders' => [
                 'allBorders' => [
-                    'borderStyle' => Border::BORDER_THIN,
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
                     'color' => ['rgb' => '3730A3'],
                 ],
             ],
@@ -356,24 +448,22 @@ class KesepahamanSpreadsheetService
     {
         $sheet->getStyle("A{$rowNum}:G{$rowNum}")->applyFromArray([
             'alignment' => [
-                'vertical' => Alignment::VERTICAL_TOP,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP,
             ],
             'borders' => [
                 'allBorders' => [
-                    'borderStyle' => Border::BORDER_THIN,
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
                     'color' => ['rgb' => 'E2E8F0'],
                 ],
             ],
         ]);
 
-        // Center alignment untuk kolom kode kelompok, urutan, nomor, ID
-        $sheet->getStyle("A{$rowNum}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle("C{$rowNum}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle("D{$rowNum}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle("F{$rowNum}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
-        $sheet->getStyle("G{$rowNum}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("A{$rowNum}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("C{$rowNum}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("D{$rowNum}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("F{$rowNum}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+        $sheet->getStyle("G{$rowNum}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
-        // Wrap text untuk judul kelompok dan uraian poin
         $sheet->getStyle("B{$rowNum}")->getAlignment()->setWrapText(true);
         $sheet->getStyle("E{$rowNum}")->getAlignment()->setWrapText(true);
     }
@@ -383,19 +473,19 @@ class KesepahamanSpreadsheetService
      */
     protected function autoFitColumns($sheet): void
     {
-        $sheet->getColumnDimension('A')->setWidth(16); // Kode Kelompok
-        $sheet->getColumnDimension('B')->setWidth(40); // Judul Kelompok
-        $sheet->getColumnDimension('C')->setWidth(16); // Urutan Kelompok
-        $sheet->getColumnDimension('D')->setWidth(14); // Nomor Poin
-        $sheet->getColumnDimension('E')->setWidth(75); // Uraian Poin
-        $sheet->getColumnDimension('F')->setWidth(20); // Kode Poin (ID)
-        $sheet->getColumnDimension('G')->setWidth(14); // Urutan Poin
+        $sheet->getColumnDimension('A')->setWidth(16);
+        $sheet->getColumnDimension('B')->setWidth(40);
+        $sheet->getColumnDimension('C')->setWidth(16);
+        $sheet->getColumnDimension('D')->setWidth(14);
+        $sheet->getColumnDimension('E')->setWidth(75);
+        $sheet->getColumnDimension('F')->setWidth(20);
+        $sheet->getColumnDimension('G')->setWidth(14);
     }
 
     /**
      * Stream spreadsheet langsung ke browser.
      */
-    protected function streamSpreadsheet(Spreadsheet $spreadsheet, string $filename, string $format): StreamedResponse
+    protected function streamSpreadsheet(\PhpOffice\PhpSpreadsheet\Spreadsheet $spreadsheet, string $filename, string $format): StreamedResponse
     {
         if ($format === 'csv') {
             $headers = [
@@ -405,7 +495,7 @@ class KesepahamanSpreadsheetService
             ];
 
             return response()->stream(function () use ($spreadsheet) {
-                $writer = new Csv($spreadsheet);
+                $writer = new \PhpOffice\PhpSpreadsheet\Writer\Csv($spreadsheet);
                 $writer->setDelimiter(',');
                 $writer->setEnclosure('"');
                 $writer->setLineEnding("\r\n");
@@ -421,7 +511,7 @@ class KesepahamanSpreadsheetService
         ];
 
         return response()->stream(function () use ($spreadsheet) {
-            $writer = new Xlsx($spreadsheet);
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
             $writer->save('php://output');
         }, 200, $headers);
     }
