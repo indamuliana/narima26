@@ -98,9 +98,9 @@
 
         <!-- Filter & Search Toolbar (DataTables Style) -->
         <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-            <form method="GET" action="{{ route('admin.calon-siswa.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+            <form method="GET" action="{{ route('admin.calon-siswa.index') }}" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-3">
                 <!-- Search Keyword -->
-                <div class="lg:col-span-2">
+                <div class="sm:col-span-2 md:col-span-2 lg:col-span-2 xl:col-span-2">
                     <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Cari Peserta</label>
                     <input type="text" name="q" value="{{ request('q') }}"
                            placeholder="Nama, NISN, No. Pendaftaran..."
@@ -146,12 +146,35 @@
                     </select>
                 </div>
 
+                <!-- Program Filter -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Program</label>
+                    <select name="program_id" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30">
+                        <option value="">Semua Program</option>
+                        @foreach ($programList as $prog)
+                            <option value="{{ $prog->id }}" {{ request('program_id') == $prog->id ? 'selected' : '' }}>
+                                {{ $prog->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Gender Filter -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Gender</label>
+                    <select name="jenis_kelamin" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30">
+                        <option value="">Semua Gender</option>
+                        <option value="L" {{ request('jenis_kelamin') === 'L' ? 'selected' : '' }}>Laki-laki (L)</option>
+                        <option value="P" {{ request('jenis_kelamin') === 'P' ? 'selected' : '' }}>Perempuan (P)</option>
+                    </select>
+                </div>
+
                 <!-- Actions / Buttons -->
-                <div class="flex items-end gap-2">
+                <div class="flex items-end gap-2 md:col-span-2 lg:col-span-1 xl:col-span-1">
                     <button type="submit" class="flex-1 py-2 px-3 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-colors cursor-pointer">
                         Filter
                     </button>
-                    @if (request()->hasAny(['q', 'status_spmb', 'jurusan_id', 'gelombang_id', 'program_id']))
+                    @if (request()->hasAny(['q', 'status_spmb', 'jurusan_id', 'gelombang_id', 'program_id', 'jenis_kelamin']))
                         <a href="{{ route('admin.calon-siswa.index') }}" class="py-2 px-3 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition-colors">
                             Reset
                         </a>
@@ -203,7 +226,18 @@
                                     {{ $calonSiswaList->firstItem() + $index }}
                                 </td>
                                 <td class="px-5 py-4">
-                                    <p class="font-bold text-slate-900 text-sm">{{ $cs->nama_lengkap }}</p>
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <p class="font-bold text-slate-900 text-sm">{{ $cs->nama_lengkap }}</p>
+                                        @if($cs->jenis_kelamin === 'L')
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200" title="Laki-laki">
+                                                L
+                                            </span>
+                                        @elseif($cs->jenis_kelamin === 'P')
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-pink-50 text-pink-700 border border-pink-200" title="Perempuan">
+                                                P
+                                            </span>
+                                        @endif
+                                    </div>
                                     <p class="text-[11px] text-slate-400 font-mono mt-0.5">
                                         {{ $cs->nomor_pendaftaran }} &bull; NISN: {{ $cs->nisn }}
                                     </p>

@@ -65,15 +65,21 @@ class CalonSiswaController extends Controller
         }
 
         if ($gelombangId = $request->input('gelombang_id')) {
-            $query->where('gelombang_id', $gelombangId);
+            if ($gelombangId !== 'SEMUA') {
+                $query->where('gelombang_id', $gelombangId);
+            }
         }
 
         if ($programId = $request->input('program_id')) {
-            $query->where('program_id', $programId);
+            if ($programId !== 'SEMUA') {
+                $query->where('program_id', $programId);
+            }
         }
 
         if ($gender = $request->input('jenis_kelamin')) {
-            $query->where('jenis_kelamin', $gender);
+            if ($gender !== 'SEMUA') {
+                $query->where('jenis_kelamin', $gender);
+            }
         }
 
         $sortBy = $request->input('sort_by', 'created_at');
