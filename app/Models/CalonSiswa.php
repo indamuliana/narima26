@@ -321,4 +321,14 @@ class CalonSiswa extends Model
     {
         return $this->hasMany(RiwayatStatusSpmb::class, 'calon_siswa_id');
     }
+
+    public function tpaJadwal(): HasOne
+    {
+        return $this->hasOne(TpaJadwalSiswa::class, 'calon_siswa_id');
+    }
+
+    public function tpaSesi(): HasOne
+    {
+        return $this->hasOne(TpaSesiSiswa::class, 'calon_siswa_id');
+    }
 }

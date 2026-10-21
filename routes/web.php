@@ -41,6 +41,24 @@ Route::controller(RegistrationController::class)->group(function () {
 Route::get('/verifikasi-dokumen/{kode}', [\App\Http\Controllers\VerifikasiDokumenController::class, 'show'])
     ->name('dokumen.verifikasi');
 
+// Portal Mandiri Ujian TPA Calon Siswa (Fase Tes Potensi Akademik)
+Route::prefix('tpa-siswa')->name('tpa.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Tpa\TpaAuthController::class, 'create'])->name('login');
+    Route::post('/', [\App\Http\Controllers\Tpa\TpaAuthController::class, 'store'])->name('login.store');
+    Route::post('/logout', [\App\Http\Controllers\Tpa\TpaAuthController::class, 'destroy'])->name('logout');
+
+    Route::middleware(['auth', 'role:calon_siswa'])->group(function () {
+        Route::get('/ruang-tunggu', [\App\Http\Controllers\Tpa\TpaSiswaController::class, 'ruangTunggu'])->name('ruang-tunggu');
+        Route::post('/mulai', [\App\Http\Controllers\Tpa\TpaSiswaController::class, 'mulaiUjian'])->name('mulai');
+        Route::get('/ujian', [\App\Http\Controllers\Tpa\TpaSiswaController::class, 'ujian'])->name('ujian');
+        Route::post('/jawaban', [\App\Http\Controllers\Tpa\TpaSiswaController::class, 'simpanJawaban'])->name('jawaban');
+        Route::post('/submit-babak-1', [\App\Http\Controllers\Tpa\TpaSiswaController::class, 'submitBabak1'])->name('submit-babak-1');
+        Route::post('/submit-babak-2', [\App\Http\Controllers\Tpa\TpaSiswaController::class, 'submitBabak2'])->name('submit-babak-2');
+        Route::post('/pelanggaran', [\App\Http\Controllers\Tpa\TpaSiswaController::class, 'catatPelanggaran'])->name('pelanggaran');
+        Route::get('/selesai', [\App\Http\Controllers\Tpa\TpaSiswaController::class, 'selesai'])->name('selesai');
+    });
+});
+
 // Authentication Routes
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
@@ -168,6 +186,41 @@ Route::middleware(['auth', 'role:admin,operator'])
                 Route::post('/batch', 'alokasiBatch')->name('batch');
                 Route::post('/{calonSiswa}', 'alokasikan')->name('single');
             });
+
+        // 5. Manajemen Tes Potensi Akademik (TPA)
+        Route::prefix('tpa')->name('tpa.')->group(function () {
+            // Pengaturan Global TPA
+            Route::get('/pengaturan', [\App\Http\Controllers\Admin\TpaPengaturanController::class, 'index'])->name('pengaturan.index');
+            Route::put('/pengaturan', [\App\Http\Controllers\Admin\TpaPengaturanController::class, 'update'])->name('pengaturan.update');
+
+            // Bank Soal TPA
+            Route::controller(\App\Http\Controllers\Admin\TpaSoalController::class)->prefix('soal')->name('soal.')->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/create', 'create')->name('create');
+                Route::post('/', 'store')->name('store');
+                Route::get('/{soal}/edit', 'edit')->name('edit');
+                Route::put('/{soal}', 'update')->name('update');
+                Route::delete('/{soal}', 'destroy')->name('destroy');
+                Route::patch('/{soal}/toggle', 'toggle')->name('toggle');
+            });
+
+            // Jadwal & Akses Masuk Siswa
+            Route::controller(\App\Http\Controllers\Admin\TpaJadwalController::class)->prefix('jadwal')->name('jadwal.')->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::put('/{calonSiswa}', 'update')->name('update');
+                Route::patch('/{calonSiswa}/toggle', 'toggle')->name('toggle');
+                Route::post('/batch', 'batch')->name('batch');
+                Route::post('/{calonSiswa}/reset-sesi', 'resetSesi')->name('reset-sesi');
+            });
+
+            // Rekapitulasi & Hasil Nilai
+            Route::controller(\App\Http\Controllers\Admin\TpaHasilController::class)->prefix('hasil')->name('hasil.')->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/export/xls', 'exportXls')->name('export.xls');
+                Route::get('/export/pdf', 'exportPdf')->name('export.pdf');
+                Route::get('/{calonSiswa}', 'show')->name('show');
+            });
+        });
     });
 
 // Admin Exclusive Area (Fase 13 - User Management, Audit Trail & Hard Deletion)
