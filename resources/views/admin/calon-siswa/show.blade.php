@@ -221,6 +221,159 @@
             </div>
         </div>
 
+        <!-- Catatan Khusus CS & Pewawancara (Admin Area) -->
+        <div class="bg-gradient-to-r from-amber-50/70 via-white to-indigo-50/70 rounded-3xl p-5 border border-slate-200/80 shadow-xs print:hidden"
+             x-data="{
+                 catatanCs: {{ json_encode($calonSiswa->catatan_admin ?? '') }},
+                 initialCs: {{ json_encode($calonSiswa->catatan_admin ?? '') }},
+                 isDoneCs: {{ $calonSiswa->is_catatan_admin_done ? 'true' : 'false' }},
+                 initialDoneCs: {{ $calonSiswa->is_catatan_admin_done ? 'true' : 'false' }},
+                 statusCs: 'idle',
+
+                 catatanWawancara: {{ json_encode($calonSiswa->catatan_untuk_pewawancara ?? '') }},
+                 initialWawancara: {{ json_encode($calonSiswa->catatan_untuk_pewawancara ?? '') }},
+                 isDoneWawancara: {{ $calonSiswa->is_catatan_pewawancara_done ? 'true' : 'false' }},
+                 initialDoneWawancara: {{ $calonSiswa->is_catatan_pewawancara_done ? 'true' : 'false' }},
+                 statusWawancara: 'idle',
+
+                 saveField(field) {
+                     let isCs = field === 'catatan_admin';
+                     let val = isCs ? this.catatanCs : this.catatanWawancara;
+                     let done = isCs ? this.isDoneCs : this.isDoneWawancara;
+                     let initVal = isCs ? this.initialCs : this.initialWawancara;
+                     let initDone = isCs ? this.initialDoneCs : this.initialDoneWawancara;
+                     if (val === initVal && done === initDone) return;
+                     if (isCs) this.statusCs = 'saving'; else this.statusWawancara = 'saving';
+
+                     fetch('{{ route('admin.kendali-calon-siswa.update-catatan', $calonSiswa) }}', {
+                         method: 'PATCH',
+                         headers: {
+                             'Content-Type': 'application/json',
+                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                             'Accept': 'application/json'
+                         },
+                         body: JSON.stringify({ field: field, value: val, is_done: done })
+                     })
+                     .then(res => res.json())
+                     .then(data => {
+                         if (data.success) {
+                             if (isCs) {
+                                 this.initialCs = this.catatanCs;
+                                 this.initialDoneCs = this.isDoneCs;
+                                 this.statusCs = 'saved';
+                                 setTimeout(() => { if (this.statusCs === 'saved') this.statusCs = 'idle'; }, 2000);
+                             } else {
+                                 this.initialWawancara = this.catatanWawancara;
+                                 this.initialDoneWawancara = this.isDoneWawancara;
+                                 this.statusWawancara = 'saved';
+                                 setTimeout(() => { if (this.statusWawancara === 'saved') this.statusWawancara = 'idle'; }, 2000);
+                             }
+                         } else {
+                             if (isCs) this.statusCs = 'error'; else this.statusWawancara = 'error';
+                         }
+                     })
+                     .catch(() => {
+                         if (isCs) this.statusCs = 'error'; else this.statusWawancara = 'error';
+                     });
+                 }
+             }">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-200/60">
+                <div class="flex items-center gap-2">
+                    <span class="text-base">📌</span>
+                    <h3 class="text-xs font-black uppercase tracking-wider text-slate-800">Catatan Khusus CS & Instruksi Pewawancara</h3>
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                        Sinkron Kendali Calon Murid
+                    </span>
+                </div>
+                @if(auth()->user()?->isAdmin())
+                    <a href="{{ route('admin.kendali-calon-siswa.index') }}" class="text-[11px] font-bold text-nampi-orange hover:underline flex items-center gap-1">
+                        <span>Buka Menu Kendali</span>
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                @endif
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                <!-- Catatan Khusus CS -->
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <label class="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
+                            <span>💬 Catatan Khusus CS</span>
+                            <span class="text-[10px] text-slate-400 font-normal">(Internal panitia)</span>
+                        </label>
+                        <div class="flex items-center gap-2">
+                            <label class="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 cursor-pointer select-none">
+                                <input type="checkbox" x-model="isDoneCs" @change="saveField('catatan_admin')"
+                                       class="rounded text-emerald-600 focus:ring-emerald-500 w-3.5 h-3.5 border-slate-300">
+                                <span :class="isDoneCs ? 'text-emerald-700 font-bold' : 'text-slate-500'">Done ✓</span>
+                            </label>
+                            <span class="text-[10px] font-mono">
+                                <span x-show="statusCs === 'saving'" class="text-amber-600 font-semibold">Menyimpan...</span>
+                                <span x-show="statusCs === 'saved'" class="text-emerald-600 font-bold">✓ Tersimpan</span>
+                                <span x-show="statusCs === 'error'" class="text-red-600 font-bold">✕ Gagal</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <textarea
+                            x-model="catatanCs"
+                            @blur="saveField('catatan_admin')"
+                            @keydown.ctrl.enter="saveField('catatan_admin')"
+                            rows="2"
+                            placeholder="Catatan khusus dari CS / admin untuk calon murid ini..."
+                            class="w-full text-xs p-2.5 rounded-xl border border-slate-200 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none resize-y transition bg-white text-slate-800"></textarea>
+                        <div class="flex items-center justify-between text-[10px] text-slate-400 mt-0.5">
+                            <span>Tersimpan otomatis saat klik di luar / Ctrl+Enter</span>
+                            <button type="button" @click="saveField('catatan_admin')" x-show="catatanCs !== initialCs || isDoneCs !== initialDoneCs"
+                                    class="px-2 py-0.5 rounded bg-amber-500 hover:bg-amber-600 text-white font-bold text-[10px] cursor-pointer">
+                                Simpan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Catatan untuk Pewawancara -->
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <label class="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
+                            <span>📝 Catatan untuk Pewawancara</span>
+                            <span class="text-[10px] text-slate-400 font-normal">(Muncul di Hub Pewawancara)</span>
+                        </label>
+                        <div class="flex items-center gap-2">
+                            <label class="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 cursor-pointer select-none">
+                                <input type="checkbox" x-model="isDoneWawancara" @change="saveField('catatan_untuk_pewawancara')"
+                                       class="rounded text-emerald-600 focus:ring-emerald-500 w-3.5 h-3.5 border-slate-300">
+                                <span :class="isDoneWawancara ? 'text-emerald-700 font-bold' : 'text-slate-500'">Done ✓</span>
+                            </label>
+                            <span class="text-[10px] font-mono">
+                                <span x-show="statusWawancara === 'saving'" class="text-indigo-600 font-semibold">Menyimpan...</span>
+                                <span x-show="statusWawancara === 'saved'" class="text-emerald-600 font-bold">✓ Tersimpan</span>
+                                <span x-show="statusWawancara === 'error'" class="text-red-600 font-bold">✕ Gagal</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <textarea
+                            x-model="catatanWawancara"
+                            @blur="saveField('catatan_untuk_pewawancara')"
+                            @keydown.ctrl.enter="saveField('catatan_untuk_pewawancara')"
+                            rows="2"
+                            placeholder="Catatan/instruksi yang akan dibaca oleh pewawancara..."
+                            class="w-full text-xs p-2.5 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 outline-none resize-y transition bg-white text-slate-800"></textarea>
+                        <div class="flex items-center justify-between text-[10px] text-slate-400 mt-0.5">
+                            <span>Tersimpan otomatis saat klik di luar / Ctrl+Enter</span>
+                            <button type="button" @click="saveField('catatan_untuk_pewawancara')" x-show="catatanWawancara !== initialWawancara || isDoneWawancara !== initialDoneWawancara"
+                                    class="px-2 py-0.5 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[10px] cursor-pointer">
+                                Simpan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+            </div>
+        </div>
+
         <!-- Sticky Quick Navigation Tab Bar (Hidden on Print) -->
         <div class="sticky top-2 z-30 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-slate-200/90 shadow-sm print:hidden">
             <div class="flex items-center gap-1.5 overflow-x-auto text-[11px] font-bold text-slate-600 no-scrollbar">

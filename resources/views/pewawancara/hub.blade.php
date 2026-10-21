@@ -91,6 +91,22 @@
             </div>
         </div>
 
+        <!-- Catatan Penting untuk Pewawancara (dari Panitia / CS) -->
+        @if(!empty($calonSiswa->catatan_untuk_pewawancara))
+            <div class="bg-amber-50 rounded-2xl p-4 sm:p-5 border-2 border-amber-300 shadow-xs flex items-start gap-3.5">
+                <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-base shrink-0 shadow-xs">
+                    📝
+                </div>
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-xs font-black uppercase tracking-wider text-amber-900">Catatan Khusus dari Panitia / CS</h3>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-200 text-amber-900">Penting</span>
+                    </div>
+                    <p class="text-xs text-amber-950 font-medium whitespace-pre-line leading-relaxed">{{ $calonSiswa->catatan_untuk_pewawancara }}</p>
+                </div>
+            </div>
+        @endif
+
         <!-- Dua Instrumen Wawancara -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 

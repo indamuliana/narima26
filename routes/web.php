@@ -183,6 +183,16 @@ Route::middleware(['auth', 'role:admin'])
         Route::delete('/calon-siswa/{calonSiswa}', [\App\Http\Controllers\Admin\CalonSiswaController::class, 'destroy'])
             ->name('calon-siswa.destroy');
 
+        // Kendali Calon Murid (Admin Exclusive)
+        Route::get('/kendali-calon-siswa', [\App\Http\Controllers\Admin\KendaliCalonSiswaController::class, 'index'])
+            ->name('kendali-calon-siswa.index');
+        Route::get('/kendali-calon-siswa/export/xls', [\App\Http\Controllers\Admin\KendaliCalonSiswaController::class, 'exportXls'])
+            ->name('kendali-calon-siswa.export.xls');
+        Route::get('/kendali-calon-siswa/export/pdf', [\App\Http\Controllers\Admin\KendaliCalonSiswaController::class, 'exportPdf'])
+            ->name('kendali-calon-siswa.export.pdf');
+        Route::patch('/kendali-calon-siswa/{calonSiswa}/catatan', [\App\Http\Controllers\Admin\KendaliCalonSiswaController::class, 'updateCatatan'])
+            ->name('kendali-calon-siswa.update-catatan');
+
         // Log Audit Trail
         Route::get('/audit-trail', [\App\Http\Controllers\Admin\AuditTrailController::class, 'index'])->name('audit-trail.index');
     });

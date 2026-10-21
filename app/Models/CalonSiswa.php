@@ -65,6 +65,9 @@ class CalonSiswa extends Model
         'status_spmb',
         'status_data',
         'catatan_admin',
+        'is_catatan_admin_done',
+        'catatan_untuk_pewawancara',
+        'is_catatan_pewawancara_done',
         'tag_beasiswa',
         'tag_jalur',
     ];
@@ -75,6 +78,8 @@ class CalonSiswa extends Model
             'tanggal_lahir' => 'date',
             'status_spmb' => \App\Enums\SpmbStatus::class,
             'is_luar_negeri' => 'boolean',
+            'is_catatan_admin_done' => 'boolean',
+            'is_catatan_pewawancara_done' => 'boolean',
         ];
     }
 

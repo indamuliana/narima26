@@ -19,14 +19,16 @@
         .header-kop {
             width: 100%;
             text-align: center;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
+        }
+        .header-kop-with-border {
             border-bottom: 2px solid #0f172a;
             padding-bottom: 6px;
         }
         .kop-image {
             width: 100%;
-            max-height: 125px;
-            object-fit: contain;
+            height: auto;
+            display: block;
         }
         .doc-title {
             text-align: center;
@@ -140,7 +142,7 @@
     @endif
 
     @unless($hideKop ?? false)
-    <div class="header-kop">
+    <div class="header-kop {{ empty($kopSuratBase64) ? 'header-kop-with-border' : '' }}">
         @if (!empty($kopSuratBase64))
             <img src="{{ $kopSuratBase64 }}" class="kop-image" alt="Kop Surat SMK Wikrama 1 Garut">
         @else
