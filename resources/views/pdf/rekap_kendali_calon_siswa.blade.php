@@ -63,13 +63,12 @@
         <thead>
             <tr style="background-color: #f1f5f9; color: #1e293b;">
                 <th style="width: 3%; text-align: center;">No</th>
-                <th style="width: 9%; text-align: left;">No. Reg & NISN</th>
-                <th style="width: 14%; text-align: left;">Nama Calon Murid</th>
+                <th style="width: 10%; text-align: left;">No. Reg & NISN</th>
+                <th style="width: 15%; text-align: left;">Nama Calon Murid</th>
                 <th style="width: 3%; text-align: center;">L/P</th>
-                <th style="width: 7%; text-align: center;">Prog & Jurusan</th>
-                <th style="width: 6%; text-align: center;">Gelombang</th>
-                <th style="width: 7%; text-align: center;">Biaya Seleksi</th>
-                <th style="width: 8%; text-align: center;">Status SPMB</th>
+                <th style="width: 8%; text-align: center;">Prog & Jurusan</th>
+                <th style="width: 9%; text-align: center;">Gelombang</th>
+                <th style="width: 9%; text-align: center;">Status SPMB</th>
                 <th style="width: 11%; text-align: left;">Rekomendasi</th>
                 <th style="width: 16%; text-align: left; word-wrap: break-word;">Catatan Khusus CS</th>
                 <th style="width: 16%; text-align: left; word-wrap: break-word;">Catatan Pewawancara</th>
@@ -79,8 +78,6 @@
             @forelse ($calonSiswaList as $index => $cs)
                 @php
                     $statusStr = is_string($cs->status_spmb) ? $cs->status_spmb : ($cs->status_spmb?->value ?? '-');
-                    $bayar = $cs->pembayaranSeleksi;
-                    $statusBayar = $bayar && $bayar->status === 'DIVERIFIKASI' ? 'LUNAS' : ($bayar && $bayar->status === 'PENDING' ? 'MENUNGGU' : 'BELUM BAYAR');
                 @endphp
                 <tr style="{{ $index % 2 === 1 ? 'background-color: #f8fafc;' : '' }}">
                     <td style="text-align: center; font-weight: bold; color: #64748b;">{{ $index + 1 }}</td>
@@ -99,11 +96,8 @@
                         <span style="color: #0369a1; font-weight: bold;">{{ $cs->program?->nama ?? $cs->program?->nama_program ?? 'Reguler' }}</span> &bull; 
                         <strong style="color: #0f172a;">{{ $cs->jurusan?->kode ?? '-' }}</strong>
                     </td>
-                    <td style="text-align: center;">{{ $cs->gelombang?->nama_gelombang ?? '-' }}</td>
-                    <td style="text-align: center; font-size: 6.5pt; font-weight: bold;">
-                        <span style="color: {{ $statusBayar === 'LUNAS' ? '#15803d' : ($statusBayar === 'MENUNGGU' ? '#b45309' : '#dc2626') }}">
-                            {{ $statusBayar }}
-                        </span>
+                    <td style="text-align: center; white-space: nowrap;">
+                        {{ $cs->gelombang?->nama_gelombang ?? '-' }}
                     </td>
                     <td style="text-align: center; font-size: 6.5pt; font-weight: bold;">
                         {{ str_replace('_', ' ', $statusStr) }}
@@ -140,7 +134,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="11" style="text-align: center; color: #94a3b8; padding: 15px;">
+                    <td colspan="10" style="text-align: center; color: #94a3b8; padding: 15px;">
                         Tidak ada data calon murid baru sesuai kriteria pencarian.
                     </td>
                 </tr>
