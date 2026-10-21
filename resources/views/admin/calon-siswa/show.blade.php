@@ -371,8 +371,6 @@
                 </div>
             </div>
         </div>
-            </div>
-        </div>
 
         <!-- Sticky Quick Navigation Tab Bar (Hidden on Print) -->
         <div class="sticky top-2 z-30 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-slate-200/90 shadow-sm print:hidden">
