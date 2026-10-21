@@ -134,6 +134,7 @@
             border-top: 1px dashed #cbd5e1;
             padding-top: 6px;
         }
+        @yield('custom_styles')
     </style>
 </head>
 <body>
