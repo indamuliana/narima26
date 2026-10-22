@@ -207,7 +207,7 @@
                             <th class="px-4 py-3.5 text-center">No</th>
                             <th class="px-5 py-3.5">calon murid</th>
                             <th class="px-4 py-3.5">Kompetensi Keahlian</th>
-                            <th class="px-4 py-3.5">Gelombang</th>
+                            <th class="px-4 py-3.5">Gelombang & Tgl Daftar</th>
                             <th class="px-4 py-3.5 text-center">Biaya Seleksi</th>
                             <th class="px-4 py-3.5 text-center">Status SPMB</th>
                             <th class="px-4 py-3.5 text-center">Keputusan</th>
@@ -266,8 +266,14 @@
                                         @endif
                                     </div>
                                 </td>
-                                <td class="px-4 py-4 text-slate-600">
-                                    {{ $cs->gelombang?->nama_gelombang }}
+                                <td class="px-4 py-4">
+                                    <span class="font-bold text-slate-800 block">{{ $cs->gelombang?->nama_gelombang ?? '-' }}</span>
+                                    <div class="flex items-center gap-1 text-[11px] text-slate-400 mt-0.5" title="{{ $cs->created_at ? $cs->created_at->translatedFormat('d F Y, H:i') . ' WIB' : '-' }}">
+                                        <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        <span>{{ $cs->created_at ? $cs->created_at->translatedFormat('d M Y') : '-' }}</span>
+                                    </div>
                                 </td>
                                 <td class="px-4 py-4 text-center">
                                     @if ($bayarSeleksi && $bayarSeleksi->status === 'DIVERIFIKASI')

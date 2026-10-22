@@ -133,6 +133,13 @@ class PhoneNumberService
      */
     public function getCsRegulerNumber(): string
     {
+        try {
+            $setting = \App\Models\PengaturanSpmb::getSettings();
+            if (! empty($setting->wa_cs_reguler)) {
+                return $setting->wa_cs_reguler;
+            }
+        } catch (\Throwable $e) {}
+
         return (string) config('services.whatsapp.cs_reguler', '628112232880');
     }
 
@@ -141,6 +148,13 @@ class PhoneNumberService
      */
     public function getCsUnggulanNumber(): string
     {
+        try {
+            $setting = \App\Models\PengaturanSpmb::getSettings();
+            if (! empty($setting->wa_cs_unggulan)) {
+                return $setting->wa_cs_unggulan;
+            }
+        } catch (\Throwable $e) {}
+
         return (string) config('services.whatsapp.cs_unggulan', '6281122802880');
     }
 

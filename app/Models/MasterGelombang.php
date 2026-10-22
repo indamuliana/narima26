@@ -62,6 +62,10 @@ class MasterGelombang extends Model
 
     public function getTahunAjaranAttribute(): string
     {
-        return '2027/2028';
+        try {
+            return PengaturanSpmb::getSettings()->tahun_ajaran ?? '2027/2028';
+        } catch (\Throwable $e) {
+            return '2027/2028';
+        }
     }
 }

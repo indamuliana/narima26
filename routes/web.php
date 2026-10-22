@@ -221,6 +221,19 @@ Route::middleware(['auth', 'role:admin,operator'])
                 Route::get('/{calonSiswa}', 'show')->name('show');
             });
         });
+
+        // 6. Manajemen Pengaturan SPMB & Gelombang
+        Route::controller(\App\Http\Controllers\Admin\PengaturanController::class)
+            ->prefix('pengaturan')
+            ->name('pengaturan.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::put('/umum', 'updateGeneral')->name('umum.update');
+                Route::post('/gelombang', 'storeGelombang')->name('gelombang.store');
+                Route::put('/gelombang/{gelombang}', 'updateGelombang')->name('gelombang.update');
+                Route::patch('/gelombang/{gelombang}/toggle', 'toggleGelombang')->name('gelombang.toggle');
+                Route::delete('/gelombang/{gelombang}', 'destroyGelombang')->name('gelombang.destroy');
+            });
     });
 
 // Admin Exclusive Area (Fase 13 - User Management, Audit Trail & Hard Deletion)
