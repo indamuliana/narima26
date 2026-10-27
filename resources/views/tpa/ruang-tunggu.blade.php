@@ -6,9 +6,12 @@
     <title>Ruang Tunggu TPA — SPMB SMK Wikrama 1 Garut</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between p-4 sm:p-6 selection:bg-orange-500 selection:text-white">
-    <!-- Topbar -->
-    <header class="max-w-4xl w-full mx-auto flex items-center justify-between pb-6 border-b border-slate-800">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-orange-500 selection:text-white">
+    @include('tpa.partials.simulasi-banner')
+
+    <div class="flex-1 flex flex-col justify-between p-4 sm:p-6">
+        <!-- Topbar -->
+        <header class="max-w-4xl w-full mx-auto flex items-center justify-between pb-6 border-b border-slate-800">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-orange-600/20 border border-orange-500/30 text-orange-500 flex items-center justify-center font-black">
                 W1
@@ -163,5 +166,6 @@
     <footer class="text-center text-xs text-slate-500 pt-6">
         &copy; {{ date('Y') }} Panitia SPMB SMK Wikrama 1 Garut &bull; Sistem Tes Potensi Akademik Terpadu
     </footer>
+    </div>
 </body>
 </html>

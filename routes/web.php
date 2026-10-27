@@ -64,6 +64,8 @@ Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('l
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::match(['GET', 'POST'], '/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 Route::post('/impersonate/leave', [\App\Http\Controllers\Auth\ImpersonateController::class, 'leave'])->middleware('auth')->name('impersonate.leave');
+Route::post('/tpa-simulasi/reset', [\App\Http\Controllers\Admin\TpaSimulasiController::class, 'reset'])->middleware('auth')->name('tpa.simulasi.reset');
+Route::match(['GET', 'POST'], '/tpa-simulasi/exit', [\App\Http\Controllers\Admin\TpaSimulasiController::class, 'exit'])->middleware('auth')->name('tpa.simulasi.exit');
 
 // Universal Dashboard Route (redirects authenticated users to their specific role dashboard)
 Route::middleware('auth')->get('/dashboard', function () {
@@ -223,6 +225,9 @@ Route::middleware(['auth', 'role:admin,operator'])
                 Route::get('/export/pdf', 'exportPdf')->name('export.pdf');
                 Route::get('/{calonSiswa}', 'show')->name('show');
             });
+
+            // Simulasi Ujian TPA (Mode Coba Ujian oleh Administrator)
+            Route::get('/simulasi', [\App\Http\Controllers\Admin\TpaSimulasiController::class, 'start'])->name('simulasi.start');
         });
 
         // 6. Manajemen Pengaturan SPMB & Gelombang

@@ -85,6 +85,19 @@ class TpaAuthController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        // Jika sedang dalam Mode Simulasi Admin, kembalikan ke akun Admin
+        if (session('is_tpa_simulation') && session('impersonate_admin_id')) {
+            $adminId = session('impersonate_admin_id');
+            session()->forget(['impersonate_admin_id', 'is_tpa_simulation', 'impersonated_calon_siswa_id']);
+
+            $admin = User::find($adminId);
+            if ($admin && $admin->isAdmin()) {
+                Auth::login($admin);
+                return redirect()->route('admin.tpa.pengaturan.index')
+                    ->with('success', 'Sesi coba ujian selesai. Anda kembali ke panel Administrator.');
+            }
+        }
+
         Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

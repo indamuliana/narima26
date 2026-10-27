@@ -27,16 +27,18 @@ class CalonSiswaController extends Controller
      */
     protected function buildFilteredQuery(Request $request)
     {
-        $query = CalonSiswa::query()->with([
-            'jurusan',
-            'jurusan2',
-            'program',
-            'gelombang',
-            'sekolahAsal',
-            'pembayaranSeleksi',
-            'tagihan',
-            'keputusanKelulusan',
-        ]);
+        $query = CalonSiswa::query()
+            ->where('nomor_pendaftaran', 'not like', 'SIM-%')
+            ->with([
+                'jurusan',
+                'jurusan2',
+                'program',
+                'gelombang',
+                'sekolahAsal',
+                'pembayaranSeleksi',
+                'tagihan',
+                'keputusanKelulusan',
+            ]);
 
         if ($search = $request->input('q')) {
             $query->where(function ($q) use ($search) {

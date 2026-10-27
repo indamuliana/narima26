@@ -6,8 +6,11 @@
     <title>Jeda Transisi Babak TPA — SPMB SMK Wikrama 1 Garut</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-center items-center p-4 sm:p-6 selection:bg-orange-500 selection:text-white">
-    <div class="max-w-lg w-full bg-slate-800/90 backdrop-blur-md rounded-3xl border border-slate-700/80 p-8 text-center space-y-6 shadow-2xl">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-orange-500 selection:text-white">
+    @include('tpa.partials.simulasi-banner')
+
+    <div class="flex-1 flex justify-center items-center p-4 sm:p-6">
+        <div class="max-w-lg w-full bg-slate-800/90 backdrop-blur-md rounded-3xl border border-slate-700/80 p-8 text-center space-y-6 shadow-2xl">
         <div class="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto">
             <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
@@ -52,6 +55,7 @@
                 </svg>
             </button>
         </form>
+    </div>
     </div>
 </body>
 </html>

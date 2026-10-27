@@ -20,12 +20,14 @@ class TpaHasilController extends Controller
      */
     protected function buildFilteredQuery(Request $request)
     {
-        $query = CalonSiswa::query()->with([
-            'jurusan',
-            'gelombang',
-            'tpaSesi.jawabanSiswa',
-            'tpaJadwal',
-        ]);
+        $query = CalonSiswa::query()
+            ->where('nomor_pendaftaran', 'not like', 'SIM-%')
+            ->with([
+                'jurusan',
+                'gelombang',
+                'tpaSesi.jawabanSiswa',
+                'tpaJadwal',
+            ]);
 
         if ($search = $request->input('q')) {
             $query->where(function ($q) use ($search) {
