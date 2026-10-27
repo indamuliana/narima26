@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\TpaSoal;
+use App\Services\TpaSoalSpreadsheetService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -31,6 +32,61 @@ class TpaSoalController extends Controller
         $countNumerasi = TpaSoal::numerasi()->count();
 
         return view('admin.tpa.soal.index', compact('soalList', 'babak', 'search', 'countLiterasi', 'countNumerasi'));
+    }
+
+    /**
+     * Download template spreadsheet (.xlsx) untuk butir soal TPA.
+     */
+    public function downloadTemplate(Request $request, TpaSoalSpreadsheetService $service)
+    {
+        $babak = $request->query('babak', 'literasi');
+        return $service->downloadTemplate($babak);
+    }
+
+    /**
+     * Export seluruh soal TPA per babak ke Excel (.xlsx).
+     */
+    public function export(Request $request, TpaSoalSpreadsheetService $service)
+    {
+        $babak = $request->query('babak', 'literasi');
+        return $service->exportSoal($babak);
+    }
+
+    /**
+     * Import butir soal dari file spreadsheet ke babak yang dipilih.
+     */
+    public function import(Request $request, TpaSoalSpreadsheetService $service): RedirectResponse
+    {
+        $babak = $request->input('babak', 'literasi');
+
+        $request->validate([
+            'babak' => ['required', 'in:literasi,numerasi'],
+            'file' => ['required', 'file', 'max:5120'],
+            'mode' => ['required', 'in:upsert,replace'],
+        ], [
+            'file.required' => 'Pilih file spreadsheet (.xlsx, .xls, .csv) terlebih dahulu.',
+            'file.max' => 'Ukuran file maksimal adalah 5MB.',
+            'mode.required' => 'Pilih mode import data.',
+        ]);
+
+        try {
+            $result = $service->importSoal($babak, $request->file('file'), $request->input('mode', 'upsert'));
+
+            $modeLabel = $result['mode'] === 'replace' ? 'Ganti Semua' : 'Tambah/Update';
+            $message = "Berhasil mengimpor {$result['total']} butir soal untuk Babak " . ucfirst($babak) . " (Baru: {$result['total_inserted']}, Diperbarui: {$result['total_updated']}, Mode: {$modeLabel}).";
+
+            if (!empty($result['errors'])) {
+                $errSnippet = implode(' ', array_slice($result['errors'], 0, 3));
+                return redirect()->route('admin.tpa.soal.index', ['babak' => $babak])
+                    ->with('warning', $message . ' Catatan: ' . $errSnippet);
+            }
+
+            return redirect()->route('admin.tpa.soal.index', ['babak' => $babak])
+                ->with('success', $message);
+        } catch (\Throwable $e) {
+            return redirect()->route('admin.tpa.soal.index', ['babak' => $babak])
+                ->with('error', 'Gagal mengimpor soal: ' . $e->getMessage());
+        }
     }
 
     /**

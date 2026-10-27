@@ -196,6 +196,9 @@ Route::middleware(['auth', 'role:admin,operator'])
             // Bank Soal TPA
             Route::controller(\App\Http\Controllers\Admin\TpaSoalController::class)->prefix('soal')->name('soal.')->group(function () {
                 Route::get('/', 'index')->name('index');
+                Route::get('/template', 'downloadTemplate')->name('template');
+                Route::get('/export', 'export')->name('export');
+                Route::post('/import', 'import')->name('import');
                 Route::get('/create', 'create')->name('create');
                 Route::post('/', 'store')->name('store');
                 Route::get('/{soal}/edit', 'edit')->name('edit');

@@ -12,7 +12,27 @@
                 <h1 class="text-2xl font-black text-slate-800">Bank Soal Tes Potensi Akademik</h1>
                 <p class="text-xs text-slate-500 mt-0.5">Kelola butir soal pilihan ganda, bobot penilaian, gambar pendukung, dan kunci jawaban per babak</p>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-2">
+                <!-- Tombol Export Excel -->
+                <a href="{{ route('admin.tpa.soal.export', ['babak' => $babak]) }}"
+                   class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all shadow-xs"
+                   title="Export bank soal babak {{ ucfirst($babak) }} ke format Excel">
+                    <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <span>Export Excel</span>
+                </a>
+
+                <!-- Tombol Import Soal -->
+                <button type="button" onclick="document.getElementById('modalImportSoal').classList.remove('hidden')"
+                        class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all shadow-xs cursor-pointer"
+                        title="Import soal dari file Excel/CSV ke babak {{ ucfirst($babak) }}">
+                    <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                    </svg>
+                    <span>Import Soal</span>
+                </button>
+
                 <a href="{{ route('admin.tpa.soal.create', ['babak' => $babak]) }}"
                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-nampi-orange text-white text-xs font-bold hover:bg-orange-600 transition-colors shadow-xs cursor-pointer">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -29,6 +49,34 @@
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                 </svg>
                 <span>{{ session('success') }}</span>
+            </div>
+        @endif
+
+        @if (session('warning'))
+            <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold flex items-center gap-2">
+                <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <span>{{ session('warning') }}</span>
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2">
+                <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <span>{{ session('error') }}</span>
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold">
+                <ul class="list-disc pl-4 space-y-0.5">
+                    @foreach ($errors->all() as $err)
+                        <li>{{ $err }}</li>
+                    @endforeach
+                </ul>
             </div>
         @endif
 
@@ -174,6 +222,81 @@
                     {{ $soalList->links() }}
                 </div>
             @endif
+        </div>
+    </div>
+
+    <!-- Modal Import Soal TPA -->
+    <div id="modalImportSoal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-100">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div>
+                    <h3 class="font-black text-slate-800 text-base">Import Butir Soal TPA</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Babak target: <strong class="text-indigo-600 uppercase">{{ $babak }}</strong></p>
+                </div>
+                <button type="button" onclick="document.getElementById('modalImportSoal').classList.add('hidden')"
+                        class="text-slate-400 hover:text-slate-600 font-bold text-lg cursor-pointer">&times;</button>
+            </div>
+
+            <form method="POST" action="{{ route('admin.tpa.soal.import') }}" enctype="multipart/form-data" class="space-y-4 mt-4 text-xs">
+                @csrf
+                <input type="hidden" name="babak" value="{{ $babak }}">
+
+                <!-- Unduh Template Panduan -->
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3">
+                    <div>
+                        <p class="font-bold text-slate-800 text-xs">Belum punya format file?</p>
+                        <p class="text-[11px] text-slate-500">Unduh template Excel resmi berisi contoh soal babak {{ ucfirst($babak) }}</p>
+                    </div>
+                    <a href="{{ route('admin.tpa.soal.template', ['babak' => $babak]) }}"
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-2xs whitespace-nowrap">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        <span>Unduh Template</span>
+                    </a>
+                </div>
+
+                <!-- Input File -->
+                <div>
+                    <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Pilih File Spreadsheet *</label>
+                    <input type="file" name="file" required accept=".xlsx,.xls,.csv"
+                           class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 border border-slate-200 rounded-xl cursor-pointer">
+                    <p class="text-[11px] text-slate-400 mt-1">Mendukung file .xlsx, .xls, atau .csv (maksimal 5MB)</p>
+                </div>
+
+                <!-- Opsi Strategi Import -->
+                <div class="space-y-2 pt-2 border-t border-slate-100">
+                    <label class="block font-bold text-slate-700 uppercase tracking-wider">Metode / Mode Import *</label>
+                    <div class="space-y-2">
+                        <label class="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 hover:bg-slate-50/70 cursor-pointer">
+                            <input type="radio" name="mode" value="upsert" checked class="mt-0.5 text-orange-600">
+                            <div>
+                                <span class="font-bold text-slate-800 block text-xs">Tambah / Update (Upsert)</span>
+                                <span class="text-[11px] text-slate-500">Perbarui soal yang memiliki nomor urut sama, dan tambahkan butir soal baru tanpa menghapus soal lain.</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start gap-2.5 p-3 rounded-xl border border-rose-200 bg-rose-50/30 hover:bg-rose-50/70 cursor-pointer">
+                            <input type="radio" name="mode" value="replace" class="mt-0.5 text-rose-600">
+                            <div>
+                                <span class="font-bold text-rose-800 block text-xs">Ganti Semua (Replace)</span>
+                                <span class="text-[11px] text-rose-600">Kosongkan seluruh butir soal babak {{ ucfirst($babak) }} yang ada saat ini, lalu gantikan seluruhnya dari file Excel.</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="document.getElementById('modalImportSoal').classList.add('hidden')"
+                            class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition-colors cursor-pointer">
+                        Batal
+                    </button>
+                    <button type="submit"
+                            class="px-4 py-2 rounded-xl bg-nampi-orange text-white font-bold hover:bg-orange-600 transition-colors shadow-xs cursor-pointer">
+                        Proses Import
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </x-layouts.app>
