@@ -62,24 +62,94 @@
         body.font-step-5 .soal-pertanyaan-text { font-size: 1.45rem !important; line-height: 2.25rem !important; }
         body.font-step-5 .opsi-jawaban-text { font-size: 1.2rem !important; }
 
-        /* Scrollbar Terlihat & Elegan pada Area Soal */
-        #soal-scroll-container {
-            scrollbar-width: thin;
-            scrollbar-color: #cbd5e1 #f8fafc;
+        /* ============================================================== */
+        /* LAYOUT FLEXBOX VIEWPORT & SCROLLING SOAL TPA                   */
+        /* ============================================================== */
+        body {
+            height: 100vh !important;
+            max-height: 100vh !important;
+            overflow: hidden !important;
         }
+
+        main.exam-main-layout {
+            display: flex !important;
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
+            height: 100% !important;
+            max-height: 100% !important;
+            overflow: hidden !important;
+            position: relative !important;
+        }
+
+        section.exam-section-layout {
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
+            height: 100% !important;
+            max-height: 100% !important;
+            overflow: hidden !important;
+            position: relative !important;
+        }
+
+        /* Wadah Soal: Wajib Scroll Internal & Menampung Seluruh Opsi Jawaban */
+        #soal-scroll-container {
+            display: block !important;
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
+            height: 100% !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch !important;
+            scrollbar-width: thin !important;
+            scrollbar-color: #cbd5e1 #f8fafc !important;
+            padding-bottom: 7rem !important; /* Ruang scroll bawah sangat lega */
+        }
+
         #soal-scroll-container::-webkit-scrollbar {
-            width: 8px;
+            width: 8px !important;
         }
         #soal-scroll-container::-webkit-scrollbar-track {
-            background: #f8fafc;
+            background: #f8fafc !important;
         }
         #soal-scroll-container::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            border-radius: 9999px;
-            border: 2px solid #f8fafc;
+            background-color: #cbd5e1 !important;
+            border-radius: 9999px !important;
+            border: 2px solid #f8fafc !important;
         }
         #soal-scroll-container::-webkit-scrollbar-thumb:hover {
-            background-color: #94a3b8;
+            background-color: #f97316 !important;
+        }
+
+        /* Bilah Navigasi Bawah Selalu Terkunci di Posisi Bawah Layar */
+        .exam-bottom-bar {
+            flex-shrink: 0 !important;
+            background-color: #ffffff !important;
+            border-top: 1px solid #e2e8f0 !important;
+            z-index: 30 !important;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        /* Gambar Soal: Ukuran Maksimal Terkendali Agar Tidak Menutupi Seluruh Layar */
+        .exam-image-box {
+            max-height: 280px !important;
+            overflow: hidden !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background-color: #f8fafc !important;
+            border-radius: 0.5rem !important;
+        }
+
+        .exam-img-element {
+            max-height: 260px !important;
+            max-width: 100% !important;
+            width: auto !important;
+            height: auto !important;
+            object-fit: contain !important;
+            border-radius: 0.5rem !important;
+            transition: transform 0.2s ease !important;
+            cursor: zoom-in !important;
         }
 
         /* Custom Scrollbar Ramping Global */
@@ -195,7 +265,7 @@
     </header>
 
     <!-- Main Container 1 Layar Penuh (Tinggi = 100vh - 56px) -->
-    <main class="flex-1 min-h-0 flex overflow-hidden relative">
+    <main class="exam-main-layout flex-1 min-h-0 flex overflow-hidden relative">
 
         <!-- Mobile Backdrop untuk Drawer Lembar Jawaban -->
         <div id="lembar-jawaban-backdrop" onclick="toggleSidebarLembarJawaban()"
@@ -319,7 +389,7 @@
         <!-- ============================================================== -->
         <!-- AREA PENGERJAAN SOAL (TENGAH / KANAN) - 1 Layar Proporsional   -->
         <!-- ============================================================== -->
-        <section class="flex-1 min-h-0 flex flex-col h-full overflow-hidden bg-slate-50/60 relative">
+        <section class="exam-section-layout flex-1 min-h-0 flex flex-col h-full overflow-hidden bg-slate-50/60 relative">
 
             <!-- Subheader Area Soal (Fixed, No Scroll) -->
             <div class="px-4 sm:px-6 py-2.5 bg-white border-b border-slate-200/80 flex items-center justify-between shrink-0">
@@ -377,30 +447,30 @@
                                 @endphp
                                 <div class="pt-2 border-t border-slate-100 flex flex-col items-center">
                                     <div class="relative inline-block rounded-xl border border-slate-200 bg-slate-50 p-2 overflow-hidden shadow-2xs group max-w-full">
-                                        <!-- Container gambar dengan overflow untuk zoom in/out di tempat -->
-                                        <div class="overflow-hidden max-h-44 sm:max-h-52 flex items-center justify-center">
+                                        <!-- Container gambar dengan max-height terkendali dan overflow untuk zoom in/out di tempat -->
+                                        <div class="exam-image-box overflow-hidden flex items-center justify-center">
                                             <img id="img-soal-{{ $idx }}"
                                                  src="{{ $imgUrl }}"
                                                  alt="Gambar Soal {{ $idx + 1 }}"
                                                  data-scale="1"
-                                                 class="max-h-44 sm:max-h-52 object-contain rounded-lg transition-transform duration-200 cursor-zoom-in"
+                                                 class="exam-img-element object-contain rounded-lg transition-transform duration-200 cursor-zoom-in"
                                                  onclick="openImageLightbox('{{ $imgUrl }}', 'Gambar Soal No. {{ $idx + 1 }}')"
                                                  loading="lazy">
                                         </div>
 
                                         <!-- Toolbar Kontrol Zoom Gambar: Zoom In (+), Zoom Out (-), Reset & Modal Layar Penuh -->
-                                        <div class="absolute bottom-2.5 right-2.5 flex items-center gap-1 bg-slate-900/85 backdrop-blur-xs px-2 py-1 rounded-lg text-white shadow-md">
-                                            <button type="button" onclick="zoomImage({{ $idx }}, 0.25)" class="w-6 h-6 flex items-center justify-center rounded hover:bg-white/20 font-black text-xs cursor-pointer" title="Perbesar (+)">
+                                        <div class="absolute bottom-2.5 right-2.5 flex items-center gap-1 bg-slate-900/90 px-2 py-1 rounded-lg text-white shadow-md border border-slate-700" style="background: rgba(15, 23, 42, 0.9);">
+                                            <button type="button" onclick="zoomImage({{ $idx }}, 0.25)" class="w-6 h-6 flex items-center justify-center rounded hover:bg-white/20 font-black text-xs cursor-pointer text-white" title="Perbesar (+)">
                                                 +
                                             </button>
-                                            <button type="button" onclick="zoomImage({{ $idx }}, -0.25)" class="w-6 h-6 flex items-center justify-center rounded hover:bg-white/20 font-black text-xs cursor-pointer" title="Perkecil (-)">
+                                            <button type="button" onclick="zoomImage({{ $idx }}, -0.25)" class="w-6 h-6 flex items-center justify-center rounded hover:bg-white/20 font-black text-xs cursor-pointer text-white" title="Perkecil (-)">
                                                 &minus;
                                             </button>
-                                            <button type="button" onclick="resetImageZoom({{ $idx }})" class="px-1.5 h-6 flex items-center justify-center rounded hover:bg-white/20 text-[10px] font-bold cursor-pointer" title="Reset Ukuran Normal">
+                                            <button type="button" onclick="resetImageZoom({{ $idx }})" class="px-1.5 h-6 flex items-center justify-center rounded hover:bg-white/20 text-[10px] font-bold cursor-pointer text-white" title="Reset Ukuran Normal">
                                                 1x
                                             </button>
-                                            <span class="text-slate-500">|</span>
-                                            <button type="button" onclick="openImageLightbox('{{ $imgUrl }}', 'Gambar Soal No. {{ $idx + 1 }}')" class="px-1.5 h-6 flex items-center justify-center rounded hover:bg-white/20 text-[10px] font-bold cursor-pointer" title="Buka Gambar Layar Penuh">
+                                            <span class="text-slate-400">|</span>
+                                            <button type="button" onclick="openImageLightbox('{{ $imgUrl }}', 'Gambar Soal No. {{ $idx + 1 }}')" class="px-1.5 h-6 flex items-center justify-center rounded hover:bg-white/20 text-[10px] font-bold cursor-pointer text-white" title="Buka Gambar Layar Penuh">
                                                 Layar Penuh
                                             </button>
                                         </div>
@@ -438,7 +508,7 @@
             </div>
 
             <!-- Bilah Navigasi Bawah Tetap (Fixed Bottom Nav Bar) -->
-            <div class="bg-white border-t border-slate-200/90 px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3 shrink-0 shadow-xs z-20">
+            <div class="exam-bottom-bar bg-white border-t border-slate-200/90 px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3 shrink-0 shadow-xs z-20">
                 <button type="button" id="btn-prev" onclick="geserSoal(-1)"
                         class="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
