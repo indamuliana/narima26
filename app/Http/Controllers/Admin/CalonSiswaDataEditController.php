@@ -55,9 +55,10 @@ class CalonSiswaDataEditController extends Controller
             ? MasterDesa::where('kecamatan_id', $calonSiswa->kecamatan_id)->orderBy('nama')->get()
             : collect();
 
-        // Master Pekerjaan, Jurusan
+        // Master Pekerjaan, Jurusan, Program
         $pekerjaanList = MasterPekerjaan::where('aktif', true)->orderBy('nama')->get();
         $jurusanList = MasterJurusan::orderBy('nama')->get();
+        $programList = \App\Models\MasterProgram::orderBy('id')->get();
 
         // Master Seragam
         $seragamQuery = MasterSeragam::aktif();
@@ -82,6 +83,7 @@ class CalonSiswaDataEditController extends Controller
             'desa',
             'pekerjaanList',
             'jurusanList',
+            'programList',
             'seragamTypes',
             'chosenSeragam',
             'activeTab'

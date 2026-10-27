@@ -231,7 +231,8 @@ class LengkapiDataService
             'kecamatan_luar_negeri', 'desa_luar_negeri',
             'provinsi_id', 'kabupaten_id', 'kecamatan_id', 'desa_id',
             'no_hp_siswa', 'email', 'anak_ke', 'jumlah_saudara', 'tahun_lulus',
-            'nisn', 'jurusan_id', 'jurusan_id_2', 'asal_sekolah_id', 'asal_sekolah_lainnya',
+            'nisn', 'program_id', 'jurusan_id', 'jurusan_id_2', 'asal_sekolah_id', 'asal_sekolah_lainnya',
+            'referensi_jenis', 'referensi_nama', 'referensi_rayon', 'referensi_nomor_seleksi',
         ];
 
         $payload = array_intersect_key($data, array_flip($allowedFields));

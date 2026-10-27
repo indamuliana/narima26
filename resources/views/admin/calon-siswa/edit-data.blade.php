@@ -155,14 +155,26 @@
                     @csrf
                     @method('PUT')
 
-                    <!-- Pilihan Jurusan & NISN (Admin Control) -->
+                    <!-- Pilihan Jurusan, Program & Hak Akses Khusus Admin -->
                     <div class="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100 space-y-4">
-                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-900">Hak Akses Khusus Admin (Jurusan & Pendaftaran)</span>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-900">Hak Akses Khusus Admin (Program, Jurusan & Pendaftaran)</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase">NISN Siswa</label>
                                 <input type="text" name="nisn" value="{{ old('nisn', $calonSiswa->nisn) }}" maxlength="10"
                                     class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none font-mono">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase">Program Pendidikan <span class="text-red-500">*</span></label>
+                                <select name="program_id" required
+                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none bg-white">
+                                    @foreach($programList as $p)
+                                        <option value="{{ $p->id }}" {{ old('program_id', $calonSiswa->program_id) == $p->id ? 'selected' : '' }}>
+                                            {{ $p->nama }} ({{ $p->kode }})
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
 
                             <div>
@@ -189,6 +201,51 @@
                                         </option>
                                     @endforeach
                                 </select>
+                            </div>
+                        </div>
+
+                        <!-- Promotor & Pemberi Rekomendasi -->
+                        <div class="pt-3 border-t border-indigo-100">
+                            <span class="text-xs font-bold uppercase tracking-wider text-indigo-900 block mb-2">Promotor & Pemberi Rekomendasi</span>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase">Kategori Promotor</label>
+                                    <select name="referensi_jenis" id="referensi_jenis_edit"
+                                        class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none bg-white">
+                                        <option value="">-- Tanpa Promotor (Mandiri) --</option>
+                                        <option value="GURU_WIKRAMA_GARUT" {{ old('referensi_jenis', $calonSiswa->referensi_jenis) === 'GURU_WIKRAMA_GARUT' ? 'selected' : '' }}>Guru SMK Wikrama 1 Garut</option>
+                                        <option value="GURU_WIKRAMA_BOGOR" {{ old('referensi_jenis', $calonSiswa->referensi_jenis) === 'GURU_WIKRAMA_BOGOR' ? 'selected' : '' }}>Guru SMK Wikrama Bogor</option>
+                                        <option value="SISWA_WIKRAMA_AKTIF" {{ old('referensi_jenis', $calonSiswa->referensi_jenis) === 'SISWA_WIKRAMA_AKTIF' ? 'selected' : '' }}>Siswa SMK Wikrama Aktif</option>
+                                        <option value="ALUMNI_WIKRAMA" {{ old('referensi_jenis', $calonSiswa->referensi_jenis) === 'ALUMNI_WIKRAMA' ? 'selected' : '' }}>Alumni SMK Wikrama</option>
+                                        <option value="CALON_SISWA_WIKRAMA" {{ old('referensi_jenis', $calonSiswa->referensi_jenis) === 'CALON_SISWA_WIKRAMA' ? 'selected' : '' }}>Calon Siswa Wikrama</option>
+                                        <option value="LAINNYA" {{ old('referensi_jenis', $calonSiswa->referensi_jenis) === 'LAINNYA' ? 'selected' : '' }}>Media Sosial / Brosur / Lainnya</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase">Nama Promotor</label>
+                                    <input type="text" name="referensi_nama" value="{{ old('referensi_nama', $calonSiswa->referensi_nama) }}"
+                                        placeholder="Nama guru/siswa/alumni..."
+                                        class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none bg-white">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase">Rayon (Khusus Siswa)</label>
+                                    <select name="referensi_rayon"
+                                        class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none bg-white">
+                                        <option value="">-- Pilih Rayon --</option>
+                                        @foreach(['Tarogong Kaler 1', 'Tarogong Kaler 2', 'Tarogong Kaler 3', 'Kadungora', 'Banyuresmi/Leles', 'Garut Tengah', 'Al Ikrom 1', 'Al Ikrom 2', 'Al Ikrom 3', 'Al Ikrom 4', 'Al Ikrom 5', 'Al Ikrom 6', 'Al Ikrom 7', 'Tidak Tahu'] as $rayon)
+                                            <option value="{{ $rayon }}" {{ old('referensi_rayon', $calonSiswa->referensi_rayon) == $rayon ? 'selected' : '' }}>Rayon {{ $rayon }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase">No. Seleksi Promotor</label>
+                                    <input type="text" name="referensi_nomor_seleksi" value="{{ old('referensi_nomor_seleksi', $calonSiswa->referensi_nomor_seleksi) }}"
+                                        placeholder="Contoh: A16260012"
+                                        class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none bg-white font-mono">
+                                </div>
                             </div>
                         </div>
                     </div>
