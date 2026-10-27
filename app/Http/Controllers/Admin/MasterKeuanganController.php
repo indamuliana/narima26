@@ -9,6 +9,7 @@ use App\Models\MasterGelombang;
 use App\Models\MasterProgram;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class MasterKeuanganController extends Controller
@@ -70,11 +71,16 @@ class MasterKeuanganController extends Controller
     public function update(Request $request, MasterBiaya $biaya): RedirectResponse
     {
         $validated = $request->validate([
+            'kode_biaya' => ['required', 'string', 'max:50', Rule::unique('master_biaya', 'kode_biaya')->ignore($biaya->id)],
             'nama_biaya' => ['required', 'string', 'max:150'],
-            'nominal' => ['required', 'numeric', 'min:0'],
             'kategori' => ['required', 'string', 'max:50'],
+            'nominal' => ['required', 'numeric', 'min:0'],
+            'program_id' => ['nullable', 'exists:master_program,id'],
+            'gelombang_id' => ['nullable', 'exists:master_gelombang,id'],
             'keterangan' => ['nullable', 'string', 'max:500'],
         ]);
+
+        $validated['wajib'] = $request->has('wajib');
 
         $biaya->update($validated);
 

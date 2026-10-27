@@ -32,6 +32,16 @@
             </div>
         @endif
 
+        @if ($errors->any())
+            <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold">
+                <ul class="list-disc pl-4 space-y-0.5">
+                    @foreach ($errors->all() as $err)
+                        <li>{{ $err }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <!-- Fee Table -->
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
             <div class="p-5 border-b border-slate-100 flex items-center justify-between">
@@ -65,6 +75,19 @@
                                 <td class="px-5 py-4">
                                     <span class="font-bold text-slate-900 text-sm block">{{ $b->nama_biaya }}</span>
                                     <span class="text-slate-400 text-[11px]">{{ $b->keterangan ?? '-' }}</span>
+                                    @if($b->program || $b->gelombang || $b->wajib)
+                                        <div class="flex items-center gap-1.5 mt-1 flex-wrap">
+                                            @if($b->wajib)
+                                                <span class="px-1.5 py-0.5 rounded text-[10px] bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200">Wajib</span>
+                                            @endif
+                                            @if($b->program)
+                                                <span class="px-1.5 py-0.5 rounded text-[10px] bg-blue-50 text-blue-700 font-semibold border border-blue-200">{{ $b->program->nama }}</span>
+                                            @endif
+                                            @if($b->gelombang)
+                                                <span class="px-1.5 py-0.5 rounded text-[10px] bg-purple-50 text-purple-700 font-semibold border border-purple-200">{{ $b->gelombang->nama }}</span>
+                                            @endif
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="px-4 py-4">
                                     <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 uppercase">
@@ -87,6 +110,11 @@
                                 </td>
                                 <td class="px-5 py-4 text-right">
                                     <div class="inline-flex items-center gap-1.5">
+                                        <button type="button"
+                                                onclick="openEditModal({{ json_encode($b) }})"
+                                                class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-slate-200 transition-colors cursor-pointer">
+                                            Edit
+                                        </button>
                                         <form method="POST" action="{{ route('admin.keuangan.toggle', $b) }}" class="inline">
                                             @csrf
                                             @method('PATCH')
@@ -196,6 +224,26 @@
                                class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30">
                     </div>
                 </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Program (Opsional)</label>
+                        <select name="program_id" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30">
+                            <option value="">Semua Program</option>
+                            @foreach($programList as $prog)
+                                <option value="{{ $prog->id }}">{{ $prog->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Gelombang (Opsional)</label>
+                        <select name="gelombang_id" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30">
+                            <option value="">Semua Gelombang</option>
+                            @foreach($gelombangList as $gel)
+                                <option value="{{ $gel->id }}">{{ $gel->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
                 <div>
                     <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Keterangan Tambahan</label>
                     <textarea name="keterangan" rows="2" placeholder="Catatan atau rincian komponen..."
@@ -218,4 +266,102 @@
             </form>
         </div>
     </div>
+
+    <!-- Modal Edit Komponen Biaya -->
+    <div id="modalEditBiaya" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="font-black text-slate-800 text-base">Edit Komponen Biaya</h3>
+                <button type="button" onclick="document.getElementById('modalEditBiaya').classList.add('hidden')"
+                        class="text-slate-400 hover:text-slate-600 font-bold text-lg">&times;</button>
+            </div>
+            <form id="formEditBiaya" method="POST" action="" class="space-y-4 mt-4 text-xs">
+                @csrf
+                @method('PUT')
+                <div>
+                    <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Kode Biaya *</label>
+                    <input type="text" id="edit_kode_biaya" name="kode_biaya" required placeholder="Contoh: DSP-G1"
+                           class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30 font-mono uppercase">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Nama Komponen Biaya *</label>
+                    <input type="text" id="edit_nama_biaya" name="nama_biaya" required placeholder="Contoh: Dana Sumbangan Pendidikan (DSP)"
+                           class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Kategori *</label>
+                        <select id="edit_kategori" name="kategori" required class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30">
+                            <option value="DAFTAR_ULANG">Daftar Ulang</option>
+                            <option value="DSP">DSP / Uang Pangkal</option>
+                            <option value="SPP">SPP Bulanan</option>
+                            <option value="ASRAMA">Biaya Asrama / Pondok</option>
+                            <option value="SERAGAM">Seragam & Atribut</option>
+                            <option value="PRAKTIK">Praktik Kejuruan</option>
+                            <option value="LAINNYA">Lainnya</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Nominal (Rp) *</label>
+                        <input type="number" id="edit_nominal" name="nominal" min="0" required placeholder="Contoh: 1500000"
+                               class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Program (Opsional)</label>
+                        <select id="edit_program_id" name="program_id" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30">
+                            <option value="">Semua Program</option>
+                            @foreach($programList as $prog)
+                                <option value="{{ $prog->id }}">{{ $prog->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Gelombang (Opsional)</label>
+                        <select id="edit_gelombang_id" name="gelombang_id" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30">
+                            <option value="">Semua Gelombang</option>
+                            @foreach($gelombangList as $gel)
+                                <option value="{{ $gel->id }}">{{ $gel->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Keterangan Tambahan</label>
+                    <textarea id="edit_keterangan" name="keterangan" rows="2" placeholder="Catatan atau rincian komponen..."
+                              class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30"></textarea>
+                </div>
+                <div class="flex items-center gap-2 pt-1">
+                    <input type="checkbox" id="edit_wajib" name="wajib" value="1" class="rounded text-nampi-orange">
+                    <label for="edit_wajib" class="font-medium text-slate-700">Wajib bagi semua Calon Murid</label>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="document.getElementById('modalEditBiaya').classList.add('hidden')"
+                            class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition-colors">
+                        Batal
+                    </button>
+                    <button type="submit"
+                            class="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-colors shadow-xs">
+                        Perbarui Data
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openEditModal(biaya) {
+            document.getElementById('edit_kode_biaya').value = biaya.kode_biaya || '';
+            document.getElementById('edit_nama_biaya').value = biaya.nama_biaya || '';
+            document.getElementById('edit_kategori').value = biaya.kategori || 'DSP';
+            document.getElementById('edit_nominal').value = Math.round(biaya.nominal) || 0;
+            document.getElementById('edit_program_id').value = biaya.program_id || '';
+            document.getElementById('edit_gelombang_id').value = biaya.gelombang_id || '';
+            document.getElementById('edit_keterangan').value = biaya.keterangan || '';
+            document.getElementById('edit_wajib').checked = !!biaya.wajib;
+            document.getElementById('formEditBiaya').action = '{{ url('admin/keuangan') }}/' + biaya.id;
+            document.getElementById('modalEditBiaya').classList.remove('hidden');
+        }
+    </script>
 </x-layouts.app>
