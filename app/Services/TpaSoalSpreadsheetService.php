@@ -11,21 +11,21 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class TpaSoalSpreadsheetService
 {
     public const HEADERS = [
-        'A' => 'Nomor Urut',
-        'B' => 'Pertanyaan',
-        'C' => 'Opsi A',
-        'D' => 'Opsi B',
-        'E' => 'Opsi C',
-        'F' => 'Opsi D',
-        'E_ALT' => 'Opsi E', // Kolom G
-        'KUNCI' => 'Kunci Jawaban', // Kolom H
-        'BOBOT' => 'Bobot', // Kolom I
+        'Nomor Urut',
+        'Pertanyaan',
+        'Opsi A',
+        'Opsi B',
+        'Opsi C',
+        'Opsi D',
+        'Opsi E',
+        'Kunci Jawaban',
+        'Bobot',
     ];
 
     /**
-     * Download template Excel (.xlsx) dengan panduan contoh soal sesuai babak.
+     * Download template panduan contoh soal (format default: CSV).
      */
-    public function downloadTemplate(string $babak = 'literasi'): StreamedResponse
+    public function downloadTemplate(string $babak = 'literasi', string $format = 'csv'): StreamedResponse
     {
         $babak = in_array(strtolower($babak), ['literasi', 'numerasi']) ? strtolower($babak) : 'literasi';
 
@@ -40,7 +40,7 @@ class TpaSoalSpreadsheetService
                     'Rp 130.000',
                     'Rp 135.000',
                     'B',
-                    1,
+                    8,
                 ],
                 [
                     2,
@@ -51,45 +51,47 @@ class TpaSoalSpreadsheetService
                     '72',
                     '128',
                     'C',
-                    1,
+                    8,
                 ],
             ];
         } else {
             $sampleRows = [
                 [
                     1,
-                    'Bacalah teks berikut: "Pendidikan vokasi berfokus pada penguasaan keahlian terapan untuk memasuki dunia kerja." Gagasan pokok dari kutipan tersebut adalah?',
-                    'Fokus utama pendidikan vokasi',
-                    'Tantangan dunia kerja masa kini',
-                    'Kurikulum sekolah menengah',
-                    'Peran teknologi dalam belajar',
-                    'Kebutuhan industri manufaktur',
-                    'A',
-                    1,
+                    "Bacalah teks berikut!\nFenomena Urban Heat Island (Pulau Bahang Perkotaan) menyebabkan suhu di wilayah perkotaan lebih tinggi 2°C hingga 5°C dibandingkan wilayah pedesaan di sekitarnya. Hal ini dipicu oleh dominasi material konstruksi seperti aspal dan beton yang menyerap serta menahan panas matahari lebih lama.\n\nBerdasarkan teks tersebut, alasan utama berkurangnya proses pendinginan alami di wilayah perkotaan adalah ....",
+                    'Penggunaan pendingin ruangan (AC) yang membuang udara panas ke luar gedung',
+                    'Kenaikan suhu udara yang mencapai 2°C hingga 5°C setiap tahunnya',
+                    'Dominasi material aspal dan beton yang memantulkan cahaya matahari',
+                    'Minimnya ruang terbuka hijau yang menghambat proses evapotranspirasi tanaman',
+                    'Kepadatan penduduk yang meningkatkan aktivitas transportasi di jalan raya',
+                    'D',
+                    8,
                 ],
                 [
                     2,
-                    'Sinonim kata "akurat" dalam konteks data penilaian adalah?',
-                    'Cepat',
-                    'Tepat',
-                    'Banyak',
-                    'Rinci',
-                    'Sederhana',
+                    "Perhatikan pernyataan berikut!\nSemua siswa yang lolos seleksi klub robotika menguasai dasar pemrograman logika. Sebagian siswa yang menguasai dasar pemrograman logika juga mahir merakit rangkaian elektronik. Raka adalah siswa yang lolos seleksi klub robotika.\n\nSimpulan yang paling tepat berdasarkan pernyataan di atas adalah ....",
+                    'Raka mahir merakit rangkaian elektronik dan menguasai pemrograman logika',
+                    'Raka menguasai dasar pemrograman logika',
+                    'Raka belum tentu menguasai dasar pemrograman logika',
+                    'Semua anggota klub robotika mahir merakit rangkaian elektronik',
+                    'Sebagian siswa yang lolos klub robotika tidak menguasai pemrograman logika',
                     'B',
-                    1,
+                    8,
                 ],
             ];
         }
 
-        $filename = "Template_Soal_TPA_" . ucfirst($babak) . ".xlsx";
+        if (strtolower($format) === 'xlsx' && class_exists(\PhpOffice\PhpSpreadsheet\Spreadsheet::class)) {
+            return $this->generateSpreadsheetFile($sampleRows, "Template_Soal_TPA_" . ucfirst($babak) . ".xlsx", $babak);
+        }
 
-        return $this->generateSpreadsheetFile($sampleRows, $filename, $babak);
+        return $this->streamNativeCsv("Template_Soal_TPA_" . ucfirst($babak) . ".csv", $sampleRows);
     }
 
     /**
-     * Export seluruh soal TPA pada babak tertentu ke format Excel (.xlsx).
+     * Export seluruh soal TPA per babak ke berkas CSV (default) atau Excel.
      */
-    public function exportSoal(string $babak = 'literasi'): StreamedResponse
+    public function exportSoal(string $babak = 'literasi', string $format = 'csv'): StreamedResponse
     {
         $babak = in_array(strtolower($babak), ['literasi', 'numerasi']) ? strtolower($babak) : 'literasi';
 
@@ -119,13 +121,17 @@ class TpaSoalSpreadsheetService
         }
 
         $timestamp = date('Ymd_His');
-        $filename = "Bank_Soal_TPA_" . ucfirst($babak) . "_{$timestamp}.xlsx";
+        if (strtolower($format) === 'xlsx' && class_exists(\PhpOffice\PhpSpreadsheet\Spreadsheet::class)) {
+            $filename = "Bank_Soal_TPA_" . ucfirst($babak) . "_{$timestamp}.xlsx";
+            return $this->generateSpreadsheetFile($rowsData, $filename, $babak);
+        }
 
-        return $this->generateSpreadsheetFile($rowsData, $filename, $babak);
+        $filename = "Bank_Soal_TPA_" . ucfirst($babak) . "_{$timestamp}.csv";
+        return $this->streamNativeCsv($filename, $rowsData);
     }
 
     /**
-     * Import butir soal dari file Excel atau CSV ke dalam babak tertentu.
+     * Import butir soal dari berkas CSV atau Excel ke babak tertentu.
      */
     public function importSoal(string $babak, UploadedFile $file, string $mode = 'upsert'): array
     {
@@ -133,41 +139,31 @@ class TpaSoalSpreadsheetService
         $mode = $mode === 'replace' ? 'replace' : 'upsert';
 
         $extension = strtolower($file->getClientOriginalExtension());
-        if (!in_array($extension, ['xlsx', 'xls', 'csv'])) {
-            throw new \InvalidArgumentException('Format file tidak didukung. Harap unggah file .xlsx, .xls, atau .csv');
+        if (!in_array($extension, ['csv', 'txt', 'xlsx', 'xls'])) {
+            throw new \InvalidArgumentException('Format file tidak didukung. Harap gunakan file .csv atau .xlsx');
         }
 
         $filePath = $file->getRealPath();
         $rawRows = [];
 
-        if ($extension === 'csv') {
+        if (in_array($extension, ['csv', 'txt'], true)) {
             $rawRows = $this->parseNativeCsv($filePath);
-        } else {
-            if (!class_exists(\PhpOffice\PhpSpreadsheet\IOFactory::class)) {
-                throw new \InvalidArgumentException('Library PhpSpreadsheet belum terpasang. Harap jalankan composer install atau gunakan file .csv.');
+        } elseif ($extension === 'xlsx') {
+            if (class_exists(\PhpOffice\PhpSpreadsheet\IOFactory::class)) {
+                $rawRows = $this->parsePhpSpreadsheet($filePath);
+            } else {
+                $rawRows = $this->parseXlsxNative($filePath);
             }
-
-            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($filePath);
-            $sheet = $spreadsheet->getActiveSheet();
-            $highestRow = $sheet->getHighestRow();
-
-            for ($row = 2; $row <= $highestRow; $row++) {
-                $rawRows[] = [
-                    (string) $sheet->getCell('A' . $row)->getValue(),
-                    (string) $sheet->getCell('B' . $row)->getValue(),
-                    (string) $sheet->getCell('C' . $row)->getValue(),
-                    (string) $sheet->getCell('D' . $row)->getValue(),
-                    (string) $sheet->getCell('E' . $row)->getValue(),
-                    (string) $sheet->getCell('F' . $row)->getValue(),
-                    (string) $sheet->getCell('G' . $row)->getValue(),
-                    (string) $sheet->getCell('H' . $row)->getValue(),
-                    (string) $sheet->getCell('I' . $row)->getValue(),
-                ];
+        } elseif ($extension === 'xls') {
+            if (class_exists(\PhpOffice\PhpSpreadsheet\IOFactory::class)) {
+                $rawRows = $this->parsePhpSpreadsheet($filePath);
+            } else {
+                throw new \InvalidArgumentException('Format .xls (Excel lama) membutuhkan library tambahan di server. Harap simpan berkas sebagai .csv atau .xlsx.');
             }
         }
 
         if (empty($rawRows)) {
-            throw new \InvalidArgumentException('File kosong atau tidak memuat data baris soal TPA.');
+            throw new \InvalidArgumentException('File kosong atau tidak memuat baris soal yang valid.');
         }
 
         $processedRows = [];
@@ -175,15 +171,15 @@ class TpaSoalSpreadsheetService
         $rowNumber = 2;
 
         foreach ($rawRows as $item) {
-            $nomorUrut = trim($item[0] ?? '');
-            $pertanyaan = trim($item[1] ?? '');
-            $opsiA = trim($item[2] ?? '');
-            $opsiB = trim($item[3] ?? '');
-            $opsiC = trim($item[4] ?? '');
-            $opsiD = trim($item[5] ?? '');
-            $opsiE = trim($item[6] ?? '');
-            $kunci = strtoupper(trim($item[7] ?? ''));
-            $bobot = trim($item[8] ?? '');
+            $nomorUrut = trim((string) ($item[0] ?? ''));
+            $pertanyaan = trim((string) ($item[1] ?? ''));
+            $opsiA = trim((string) ($item[2] ?? ''));
+            $opsiB = trim((string) ($item[3] ?? ''));
+            $opsiC = trim((string) ($item[4] ?? ''));
+            $opsiD = trim((string) ($item[5] ?? ''));
+            $opsiE = trim((string) ($item[6] ?? ''));
+            $kunci = strtoupper(trim((string) ($item[7] ?? '')));
+            $bobot = trim((string) ($item[8] ?? ''));
 
             // Abaikan baris yang seluruhnya kosong
             if ($pertanyaan === '' && $opsiA === '' && $opsiB === '') {
@@ -209,7 +205,7 @@ class TpaSoalSpreadsheetService
                 continue;
             }
 
-            // Susun array opsi jawaban
+            // Susun opsi jawaban
             $opsiJawaban = [
                 ['key' => 'A', 'text' => $opsiA],
                 ['key' => 'B', 'text' => $opsiB],
@@ -218,7 +214,6 @@ class TpaSoalSpreadsheetService
             if ($opsiD !== '') $opsiJawaban[] = ['key' => 'D', 'text' => $opsiD];
             if ($opsiE !== '') $opsiJawaban[] = ['key' => 'E', 'text' => $opsiE];
 
-            // Validasi kunci ada di antara opsi yang disediakan
             $availableKeys = array_column($opsiJawaban, 'key');
             if (!in_array($kunci, $availableKeys, true)) {
                 $errors[] = "Baris {$rowNumber}: Kunci jawaban '{$kunci}' tidak ada di daftar opsi yang terisi.";
@@ -238,7 +233,7 @@ class TpaSoalSpreadsheetService
         }
 
         if (empty($processedRows)) {
-            $msg = 'Tidak ada data soal valid yang dapat diimpor.';
+            $msg = 'Tidak ada butir soal valid yang dapat diimpor.';
             if (!empty($errors)) {
                 $msg .= ' ' . implode(' ', array_slice($errors, 0, 3));
             }
@@ -250,20 +245,20 @@ class TpaSoalSpreadsheetService
             $totalUpdated = 0;
 
             if ($mode === 'replace') {
-                // Hapus berkas gambar soal lama
-                $oldSoal = TpaSoal::where('babak', $babak)->get();
-                foreach ($oldSoal as $os) {
-                    if ($os->gambar_path) {
-                        Storage::disk('public')->delete($os->gambar_path);
+                $oldSoals = TpaSoal::where('babak', $babak)->get();
+                foreach ($oldSoals as $old) {
+                    if ($old->gambar_path && Storage::disk('public')->exists($old->gambar_path)) {
+                        Storage::disk('public')->delete($old->gambar_path);
                     }
-                    $os->delete();
                 }
+                TpaSoal::where('babak', $babak)->delete();
 
-                $counter = 1;
+                $currNomor = 1;
                 foreach ($processedRows as $row) {
+                    $nomorUrut = $row['nomor_urut'] ?? $currNomor;
                     TpaSoal::create([
                         'babak' => $babak,
-                        'nomor_urut' => $row['nomor_urut'] ?? $counter++,
+                        'nomor_urut' => $nomorUrut,
                         'pertanyaan' => $row['pertanyaan'],
                         'opsi_jawaban' => $row['opsi_jawaban'],
                         'kunci_jawaban' => $row['kunci_jawaban'],
@@ -271,40 +266,36 @@ class TpaSoalSpreadsheetService
                         'is_active' => true,
                     ]);
                     $totalInserted++;
+                    $currNomor = max($currNomor + 1, $nomorUrut + 1);
                 }
             } else {
-                // Mode Upsert
-                $maxUrut = (TpaSoal::where('babak', $babak)->max('nomor_urut') ?? 0);
+                // Upsert
+                $maxUrut = TpaSoal::where('babak', $babak)->max('nomor_urut') ?? 0;
 
                 foreach ($processedRows as $row) {
-                    $targetUrut = $row['nomor_urut'];
+                    $targetNomor = $row['nomor_urut'];
 
-                    if ($targetUrut !== null) {
-                        $existing = TpaSoal::where('babak', $babak)
-                            ->where('nomor_urut', $targetUrut)
-                            ->first();
-
+                    if ($targetNomor !== null) {
+                        $existing = TpaSoal::where('babak', $babak)->where('nomor_urut', $targetNomor)->first();
                         if ($existing) {
                             $existing->update([
                                 'pertanyaan' => $row['pertanyaan'],
                                 'opsi_jawaban' => $row['opsi_jawaban'],
                                 'kunci_jawaban' => $row['kunci_jawaban'],
                                 'bobot' => $row['bobot'],
+                                'is_active' => true,
                             ]);
                             $totalUpdated++;
                             continue;
                         }
-                    }
-
-                    // Buat baru jika belum ada
-                    $nextUrut = $targetUrut ?? (++$maxUrut);
-                    if ($nextUrut > $maxUrut) {
-                        $maxUrut = $nextUrut;
+                    } else {
+                        $maxUrut++;
+                        $targetNomor = $maxUrut;
                     }
 
                     TpaSoal::create([
                         'babak' => $babak,
-                        'nomor_urut' => $nextUrut,
+                        'nomor_urut' => $targetNomor,
                         'pertanyaan' => $row['pertanyaan'],
                         'opsi_jawaban' => $row['opsi_jawaban'],
                         'kunci_jawaban' => $row['kunci_jawaban'],
@@ -312,6 +303,7 @@ class TpaSoalSpreadsheetService
                         'is_active' => true,
                     ]);
                     $totalInserted++;
+                    $maxUrut = max($maxUrut, $targetNomor);
                 }
             }
 
@@ -326,33 +318,252 @@ class TpaSoalSpreadsheetService
     }
 
     /**
-     * Generator berkas Spreadsheet (PhpSpreadsheet / native CSV).
+     * Parser berkas CSV native PHP dengan auto-deteksi delimiter (koma, titik koma, tab) & BOM UTF-8.
+     */
+    protected function parseNativeCsv(string $filePath): array
+    {
+        if (!file_exists($filePath) || !is_readable($filePath)) {
+            throw new \InvalidArgumentException('File CSV tidak dapat dibaca.');
+        }
+
+        $handle = fopen($filePath, 'r');
+        if ($handle === false) {
+            throw new \InvalidArgumentException('Gagal membuka file CSV.');
+        }
+
+        // Baca baris pertama untuk mendeteksi delimiter
+        $firstLine = fgets($handle);
+        if ($firstLine === false) {
+            fclose($handle);
+            throw new \InvalidArgumentException('File CSV kosong.');
+        }
+
+        if (str_starts_with($firstLine, "\xEF\xBB\xBF")) {
+            $firstLine = substr($firstLine, 3);
+        }
+
+        $countSemicolon = substr_count($firstLine, ';');
+        $countComma = substr_count($firstLine, ',');
+        $countTab = substr_count($firstLine, "\t");
+
+        $delimiter = ',';
+        if ($countSemicolon > $countComma && $countSemicolon > $countTab) {
+            $delimiter = ';';
+        } elseif ($countTab > $countComma && $countTab > $countSemicolon) {
+            $delimiter = "\t";
+        }
+
+        rewind($handle);
+        // Lewati BOM UTF-8 jika ada pada byte awal
+        $bomCheck = fread($handle, 3);
+        if ($bomCheck !== "\xEF\xBB\xBF") {
+            rewind($handle);
+        }
+
+        $rows = [];
+        $isHeader = true;
+
+        while (($data = fgetcsv($handle, 0, $delimiter, '"')) !== false) {
+            if (count($data) === 1 && trim((string) $data[0]) === '') {
+                continue;
+            }
+
+            if ($isHeader) {
+                $isHeader = false;
+                continue;
+            }
+
+            // Standarisasi tepat 9 kolom
+            $cols = array_pad(array_slice($data, 0, 9), 9, '');
+            $rows[] = $cols;
+        }
+
+        fclose($handle);
+        return $rows;
+    }
+
+    /**
+     * Parser native berkas .xlsx menggunakan ekstensi standar ZipArchive & SimpleXML tanpa PhpSpreadsheet.
+     */
+    protected function parseXlsxNative(string $filePath): array
+    {
+        if (!class_exists(\ZipArchive::class)) {
+            throw new \RuntimeException('Ekstensi PHP ZipArchive tidak aktif pada server hosting.');
+        }
+
+        $zip = new \ZipArchive();
+        if ($zip->open($filePath) !== true) {
+            throw new \InvalidArgumentException('Gagal membuka file .xlsx.');
+        }
+
+        // 1. Ambil tabel shared strings
+        $sharedStrings = [];
+        $sharedStringsXml = $zip->getFromName('xl/sharedStrings.xml');
+        if ($sharedStringsXml !== false) {
+            $xml = @simplexml_load_string($sharedStringsXml);
+            if ($xml) {
+                foreach ($xml->children() as $si) {
+                    if (isset($si->t)) {
+                        $sharedStrings[] = (string) $si->t;
+                    } elseif (isset($si->r)) {
+                        $tCombined = '';
+                        foreach ($si->r as $r) {
+                            $tCombined .= (string) ($r->t ?? '');
+                        }
+                        $sharedStrings[] = $tCombined;
+                    } else {
+                        $sharedStrings[] = '';
+                    }
+                }
+            }
+        }
+
+        // 2. Cari lembar kerja pertama
+        $sheetXml = $zip->getFromName('xl/worksheets/sheet1.xml');
+        if ($sheetXml === false) {
+            for ($i = 0; $i < $zip->numFiles; $i++) {
+                $name = $zip->getNameIndex($i);
+                if (preg_match('#^xl/worksheets/sheet\d*\.xml$#i', $name)) {
+                    $sheetXml = $zip->getFromName($name);
+                    break;
+                }
+            }
+        }
+
+        $zip->close();
+
+        if ($sheetXml === false) {
+            throw new \InvalidArgumentException('Lembar kerja Excel tidak ditemukan di dalam file.');
+        }
+
+        $xml = @simplexml_load_string($sheetXml);
+        if (!$xml || !isset($xml->sheetData)) {
+            throw new \InvalidArgumentException('Format isi file Excel tidak valid.');
+        }
+
+        $rawRows = [];
+        $isFirst = true;
+
+        foreach ($xml->sheetData->row as $row) {
+            $rowNum = isset($row['r']) ? (int) $row['r'] : null;
+            if ($isFirst || $rowNum === 1) {
+                $isFirst = false;
+                continue;
+            }
+
+            $cols = array_fill(0, 9, '');
+
+            foreach ($row->c as $cell) {
+                $ref = (string) $cell['r'];
+                if (!preg_match('/^([A-Z]+)(\d+)$/', $ref, $m)) {
+                    continue;
+                }
+
+                $colLetter = $m[1];
+                $colIndex = 0;
+                $len = strlen($colLetter);
+                for ($k = 0; $k < $len; $k++) {
+                    $colIndex = $colIndex * 26 + (ord($colLetter[$k]) - ord('A') + 1);
+                }
+                $colIndex -= 1;
+
+                if ($colIndex < 0 || $colIndex > 8) {
+                    continue;
+                }
+
+                $type = (string) $cell['t'];
+                $val = '';
+
+                if ($type === 's') {
+                    $sIdx = (int) $cell->v;
+                    $val = $sharedStrings[$sIdx] ?? '';
+                } elseif ($type === 'inlineStr') {
+                    if (isset($cell->is->t)) {
+                        $val = (string) $cell->is->t;
+                    } elseif (isset($cell->is->r)) {
+                        foreach ($cell->is->r as $r) {
+                            $val .= (string) ($r->t ?? '');
+                        }
+                    }
+                } elseif ($type === 'b') {
+                    $val = ((string) $cell->v === '1') ? '1' : '0';
+                } else {
+                    $val = (string) $cell->v;
+                }
+
+                $cols[$colIndex] = $val;
+            }
+
+            $rawRows[] = $cols;
+        }
+
+        return $rawRows;
+    }
+
+    /**
+     * Parser menggunakan PhpSpreadsheet jika library tersedia.
+     */
+    protected function parsePhpSpreadsheet(string $filePath): array
+    {
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($filePath);
+        $sheet = $spreadsheet->getActiveSheet();
+        $highestRow = $sheet->getHighestRow();
+
+        $rawRows = [];
+        for ($row = 2; $row <= $highestRow; $row++) {
+            $rawRows[] = [
+                (string) $sheet->getCell('A' . $row)->getValue(),
+                (string) $sheet->getCell('B' . $row)->getValue(),
+                (string) $sheet->getCell('C' . $row)->getValue(),
+                (string) $sheet->getCell('D' . $row)->getValue(),
+                (string) $sheet->getCell('E' . $row)->getValue(),
+                (string) $sheet->getCell('F' . $row)->getValue(),
+                (string) $sheet->getCell('G' . $row)->getValue(),
+                (string) $sheet->getCell('H' . $row)->getValue(),
+                (string) $sheet->getCell('I' . $row)->getValue(),
+            ];
+        }
+
+        return $rawRows;
+    }
+
+    /**
+     * Stream CSV native dengan UTF-8 BOM untuk kompatibilitas penuh dengan Excel.
+     */
+    protected function streamNativeCsv(string $filename, array $rowsData): StreamedResponse
+    {
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            'Pragma' => 'no-cache',
+            'Expires' => '0',
+        ];
+
+        return response()->stream(function () use ($rowsData) {
+            $handle = fopen('php://output', 'w');
+            // Tulis UTF-8 BOM agar Excel Windows langsung membaca dengan UTF-8 yang rapi
+            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            fputcsv($handle, self::HEADERS);
+
+            foreach ($rowsData as $row) {
+                fputcsv($handle, $row);
+            }
+            fclose($handle);
+        }, 200, $headers);
+    }
+
+    /**
+     * Stream file Excel menggunakan PhpSpreadsheet (jika terpasang).
      */
     protected function generateSpreadsheetFile(array $rowsData, string $filename, string $babak): StreamedResponse
     {
-        if (!class_exists(\PhpOffice\PhpSpreadsheet\Spreadsheet::class)) {
-            return $this->streamNativeCsv($filename, $rowsData);
-        }
-
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Soal ' . ucfirst($babak));
 
-        // Tulis Header
-        $headers = [
-            'Nomor Urut',
-            'Pertanyaan',
-            'Opsi A',
-            'Opsi B',
-            'Opsi C',
-            'Opsi D',
-            'Opsi E',
-            'Kunci Jawaban',
-            'Bobot',
-        ];
-        $sheet->fromArray($headers, null, 'A1');
+        $sheet->fromArray(self::HEADERS, null, 'A1');
 
-        // Style Header
         $sheet->getStyle('A1:I1')->applyFromArray([
             'font' => [
                 'bold' => true,
@@ -370,7 +581,6 @@ class TpaSoalSpreadsheetService
         ]);
         $sheet->getRowDimension(1)->setRowHeight(28);
 
-        // Tulis Data
         $rowNum = 2;
         foreach ($rowsData as $row) {
             $sheet->fromArray($row, null, 'A' . $rowNum);
@@ -394,7 +604,6 @@ class TpaSoalSpreadsheetService
             $rowNum++;
         }
 
-        // Auto width
         $sheet->getColumnDimension('A')->setWidth(14);
         $sheet->getColumnDimension('B')->setWidth(55);
         $sheet->getColumnDimension('C')->setWidth(25);
@@ -414,50 +623,6 @@ class TpaSoalSpreadsheetService
         return response()->stream(function () use ($spreadsheet) {
             $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
             $writer->save('php://output');
-        }, 200, $headers);
-    }
-
-    /**
-     * Fallback parsing CSV native PHP tanpa modul tambahan.
-     */
-    protected function parseNativeCsv(string $filePath): array
-    {
-        $rows = [];
-        if (($handle = fopen($filePath, 'r')) !== false) {
-            $first = true;
-            while (($data = fgetcsv($handle, 4096, ',')) !== false) {
-                if ($first) {
-                    $first = false;
-                    continue; // Skip header
-                }
-                $rows[] = $data;
-            }
-            fclose($handle);
-        }
-        return $rows;
-    }
-
-    /**
-     * Fallback stream CSV native.
-     */
-    protected function streamNativeCsv(string $filename, array $rowsData): StreamedResponse
-    {
-        $headers = [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => "attachment; filename=\"" . str_replace('.xlsx', '.csv', $filename) . "\"",
-            'Cache-Control' => 'max-age=0',
-        ];
-
-        return response()->stream(function () use ($rowsData) {
-            $handle = fopen('php://output', 'w');
-            // BOM UTF-8
-            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
-            fputcsv($handle, ['Nomor Urut', 'Pertanyaan', 'Opsi A', 'Opsi B', 'Opsi C', 'Opsi D', 'Opsi E', 'Kunci Jawaban', 'Bobot']);
-
-            foreach ($rowsData as $row) {
-                fputcsv($handle, $row);
-            }
-            fclose($handle);
         }, 200, $headers);
     }
 }

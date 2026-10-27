@@ -35,25 +35,27 @@ class TpaSoalController extends Controller
     }
 
     /**
-     * Download template spreadsheet (.xlsx) untuk butir soal TPA.
+     * Download template (.csv / .xlsx) untuk butir soal TPA.
      */
     public function downloadTemplate(Request $request, TpaSoalSpreadsheetService $service)
     {
         $babak = $request->query('babak', 'literasi');
-        return $service->downloadTemplate($babak);
+        $format = $request->query('format', 'csv');
+        return $service->downloadTemplate($babak, $format);
     }
 
     /**
-     * Export seluruh soal TPA per babak ke Excel (.xlsx).
+     * Export seluruh soal TPA per babak ke format CSV (default) atau Excel.
      */
     public function export(Request $request, TpaSoalSpreadsheetService $service)
     {
         $babak = $request->query('babak', 'literasi');
-        return $service->exportSoal($babak);
+        $format = $request->query('format', 'csv');
+        return $service->exportSoal($babak, $format);
     }
 
     /**
-     * Import butir soal dari file spreadsheet ke babak yang dipilih.
+     * Import butir soal dari file CSV atau Excel ke babak yang dipilih.
      */
     public function import(Request $request, TpaSoalSpreadsheetService $service): RedirectResponse
     {
@@ -64,7 +66,7 @@ class TpaSoalController extends Controller
             'file' => ['required', 'file', 'max:5120'],
             'mode' => ['required', 'in:upsert,replace'],
         ], [
-            'file.required' => 'Pilih file spreadsheet (.xlsx, .xls, .csv) terlebih dahulu.',
+            'file.required' => 'Pilih file CSV (.csv) atau Excel (.xlsx) terlebih dahulu.',
             'file.max' => 'Ukuran file maksimal adalah 5MB.',
             'mode.required' => 'Pilih mode import data.',
         ]);

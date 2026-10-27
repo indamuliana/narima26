@@ -13,24 +13,24 @@
                 <p class="text-xs text-slate-500 mt-0.5">Kelola butir soal pilihan ganda, bobot penilaian, gambar pendukung, dan kunci jawaban per babak</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
-                <!-- Tombol Export Excel -->
-                <a href="{{ route('admin.tpa.soal.export', ['babak' => $babak]) }}"
+                <!-- Tombol Export CSV -->
+                <a href="{{ route('admin.tpa.soal.export', ['babak' => $babak, 'format' => 'csv']) }}"
                    class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all shadow-xs"
-                   title="Export bank soal babak {{ ucfirst($babak) }} ke format Excel">
+                   title="Export bank soal babak {{ ucfirst($babak) }} ke format CSV">
                     <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
-                    <span>Export Excel</span>
+                    <span>Export CSV</span>
                 </a>
 
-                <!-- Tombol Import Soal -->
+                <!-- Tombol Import CSV -->
                 <button type="button" onclick="document.getElementById('modalImportSoal').classList.remove('hidden')"
                         class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all shadow-xs cursor-pointer"
-                        title="Import soal dari file Excel/CSV ke babak {{ ucfirst($babak) }}">
+                        title="Import butir soal dari file CSV atau Excel ke babak {{ ucfirst($babak) }}">
                     <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
                     </svg>
-                    <span>Import Soal</span>
+                    <span>Import CSV</span>
                 </button>
 
                 <a href="{{ route('admin.tpa.soal.create', ['babak' => $babak]) }}"
@@ -230,8 +230,8 @@
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-100">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div>
-                    <h3 class="font-black text-slate-800 text-base">Import Butir Soal TPA</h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Babak target: <strong class="text-indigo-600 uppercase">{{ $babak }}</strong></p>
+                    <h3 class="font-black text-slate-800 text-base">Import Butir Soal TPA (CSV / Excel)</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Babak target: <strong class="text-indigo-600 uppercase">{{ $babak }}</strong> &bull; Format utama: <strong class="text-emerald-700">.csv</strong></p>
                 </div>
                 <button type="button" onclick="document.getElementById('modalImportSoal').classList.add('hidden')"
                         class="text-slate-400 hover:text-slate-600 font-bold text-lg cursor-pointer">&times;</button>
@@ -241,27 +241,27 @@
                 @csrf
                 <input type="hidden" name="babak" value="{{ $babak }}">
 
-                <!-- Unduh Template Panduan -->
+                <!-- Unduh Template Panduan CSV -->
                 <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3">
                     <div>
                         <p class="font-bold text-slate-800 text-xs">Belum punya format file?</p>
-                        <p class="text-[11px] text-slate-500">Unduh template Excel resmi berisi contoh soal babak {{ ucfirst($babak) }}</p>
+                        <p class="text-[11px] text-slate-500">Unduh template CSV resmi berisi contoh soal babak {{ ucfirst($babak) }}</p>
                     </div>
-                    <a href="{{ route('admin.tpa.soal.template', ['babak' => $babak]) }}"
+                    <a href="{{ route('admin.tpa.soal.template', ['babak' => $babak, 'format' => 'csv']) }}"
                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-2xs whitespace-nowrap">
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                         </svg>
-                        <span>Unduh Template</span>
+                        <span>Unduh Template CSV</span>
                     </a>
                 </div>
 
                 <!-- Input File -->
                 <div>
-                    <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Pilih File Spreadsheet *</label>
-                    <input type="file" name="file" required accept=".xlsx,.xls,.csv"
+                    <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Pilih File CSV / Excel *</label>
+                    <input type="file" name="file" required accept=".csv,.txt,.xlsx,.xls"
                            class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 border border-slate-200 rounded-xl cursor-pointer">
-                    <p class="text-[11px] text-slate-400 mt-1">Mendukung file .xlsx, .xls, atau .csv (maksimal 5MB)</p>
+                    <p class="text-[11px] text-slate-400 mt-1">Mendukung file .csv (direkomendasikan) atau .xlsx (maksimal 5MB)</p>
                 </div>
 
                 <!-- Opsi Strategi Import -->
@@ -280,7 +280,7 @@
                             <input type="radio" name="mode" value="replace" class="mt-0.5 text-rose-600">
                             <div>
                                 <span class="font-bold text-rose-800 block text-xs">Ganti Semua (Replace)</span>
-                                <span class="text-[11px] text-rose-600">Kosongkan seluruh butir soal babak {{ ucfirst($babak) }} yang ada saat ini, lalu gantikan seluruhnya dari file Excel.</span>
+                                <span class="text-[11px] text-rose-600">Kosongkan seluruh butir soal babak {{ ucfirst($babak) }} yang ada saat ini, lalu gantikan seluruhnya dari file.</span>
                             </div>
                         </label>
                     </div>
