@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\SpmbStatus;
 use App\Models\CalonSiswa;
+use App\Models\MasterGelombang;
 use App\Models\MasterProgram;
 use App\Models\MasterSekolahAsal;
 use Carbon\Carbon;
@@ -26,6 +27,263 @@ class DashboardMetricsService
         ['year' => 2027, 'month' => 5,  'ym' => '2027-05', 'label' => 'Mei 2027', 'short' => 'Mei', 'days' => 31],
         ['year' => 2027, 'month' => 6,  'ym' => '2027-06', 'label' => 'Jun 2027', 'short' => 'Jun', 'days' => 30],
     ];
+
+    /**
+     * Get clean timeline registration data across 4 All-Time categories:
+     * All Time Harian, All Time Mingguan (Default), All Time Bulanan, and Gelombang.
+     */
+    public function getTimelineClean(): array
+    {
+        $startDate = Carbon::create(2026, 9, 1)->startOfDay();
+        $endDate   = Carbon::create(2027, 6, 30)->endOfDay();
+
+        // 1. Data All Time Harian (303 Hari: 1 Sep 2026 - 30 Jun 2027)
+        $dailyDb = CalonSiswa::whereBetween('created_at', [$startDate, $endDate])
+            ->selectRaw('DATE(created_at) as tgl, count(*) as count')
+            ->groupBy('tgl')
+            ->pluck('count', 'tgl')
+            ->toArray();
+
+        $harianLabels = [];
+        $harianCounts = [];
+        $dayCursor = $startDate->copy();
+        $dayIndexMap = [];
+        $dIdx = 0;
+
+        while ($dayCursor->lte($endDate)) {
+            $ymd = $dayCursor->format('Y-m-d');
+            $harianLabels[] = $dayCursor->translatedFormat('d M');
+            $harianCounts[] = (int) ($dailyDb[$ymd] ?? 0);
+            $dayIndexMap[$ymd] = $dIdx++;
+            $dayCursor->addDay();
+        }
+        $harianTotal = array_sum($harianCounts);
+        $harianAvg = count($harianCounts) > 0 ? round($harianTotal / count($harianCounts), 2) : 0;
+
+        $harianMilestones = [
+            ['index' => $dayIndexMap['2026-09-01'] ?? 0,   'label' => 'Pembukaan (1 Sep)',           'color' => '#10b981'],
+            ['index' => $dayIndexMap['2026-12-31'] ?? 121, 'label' => 'Batas Akhir Gel. 1 (31 Des)', 'color' => '#3b82f6'],
+            ['index' => $dayIndexMap['2027-02-28'] ?? 180, 'label' => 'Batas Akhir Gel. 2 (28 Feb)', 'color' => '#8b5cf6'],
+            ['index' => $dayIndexMap['2027-06-30'] ?? 302, 'label' => 'Batas Akhir Gel. 3 (30 Jun)', 'color' => '#ea580c'],
+        ];
+
+        // 2. Data All Time Mingguan (49 Minggu: M1 Sep 2026 - M5 Jun 2027)
+        $allTimeWeeks = [];
+        $weekIndexMap = [];
+        $wIdx = 0;
+        foreach (self::TIMELINE_MONTHS as $m) {
+            $numWeeks = (int) ceil($m['days'] / 7);
+            for ($w = 1; $w <= $numWeeks; $w++) {
+                $startDay = ($w - 1) * 7 + 1;
+                $endDay   = min($w * 7, $m['days']);
+                $key      = "{$m['ym']}-w{$w}";
+
+                $allTimeWeeks[] = [
+                    'key'   => $key,
+                    'label' => "M{$w} {$m['short']}",
+                    'range' => "{$startDay} - {$endDay} {$m['short']} {$m['year']}",
+                ];
+                $weekIndexMap[$key] = $wIdx++;
+            }
+        }
+
+        $mingguanLabels = array_column($allTimeWeeks, 'label');
+        $mingguanRanges = array_column($allTimeWeeks, 'range');
+        $mingguanCounts = array_fill(0, count($allTimeWeeks), 0);
+
+        $allCandidates = CalonSiswa::whereBetween('created_at', [$startDate, $endDate])
+            ->get(['id', 'created_at']);
+
+        foreach ($allCandidates as $cs) {
+            $date = $cs->created_at;
+            $ym   = $date->format('Y-m');
+            $d    = (int) $date->format('j');
+            $daysInMonth = (int) $date->daysInMonth;
+            $w    = min((int) ceil($d / 7), (int) ceil($daysInMonth / 7));
+            $weekKey = "{$ym}-w{$w}";
+            if (isset($weekIndexMap[$weekKey])) {
+                $mingguanCounts[$weekIndexMap[$weekKey]]++;
+            }
+        }
+
+        $mingguanTotal = array_sum($mingguanCounts);
+        $mingguanAvg = count($mingguanCounts) > 0 ? round($mingguanTotal / count($mingguanCounts), 2) : 0;
+
+        $mingguanMilestones = [
+            ['index' => $weekIndexMap['2026-09-w1'] ?? 0,  'label' => 'Pembukaan (1 Sep)',           'color' => '#10b981'],
+            ['index' => $weekIndexMap['2026-12-w5'] ?? 19, 'label' => 'Batas Akhir Gel. 1 (31 Des)', 'color' => '#3b82f6'],
+            ['index' => $weekIndexMap['2027-02-w4'] ?? 28, 'label' => 'Batas Akhir Gel. 2 (28 Feb)', 'color' => '#8b5cf6'],
+            ['index' => $weekIndexMap['2027-06-w5'] ?? 48, 'label' => 'Batas Akhir Gel. 3 (30 Jun)', 'color' => '#ea580c'],
+        ];
+
+        // 3. Data All Time Bulanan (10 Bulan Penuh: Sep 2026 - Jun 2027)
+        $bulananMonths = [
+            ['label' => 'Sep 26', 'year' => 2026, 'month' => 9],
+            ['label' => 'Okt 26', 'year' => 2026, 'month' => 10],
+            ['label' => 'Nov 26', 'year' => 2026, 'month' => 11],
+            ['label' => 'Des 26', 'year' => 2026, 'month' => 12],
+            ['label' => 'Jan 27', 'year' => 2027, 'month' => 1],
+            ['label' => 'Feb 27', 'year' => 2027, 'month' => 2],
+            ['label' => 'Mar 27', 'year' => 2027, 'month' => 3],
+            ['label' => 'Apr 27', 'year' => 2027, 'month' => 4],
+            ['label' => 'Mei 27', 'year' => 2027, 'month' => 5],
+            ['label' => 'Jun 27', 'year' => 2027, 'month' => 6],
+        ];
+
+        $bulananLabels = [];
+        $bulananCounts = [];
+        foreach ($bulananMonths as $bm) {
+            $bulananLabels[] = $bm['label'];
+            $cnt = CalonSiswa::whereYear('created_at', $bm['year'])
+                ->whereMonth('created_at', $bm['month'])
+                ->count();
+            $bulananCounts[] = $cnt;
+        }
+        $bulananTotal = array_sum($bulananCounts);
+        $bulananAvg = count($bulananCounts) > 0 ? round($bulananTotal / count($bulananCounts), 1) : 0;
+
+        $bulananMilestones = [
+            ['index' => 0, 'label' => 'Pembukaan (1 Sep)',           'color' => '#10b981'],
+            ['index' => 3, 'label' => 'Batas Akhir Gel. 1 (31 Des)', 'color' => '#3b82f6'],
+            ['index' => 5, 'label' => 'Batas Akhir Gel. 2 (28 Feb)', 'color' => '#8b5cf6'],
+            ['index' => 9, 'label' => 'Batas Akhir Gel. 3 (30 Jun)', 'color' => '#ea580c'],
+        ];
+
+        // 4. Data Gelombang (Berdasarkan master_gelombang)
+        $gelombangs = MasterGelombang::orderBy('periode_mulai')->get();
+        $gelombangLabels = [];
+        $gelombangRanges = [];
+        $gelombangCounts = [];
+        foreach ($gelombangs as $g) {
+            $gelombangLabels[] = $g->nama;
+            $gelombangRanges[] = ($g->periode_mulai ? $g->periode_mulai->translatedFormat('d M Y') : '-') . ' - ' . ($g->periode_selesai ? $g->periode_selesai->translatedFormat('d M Y') : '-');
+            $cnt = CalonSiswa::where('gelombang_id', $g->id)->count();
+            $gelombangCounts[] = $cnt;
+        }
+        $gelombangTotal = array_sum($gelombangCounts);
+        $gelombangAvg = count($gelombangCounts) > 0 ? round($gelombangTotal / count($gelombangCounts), 1) : 0;
+
+        // Fungsi pembantu menghitung titik puncak pendaftaran (Peak)
+        $calcPeak = function (array $labels, array $counts) {
+            $max = count($counts) > 0 ? max($counts) : 0;
+            if ($max <= 0) {
+                return ['value' => 0, 'label' => 'Belum Ada Data', 'point' => '-'];
+            }
+            $idx = array_search($max, $counts, true);
+            $lbl = $labels[$idx] ?? '-';
+            return [
+                'value' => $max,
+                'label' => "{$lbl} ({$max} Murid)",
+                'point' => $lbl,
+            ];
+        };
+
+        // Status Gelombang Berjalan & Sisa Waktu
+        $activeWave = MasterGelombang::aktif()->first()
+            ?? MasterGelombang::where('periode_mulai', '<=', Carbon::now())->where('periode_selesai', '>=', Carbon::now())->first()
+            ?? MasterGelombang::orderBy('periode_mulai')->first();
+
+        $sisaHari = 0;
+        $statusGelombangText = 'Belum Dibuka';
+        if ($activeWave && $activeWave->periode_selesai) {
+            $diff = (int) Carbon::now()->startOfDay()->diffInDays($activeWave->periode_selesai->startOfDay(), false);
+            if ($diff > 0) {
+                $sisaHari = $diff;
+                $statusGelombangText = "Sisa {$sisaHari} Hari";
+            } elseif ($diff === 0) {
+                $statusGelombangText = "Hari Terakhir";
+            } else {
+                $statusGelombangText = "Selesai";
+            }
+        }
+
+        $kpiGelombang = [
+            'nama'        => $activeWave?->nama ?? 'Gelombang 1',
+            'status_text' => $statusGelombangText,
+            'sisa_hari'   => $sisaHari,
+            'target_tgl'  => $activeWave?->periode_selesai ? $activeWave->periode_selesai->translatedFormat('d M Y') : '-',
+        ];
+
+        // Legend Tanggal Pembukaan & Batas Akhir Gelombang 1, 2, 3
+        $legend = [
+            [
+                'title'      => 'Pembukaan',
+                'date_range' => '1 September 2026',
+                'color'      => '#10b981',
+                'bg_badge'   => 'bg-emerald-50 text-emerald-900 border-emerald-200/80',
+                'dot_color'  => 'bg-emerald-500',
+            ],
+            [
+                'title'      => 'Batas Gelombang 1',
+                'date_range' => '31 Des 2026 (1 Sep – 31 Des)',
+                'color'      => '#3b82f6',
+                'bg_badge'   => 'bg-blue-50 text-blue-900 border-blue-200/80',
+                'dot_color'  => 'bg-blue-500',
+            ],
+            [
+                'title'      => 'Batas Gelombang 2',
+                'date_range' => '28 Feb 2027 (1 Jan – 28 Feb)',
+                'color'      => '#8b5cf6',
+                'bg_badge'   => 'bg-purple-50 text-purple-900 border-purple-200/80',
+                'dot_color'  => 'bg-purple-500',
+            ],
+            [
+                'title'      => 'Batas Gelombang 3',
+                'date_range' => '30 Jun 2027 (1 Mar – 30 Jun)',
+                'color'      => '#ea580c',
+                'bg_badge'   => 'bg-orange-50 text-orange-900 border-orange-200/80',
+                'dot_color'  => 'bg-orange-500',
+            ],
+        ];
+
+        return [
+            'all_time_harian' => [
+                'type'       => 'line',
+                'labels'     => $harianLabels,
+                'counts'     => $harianCounts,
+                'total'      => $harianTotal,
+                'avg'        => $harianAvg,
+                'unit'       => 'Hari',
+                'peak'       => $calcPeak($harianLabels, $harianCounts),
+                'milestones' => $harianMilestones,
+            ],
+            'all_time_mingguan' => [
+                'type'       => 'line',
+                'labels'     => $mingguanLabels,
+                'ranges'     => $mingguanRanges,
+                'counts'     => $mingguanCounts,
+                'total'      => $mingguanTotal,
+                'avg'        => $mingguanAvg,
+                'unit'       => 'Minggu',
+                'peak'       => $calcPeak($mingguanLabels, $mingguanCounts),
+                'milestones' => $mingguanMilestones,
+            ],
+            'all_time_bulanan' => [
+                'type'       => 'bar',
+                'labels'     => $bulananLabels,
+                'counts'     => $bulananCounts,
+                'total'      => $bulananTotal,
+                'avg'        => $bulananAvg,
+                'unit'       => 'Bulan',
+                'peak'       => $calcPeak($bulananLabels, $bulananCounts),
+                'milestones' => $bulananMilestones,
+            ],
+            'gelombang' => [
+                'type'       => 'bar',
+                'labels'     => $gelombangLabels,
+                'ranges'     => $gelombangRanges,
+                'counts'     => $gelombangCounts,
+                'total'      => $gelombangTotal,
+                'avg'        => $gelombangAvg,
+                'unit'       => 'Gelombang',
+                'peak'       => $calcPeak($gelombangLabels, $gelombangCounts),
+                'bar_colors' => ['#3b82f6', '#8b5cf6', '#ea580c'],
+                'milestones' => [],
+            ],
+            'legend'        => $legend,
+            'kpi_gelombang' => $kpiGelombang,
+        ];
+    }
 
     /**
      * Get registration weekly & monthly timeline metrics for September 2026 to June 2027.
@@ -444,14 +702,14 @@ class DashboardMetricsService
      * Top Origin Junior High Schools (SMP / MTs Feeder Schools).
      * Mendukung sekolah dari master_sekolah_asal maupun input mandiri (asal_sekolah_lainnya).
      */
-    public function getTopAsalSekolah(int $limit = 5): array
+    public function getTopAsalSekolah(?int $limit = 5): array
     {
         $total = CalonSiswa::count();
 
         $nameExpr = "TRIM(COALESCE(master_sekolah_asal.nama_sekolah, calon_siswa.asal_sekolah_lainnya))";
         $cityExpr = "MAX(COALESCE(master_sekolah_asal.kokab, calon_siswa.kabupaten_nama, 'Garut'))";
 
-        $topSekolah = CalonSiswa::query()
+        $query = CalonSiswa::query()
             ->leftJoin('master_sekolah_asal', 'calon_siswa.asal_sekolah_id', '=', 'master_sekolah_asal.id')
             ->where(function ($q) {
                 $q->whereNotNull('calon_siswa.asal_sekolah_id')
@@ -462,9 +720,13 @@ class DashboardMetricsService
             })
             ->selectRaw("{$nameExpr} as nama, {$cityExpr} as kota, count(*) as total_siswa")
             ->groupBy('nama')
-            ->orderByDesc('total_siswa')
-            ->limit($limit)
-            ->get()
+            ->orderByDesc('total_siswa');
+
+        if ($limit !== null && $limit > 0) {
+            $query->limit($limit);
+        }
+
+        $topSekolah = $query->get()
             ->map(function ($row) use ($total) {
                 $nama = $row->nama ?: 'Sekolah Tidak Terdaftar';
                 $kota = $row->kota ?: 'Garut';

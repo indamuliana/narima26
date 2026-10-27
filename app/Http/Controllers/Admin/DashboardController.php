@@ -9,6 +9,7 @@ use App\Models\MasterGelombang;
 use App\Models\MasterJurusan;
 use App\Models\PembayaranDaftarUlang;
 use App\Models\PembayaranSeleksi;
+use App\Models\PengaturanSpmb;
 use App\Models\Tagihan;
 use App\Services\DashboardMetricsService;
 use Illuminate\View\View;
@@ -17,80 +18,102 @@ use Spatie\Activitylog\Models\Activity;
 class DashboardController extends Controller
 {
     /**
-     * Display Administrator executive dashboard with live metrics.
+     * Display Administrator executive dashboard with minimalist 4-row layout.
      */
     public function index(DashboardMetricsService $metricsService): View
     {
+        // Baris 1: Ringkasan Total & Breakdown Program / Gender
         $totalPendaftar = CalonSiswa::count();
-        $timeline       = $metricsService->getTimelinePendaftar();
-        $funnel         = $metricsService->getFunnelKonversi();
-        $demografi      = $metricsService->getDemografiData();
-        $topSekolah     = $metricsService->getTopAsalSekolah(5);
-        $programStats   = $metricsService->getProgramGenderStats();
+        $unggulanAll = CalonSiswa::whereHas('program', fn($q) => $q->where('kode', 'UGG')->orWhere('nama', 'like', '%Unggulan%'))->count();
+        $regulerAll = CalonSiswa::whereHas('program', fn($q) => $q->where('kode', 'REG')->orWhere('nama', 'like', '%Reguler%'))->count();
+        $unggulanLaki = CalonSiswa::whereHas('program', fn($q) => $q->where('kode', 'UGG')->orWhere('nama', 'like', '%Unggulan%'))->where('jenis_kelamin', 'L')->count();
+        $unggulanPerempuan = CalonSiswa::whereHas('program', fn($q) => $q->where('kode', 'UGG')->orWhere('nama', 'like', '%Unggulan%'))->where('jenis_kelamin', 'P')->count();
+        $regulerLaki = CalonSiswa::whereHas('program', fn($q) => $q->where('kode', 'REG')->orWhere('nama', 'like', '%Reguler%'))->where('jenis_kelamin', 'L')->count();
+        $regulerPerempuan = CalonSiswa::whereHas('program', fn($q) => $q->where('kode', 'REG')->orWhere('nama', 'like', '%Reguler%'))->where('jenis_kelamin', 'P')->count();
 
-        // Status Counts
-        $stats = [
+        $baris1 = [
             'total_pendaftar' => $totalPendaftar,
-            'menunggu_bayar_seleksi' => CalonSiswa::whereIn('status_spmb', [
-                SpmbStatus::REGISTRASI->value,
-                SpmbStatus::MENUNGGU_PEMBAYARAN_SELEKSI->value,
-            ])->count(),
-            'bayar_terverifikasi' => CalonSiswa::where('status_spmb', SpmbStatus::PEMBAYARAN_SELEKSI_DIVERIFIKASI->value)->count(),
-            'sedang_lengkapi_data' => CalonSiswa::whereIn('status_spmb', [
-                SpmbStatus::MELENGKAPI_DATA->value,
-                SpmbStatus::DATA_LENGKAP->value,
-                SpmbStatus::MENUNGGU_WAWANCARA->value,
-            ])->count(),
-            'wawancara_selesai' => CalonSiswa::whereIn('status_spmb', [
-                SpmbStatus::SUDAH_DIWAWANCARA->value,
-                SpmbStatus::MENUNGGU_KEPUTUSAN->value,
-            ])->count(),
-            'diterima' => CalonSiswa::whereIn('status_spmb', [
-                SpmbStatus::DITERIMA->value,
-                SpmbStatus::MENUNGGU_DAFTAR_ULANG->value,
-                SpmbStatus::DAFTAR_ULANG_DIVERIFIKASI->value,
-                SpmbStatus::RESMI_TERDAFTAR->value,
-            ])->count(),
-            'ditolak' => CalonSiswa::where('status_spmb', SpmbStatus::DITOLAK->value)->count(),
-            'mengundurkan_diri' => CalonSiswa::where('status_spmb', SpmbStatus::MENGUNDURKAN_DIRI->value)->count(),
-            'resmi_terdaftar' => CalonSiswa::where('status_spmb', SpmbStatus::RESMI_TERDAFTAR->value)->count(),
+            'total_unggulan' => $unggulanAll,
+            'total_reguler' => $regulerAll,
+            'unggulan_laki' => $unggulanLaki,
+            'unggulan_perempuan' => $unggulanPerempuan,
+            'reguler_laki' => $regulerLaki,
+            'reguler_perempuan' => $regulerPerempuan,
         ];
 
-        // Kuota & Progres Keterisian Kompetensi Keahlian (Standar 2 rombel = 72 siswa)
-        $targetQuota = 72;
-        $jurusanStats = MasterJurusan::aktif()->get()->map(function ($j) use ($targetQuota) {
-            $totalApplied = CalonSiswa::where('jurusan_id', $j->id)->count();
-            $acceptedCount = CalonSiswa::where('jurusan_id', $j->id)
-                ->whereIn('status_spmb', [
-                    SpmbStatus::DITERIMA->value,
-                    SpmbStatus::MENUNGGU_DAFTAR_ULANG->value,
-                    SpmbStatus::DAFTAR_ULANG_DIVERIFIKASI->value,
-                    SpmbStatus::RESMI_TERDAFTAR->value,
-                ])
-                ->count();
-            $resmiCount = CalonSiswa::where('jurusan_id', $j->id)
-                ->where('status_spmb', SpmbStatus::RESMI_TERDAFTAR->value)
-                ->count();
+        // Baris 2: 8 Status Kunci Alur SPMB
+        $statusCounts = [
+            'menunggu_bayar' => [
+                'label' => 'Menunggu Bayar Seleksi',
+                'count' => CalonSiswa::whereIn('status_spmb', [SpmbStatus::REGISTRASI->value, SpmbStatus::MENUNGGU_PEMBAYARAN_SELEKSI->value])->count(),
+                'color' => 'amber',
+                'status_key' => SpmbStatus::MENUNGGU_PEMBAYARAN_SELEKSI->value,
+            ],
+            'melengkapi_data' => [
+                'label' => 'Melengkapi Data & Dokumen',
+                'count' => CalonSiswa::whereIn('status_spmb', [SpmbStatus::PEMBAYARAN_SELEKSI_DIVERIFIKASI->value, SpmbStatus::MELENGKAPI_DATA->value, SpmbStatus::DATA_LENGKAP->value])->count(),
+                'color' => 'orange',
+                'status_key' => SpmbStatus::MELENGKAPI_DATA->value,
+            ],
+            'menunggu_wawancara' => [
+                'label' => 'Menunggu Wawancara',
+                'count' => CalonSiswa::where('status_spmb', SpmbStatus::MENUNGGU_WAWANCARA->value)->count(),
+                'color' => 'cyan',
+                'status_key' => SpmbStatus::MENUNGGU_WAWANCARA->value,
+            ],
+            'menunggu_keputusan' => [
+                'label' => 'Menunggu Sidang / Keputusan',
+                'count' => CalonSiswa::whereIn('status_spmb', [SpmbStatus::SUDAH_DIWAWANCARA->value, SpmbStatus::MENUNGGU_KEPUTUSAN->value])->count(),
+                'color' => 'indigo',
+                'status_key' => SpmbStatus::MENUNGGU_KEPUTUSAN->value,
+            ],
+            'diterima' => [
+                'label' => 'Lulus / Menunggu Daftar Ulang',
+                'count' => CalonSiswa::whereIn('status_spmb', [SpmbStatus::DITERIMA->value, SpmbStatus::MENUNGGU_DAFTAR_ULANG->value, SpmbStatus::DAFTAR_ULANG_DIVERIFIKASI->value])->count(),
+                'color' => 'emerald',
+                'status_key' => SpmbStatus::DITERIMA->value,
+            ],
+            'resmi_terdaftar' => [
+                'label' => 'Resmi Terdaftar',
+                'count' => CalonSiswa::where('status_spmb', SpmbStatus::RESMI_TERDAFTAR->value)->count(),
+                'color' => 'teal',
+                'status_key' => SpmbStatus::RESMI_TERDAFTAR->value,
+            ],
+            'ditolak' => [
+                'label' => 'Ditolak',
+                'count' => CalonSiswa::where('status_spmb', SpmbStatus::DITOLAK->value)->count(),
+                'color' => 'rose',
+                'status_key' => SpmbStatus::DITOLAK->value,
+            ],
+            'mengundurkan_diri' => [
+                'label' => 'Mengundurkan Diri',
+                'count' => CalonSiswa::where('status_spmb', SpmbStatus::MENGUNDURKAN_DIRI->value)->count(),
+                'color' => 'slate',
+                'status_key' => SpmbStatus::MENGUNDURKAN_DIRI->value,
+            ],
+        ];
 
-            $percentage = $targetQuota > 0 ? round(($acceptedCount / $targetQuota) * 100, 1) : 0;
+        // Baris 3: Sebaran Data Jurusan (Cukup jumlah saja)
+        $jurusanStats = MasterJurusan::aktif()
+            ->withCount('calonSiswa')
+            ->orderBy('kode')
+            ->get();
 
-            return [
-                'id' => $j->id,
-                'kode' => $j->kode_jurusan,
-                'nama' => $j->nama_jurusan,
-                'kuota' => $targetQuota,
-                'pendaftar' => $totalApplied,
-                'diterima' => $acceptedCount,
-                'resmi' => $resmiCount,
-                'sisa' => max(0, $targetQuota - $acceptedCount),
-                'persentase' => min(100, $percentage),
-            ];
-        });
+        // Baris 4: Timeline Pendaftar (5 Mode & Milestones)
+        $timeline = $metricsService->getTimelineClean();
 
-        // Distribusi per Gelombang
-        $gelombangStats = MasterGelombang::withCount('calonSiswa')->get();
+        // Header Info: Pengaturan SPMB & Gelombang Aktif
+        $pengaturan = PengaturanSpmb::getSettings();
+        $gelombangAktif = MasterGelombang::aktif()->first()
+            ?? MasterGelombang::where('periode_mulai', '<=', now())->where('periode_selesai', '>=', now())->first()
+            ?? MasterGelombang::orderBy('periode_mulai')->first();
 
-        // Ringkasan Keuangan
+        // Baris 5 (Kiri): Status Periode & Gelombang Pendaftaran
+        $gelombangList = MasterGelombang::withCount('calonSiswa')
+            ->orderBy('periode_mulai')
+            ->get();
+
+        // Baris 5 (Kanan): Kas & Keuangan SPMB
         $kasSeleksi = (float) PembayaranSeleksi::where('status', 'DIVERIFIKASI')->sum('nominal_dibayar');
         $kasDaftarUlang = (float) PembayaranDaftarUlang::where('status', 'DIVERIFIKASI')->sum('nominal_dibayar');
         $totalTagihanDaftarUlang = (float) Tagihan::sum('total_netto');
@@ -100,34 +123,44 @@ class DashboardController extends Controller
             'kas_seleksi' => $kasSeleksi,
             'kas_daftar_ulang' => $kasDaftarUlang,
             'total_kas_masuk' => $kasSeleksi + $kasDaftarUlang,
-            'total_tagihan_daftar_ulang' => $totalTagihanDaftarUlang,
+            'total_tagihan' => $totalTagihanDaftarUlang,
             'sisa_piutang' => $sisaPiutang,
         ];
 
-        // Pendaftar Terbaru (10 record)
+        // Baris 6 (Kiri): Saluran Referensi & Promosi (Top & Seluruh Data untuk Modal)
+        $demografi = $metricsService->getDemografiData();
+        $referensiStats = $demografi['referensi_stats'] ?? collect();
+
+        // Baris 6 (Kanan): Top Sekolah Asal & Seluruh Data untuk Modal
+        $topSekolah = $metricsService->getTopAsalSekolah(5);
+        $allSekolah = $metricsService->getTopAsalSekolah(null);
+
+        // Baris 7 (Kiri): Pendaftar Terbaru (10 data)
         $recentCandidates = CalonSiswa::with(['jurusan', 'program', 'gelombang'])
             ->latest('id')
             ->take(10)
             ->get();
 
-        // Log Aktivitas Sistem Terbaru (10 log)
+        // Baris 7 (Kanan): Aktivitas Terkini (Audit Log Sistem)
         $recentActivities = Activity::with('causer')
             ->latest('id')
             ->take(8)
             ->get();
 
         return view('admin.dashboard', compact(
-            'stats',
+            'pengaturan',
+            'gelombangAktif',
+            'baris1',
+            'statusCounts',
             'jurusanStats',
-            'gelombangStats',
-            'keuangan',
-            'recentCandidates',
-            'recentActivities',
             'timeline',
-            'funnel',
-            'demografi',
+            'gelombangList',
+            'keuangan',
+            'referensiStats',
             'topSekolah',
-            'programStats'
+            'allSekolah',
+            'recentCandidates',
+            'recentActivities'
         ));
     }
 }

@@ -16,11 +16,27 @@ class UpdateBiodataRequest extends FormRequest
     {
         $isLuarNegeri = $this->boolean('is_luar_negeri');
 
+        $calonSiswaParam = $this->route('calonSiswa');
+        $calonSiswaId = $calonSiswaParam instanceof \App\Models\CalonSiswa
+            ? $calonSiswaParam->id
+            : ($calonSiswaParam ?? $this->user()?->calonSiswa?->id);
+
+        $userId = $calonSiswaParam instanceof \App\Models\CalonSiswa
+            ? $calonSiswaParam->user_id
+            : ($this->user()?->calonSiswa?->user_id ?? $this->user()?->id);
+
         $rules = [
             'nama_lengkap' => ['sometimes', 'required', 'string', 'max:150'],
             'nama_panggilan' => ['nullable', 'string', 'max:50'],
             'jenis_kelamin' => ['sometimes', 'required', 'in:L,P,Laki-laki,Perempuan'],
-            'nisn' => ['nullable', 'string', 'digits:10'],
+            'nisn' => [
+                'nullable',
+                'string',
+                'digits:10',
+                Rule::unique('calon_siswa', 'nisn')->ignore($calonSiswaId),
+                Rule::unique('users', 'username')->ignore($userId),
+            ],
+            'reset_password_to_default' => ['nullable', 'boolean'],
             'program_id' => ['nullable', 'exists:master_program,id'],
             'jurusan_id' => ['nullable', 'exists:master_jurusan,id'],
             'jurusan_id_2' => ['nullable', 'exists:master_jurusan,id'],
@@ -85,6 +101,8 @@ class UpdateBiodataRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'nisn.digits' => 'NISN harus berjumlah tepat 10 digit angka.',
+            'nisn.unique' => 'NISN ini sudah terdaftar pada calon siswa lain.',
             'nik.digits' => 'NIK harus berjumlah 16 digit.',
             'no_kk.digits' => 'Nomor Kartu Keluarga (KK) harus berjumlah 16 digit.',
             'provinsi_nama.required' => 'Provinsi wajib diisi.',

@@ -95,20 +95,42 @@ class CalonSiswaDataEditController extends Controller
      */
     public function updateBiodata(UpdateBiodataRequest $request, CalonSiswa $calonSiswa): RedirectResponse
     {
+        $oldNisn = $calonSiswa->nisn;
         $this->lengkapiDataService->saveBiodata($calonSiswa, $request->validated());
 
         if (function_exists('activity')) {
+            $logMsg = "Administrator " . auth()->user()->name . " memperbarui biodata calon siswa {$calonSiswa->nama_lengkap} ({$calonSiswa->nomor_pendaftaran}).";
+            if ($request->filled('nisn') && $request->input('nisn') !== $oldNisn) {
+                $logMsg .= " NISN diubah dari '{$oldNisn}' ke '{$request->input('nisn')}' (username login disinkronkan).";
+            }
+            if ($request->boolean('reset_password_to_default')) {
+                $logMsg .= " Password akun direset ke default ({$calonSiswa->nomor_pendaftaran}).";
+            }
+
             activity('admin_calon_siswa_edit')
                 ->performedOn($calonSiswa)
                 ->causedBy(auth()->user())
-                ->withProperties(['tab' => 'biodata'])
-                ->log("Administrator " . auth()->user()->name . " memperbarui biodata calon siswa {$calonSiswa->nama_lengkap} ({$calonSiswa->nomor_pendaftaran}).");
+                ->withProperties([
+                    'tab' => 'biodata',
+                    'old_nisn' => $oldNisn,
+                    'new_nisn' => $request->input('nisn'),
+                    'password_reset' => $request->boolean('reset_password_to_default'),
+                ])
+                ->log($logMsg);
         }
 
         $tab = $request->input('action') === 'next' ? 'orang_tua' : 'biodata';
 
+        $msg = 'Biodata & Identitas calon siswa berhasil diperbarui oleh Administrator.';
+        if ($request->filled('nisn') && $request->input('nisn') !== $oldNisn) {
+            $msg .= ' NISN & username login murid telah disinkronkan.';
+        }
+        if ($request->boolean('reset_password_to_default')) {
+            $msg .= " Password akun murid telah direset ke default ({$calonSiswa->nomor_pendaftaran}).";
+        }
+
         return redirect()->route('admin.calon-siswa.edit-data', [$calonSiswa, 'tab' => $tab])
-            ->with('success', 'Biodata & Identitas calon siswa berhasil diperbarui oleh Administrator.');
+            ->with('success', $msg);
     }
 
     /**

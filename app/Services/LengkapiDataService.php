@@ -17,6 +17,7 @@ use App\Models\UkuranSeragam;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use InvalidArgumentException;
 
 class LengkapiDataService
@@ -300,18 +301,35 @@ class LengkapiDataService
             }
         }
 
-        $calonSiswa->update($payload);
+        return DB::transaction(function () use ($calonSiswa, $payload, $data) {
+            $oldNisn = $calonSiswa->nisn;
+            $calonSiswa->update($payload);
 
-        // Jika status masih PEMBAYARAN_SELEKSI_DIVERIFIKASI, transisi ke MELENGKAPI_DATA
-        if ($calonSiswa->status_spmb === SpmbStatus::PEMBAYARAN_SELEKSI_DIVERIFIKASI) {
-            $this->spmbStatusService->changeStatus(
-                $calonSiswa,
-                SpmbStatus::MELENGKAPI_DATA,
-                'Mulai melengkapi biodata pendaftaran.'
-            );
-        }
+            // Sinkronkan NISN ke username akun login jika berubah
+            if (!empty($payload['nisn']) && $payload['nisn'] !== $oldNisn && $calonSiswa->user) {
+                $calonSiswa->user->update([
+                    'username' => $payload['nisn'],
+                ]);
+            }
 
-        return $calonSiswa->fresh();
+            // Reset password akun ke default jika diminta oleh Admin
+            if (!empty($data['reset_password_to_default']) && auth()->check() && auth()->user()->isAdmin() && $calonSiswa->user) {
+                $calonSiswa->user->update([
+                    'password' => Hash::make($calonSiswa->nomor_pendaftaran),
+                ]);
+            }
+
+            // Jika status masih PEMBAYARAN_SELEKSI_DIVERIFIKASI, transisi ke MELENGKAPI_DATA
+            if ($calonSiswa->status_spmb === SpmbStatus::PEMBAYARAN_SELEKSI_DIVERIFIKASI) {
+                $this->spmbStatusService->changeStatus(
+                    $calonSiswa,
+                    SpmbStatus::MELENGKAPI_DATA,
+                    'Mulai melengkapi biodata pendaftaran.'
+                );
+            }
+
+            return $calonSiswa->fresh();
+        });
     }
 
     /**

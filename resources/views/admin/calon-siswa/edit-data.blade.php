@@ -162,7 +162,14 @@
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase">NISN Siswa</label>
                                 <input type="text" name="nisn" value="{{ old('nisn', $calonSiswa->nisn) }}" maxlength="10"
-                                    class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none font-mono">
+                                    placeholder="10 digit NISN"
+                                    class="mt-1 w-full rounded-xl border @error('nisn') border-red-500 @else border-slate-300 @enderror px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none font-mono">
+                                @error('nisn')
+                                    <p class="text-[11px] text-red-600 font-semibold mt-1">{{ $message }}</p>
+                                @enderror
+                                <p class="text-[11px] text-slate-500 mt-1 leading-tight">
+                                    *Mengubah NISN otomatis menyinkronkan username login murid.
+                                </p>
                             </div>
 
                             <div>
@@ -202,6 +209,14 @@
                                     @endforeach
                                 </select>
                             </div>
+                        </div>
+
+                        <!-- Opsi Tambahan Kredensial Akun Siswa -->
+                        <div class="pt-2">
+                            <label class="inline-flex items-center gap-2.5 text-xs font-semibold text-slate-700 cursor-pointer bg-white px-3.5 py-2 rounded-xl border border-indigo-200/80 hover:bg-indigo-50/50 transition-colors">
+                                <input type="checkbox" name="reset_password_to_default" value="1" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                                <span>Reset kata sandi (password) akun siswa ke default (<span class="font-mono font-bold text-slate-900">{{ $calonSiswa->nomor_pendaftaran }}</span>)</span>
+                            </label>
                         </div>
 
                         <!-- Promotor & Pemberi Rekomendasi -->
