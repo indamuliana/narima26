@@ -78,6 +78,7 @@
                         <tr>
                             <th class="px-5 py-3.5">Calon Murid</th>
                             <th class="px-4 py-3.5">Jurusan</th>
+                            <th class="px-4 py-3.5">Referensi</th>
                             <th class="px-4 py-3.5 text-right">Nominal Tagihan</th>
                             <th class="px-4 py-3.5 text-right">Nominal Bayar</th>
                             <th class="px-4 py-3.5 text-center">Status</th>
@@ -93,7 +94,12 @@
                                     <span class="text-slate-400 font-mono text-[11px]">{{ $p->calonSiswa?->nomor_pendaftaran }} &bull; NISN: {{ $p->calonSiswa?->nisn }}</span>
                                 </td>
                                 <td class="px-4 py-4 font-semibold text-slate-700">
-                                    {{ $p->calonSiswa?->jurusan?->nama ?? '-' }}
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-slate-100 text-slate-800" title="{{ $p->calonSiswa?->jurusan?->nama }}">
+                                        {{ $p->calonSiswa?->jurusan?->kode ?? '-' }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-4 text-slate-700 font-medium">
+                                    {{ $p->calonSiswa?->referensi_display ?? '-' }}
                                 </td>
                                 <td class="px-4 py-4 text-right font-medium text-slate-600">
                                     Rp {{ number_format($p->nominal_tagihan, 0, ',', '.') }}
@@ -145,7 +151,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="p-8 text-center text-slate-400">Tidak ada transaksi pembayaran seleksi sesuai filter.</td>
+                                <td colspan="8" class="p-8 text-center text-slate-400">Tidak ada transaksi pembayaran seleksi sesuai filter.</td>
                             </tr>
                         @endforelse
                     </tbody>

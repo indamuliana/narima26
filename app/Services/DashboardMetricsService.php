@@ -38,7 +38,8 @@ class DashboardMetricsService
         $endDate   = Carbon::create(2027, 6, 30)->endOfDay();
 
         // 1. Data All Time Harian (303 Hari: 1 Sep 2026 - 30 Jun 2027)
-        $dailyDb = CalonSiswa::whereBetween('created_at', [$startDate, $endDate])
+        $dailyDb = CalonSiswa::tanpaDemo()
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->selectRaw('DATE(created_at) as tgl, count(*) as count')
             ->groupBy('tgl')
             ->pluck('count', 'tgl')
@@ -91,7 +92,8 @@ class DashboardMetricsService
         $mingguanRanges = array_column($allTimeWeeks, 'range');
         $mingguanCounts = array_fill(0, count($allTimeWeeks), 0);
 
-        $allCandidates = CalonSiswa::whereBetween('created_at', [$startDate, $endDate])
+        $allCandidates = CalonSiswa::tanpaDemo()
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->get(['id', 'created_at']);
 
         foreach ($allCandidates as $cs) {
@@ -134,7 +136,7 @@ class DashboardMetricsService
         $bulananCounts = [];
         foreach ($bulananMonths as $bm) {
             $bulananLabels[] = $bm['label'];
-            $cnt = CalonSiswa::whereYear('created_at', $bm['year'])
+            $cnt = CalonSiswa::tanpaDemo()->whereYear('created_at', $bm['year'])
                 ->whereMonth('created_at', $bm['month'])
                 ->count();
             $bulananCounts[] = $cnt;
@@ -157,7 +159,7 @@ class DashboardMetricsService
         foreach ($gelombangs as $g) {
             $gelombangLabels[] = $g->nama;
             $gelombangRanges[] = ($g->periode_mulai ? $g->periode_mulai->translatedFormat('d M Y') : '-') . ' - ' . ($g->periode_selesai ? $g->periode_selesai->translatedFormat('d M Y') : '-');
-            $cnt = CalonSiswa::where('gelombang_id', $g->id)->count();
+            $cnt = CalonSiswa::tanpaDemo()->where('gelombang_id', $g->id)->count();
             $gelombangCounts[] = $cnt;
         }
         $gelombangTotal = array_sum($gelombangCounts);
@@ -320,7 +322,8 @@ class DashboardMetricsService
             SpmbStatus::RESMI_TERDAFTAR->value,
         ];
 
-        $candidates = CalonSiswa::whereBetween('created_at', [$startDate, $endDate])
+        $candidates = CalonSiswa::tanpaDemo()
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->select(['id', 'status_spmb', 'created_at'])
             ->get();
 
@@ -486,7 +489,7 @@ class DashboardMetricsService
      */
     public function getFunnelKonversi(): array
     {
-        $total = CalonSiswa::count();
+        $total = CalonSiswa::tanpaDemo()->count();
         if ($total === 0) {
             return [
                 'total' => 0,
@@ -498,13 +501,13 @@ class DashboardMetricsService
         $step1 = $total;
 
         // 2. Pembayaran Seleksi Terverifikasi (status beyond REGISTRASI / MENUNGGU_PEMBAYARAN_SELEKSI)
-        $step2 = CalonSiswa::whereNotIn('status_spmb', [
+        $step2 = CalonSiswa::tanpaDemo()->whereNotIn('status_spmb', [
             SpmbStatus::REGISTRASI->value,
             SpmbStatus::MENUNGGU_PEMBAYARAN_SELEKSI->value,
         ])->count();
 
         // 3. Berkas & Rapor Lengkap
-        $step3 = CalonSiswa::whereIn('status_spmb', [
+        $step3 = CalonSiswa::tanpaDemo()->whereIn('status_spmb', [
             SpmbStatus::DATA_LENGKAP->value,
             SpmbStatus::MENUNGGU_WAWANCARA->value,
             SpmbStatus::SUDAH_DIWAWANCARA->value,
@@ -516,7 +519,7 @@ class DashboardMetricsService
         ])->count();
 
         // 4. Tes Wawancara Selesai
-        $step4 = CalonSiswa::whereIn('status_spmb', [
+        $step4 = CalonSiswa::tanpaDemo()->whereIn('status_spmb', [
             SpmbStatus::SUDAH_DIWAWANCARA->value,
             SpmbStatus::MENUNGGU_KEPUTUSAN->value,
             SpmbStatus::DITERIMA->value,
@@ -526,7 +529,7 @@ class DashboardMetricsService
         ])->count();
 
         // 5. Lulus / Diterima
-        $step5 = CalonSiswa::whereIn('status_spmb', [
+        $step5 = CalonSiswa::tanpaDemo()->whereIn('status_spmb', [
             SpmbStatus::DITERIMA->value,
             SpmbStatus::MENUNGGU_DAFTAR_ULANG->value,
             SpmbStatus::DAFTAR_ULANG_DIVERIFIKASI->value,
@@ -534,7 +537,7 @@ class DashboardMetricsService
         ])->count();
 
         // 6. Resmi Terdaftar (Daftar Ulang Lunas)
-        $step6 = CalonSiswa::where('status_spmb', SpmbStatus::RESMI_TERDAFTAR->value)->count();
+        $step6 = CalonSiswa::tanpaDemo()->where('status_spmb', SpmbStatus::RESMI_TERDAFTAR->value)->count();
 
         $calcPct = fn($val) => $total > 0 ? round(($val / $total) * 100, 1) : 0;
 
@@ -598,16 +601,16 @@ class DashboardMetricsService
      */
     public function getDemografiData(): array
     {
-        $total = CalonSiswa::count();
+        $total = CalonSiswa::tanpaDemo()->count();
 
         // Gender breakdown
-        $laki = CalonSiswa::where('jenis_kelamin', 'L')->count();
-        $perempuan = CalonSiswa::where('jenis_kelamin', 'P')->count();
+        $laki = CalonSiswa::tanpaDemo()->where('jenis_kelamin', 'L')->count();
+        $perempuan = CalonSiswa::tanpaDemo()->where('jenis_kelamin', 'P')->count();
         $belumIsiGender = max(0, $total - ($laki + $perempuan));
 
         // Program breakdown (Reguler vs Unggulan)
         $programs = MasterProgram::aktif()->get()->map(function ($p) use ($total) {
-            $count = CalonSiswa::where('program_id', $p->id)->count();
+            $count = CalonSiswa::tanpaDemo()->where('program_id', $p->id)->count();
             $pct   = $total > 0 ? round(($count / $total) * 100, 1) : 0;
             return [
                 'id'    => $p->id,
@@ -618,7 +621,7 @@ class DashboardMetricsService
         });
 
         // Referensi / Sumber Informasi
-        $referensiRaw = CalonSiswa::whereNotNull('referensi_jenis')
+        $referensiRaw = CalonSiswa::tanpaDemo()->whereNotNull('referensi_jenis')
             ->select('referensi_jenis', DB::raw('count(*) as count'))
             ->groupBy('referensi_jenis')
             ->orderByDesc('count')
@@ -665,7 +668,7 @@ class DashboardMetricsService
      */
     public function getProgramGenderStats(): array
     {
-        $raw = CalonSiswa::selectRaw("
+        $raw = CalonSiswa::tanpaDemo()->selectRaw("
             COALESCE(SUM(CASE WHEN master_program.kode = 'UGG' OR master_program.nama LIKE '%Unggulan%' THEN 1 ELSE 0 END), 0) as unggulan_all,
             COALESCE(SUM(CASE WHEN (master_program.kode = 'UGG' OR master_program.nama LIKE '%Unggulan%') AND calon_siswa.jenis_kelamin = 'L' THEN 1 ELSE 0 END), 0) as unggulan_laki,
             COALESCE(SUM(CASE WHEN (master_program.kode = 'UGG' OR master_program.nama LIKE '%Unggulan%') AND calon_siswa.jenis_kelamin = 'P' THEN 1 ELSE 0 END), 0) as unggulan_perempuan,
@@ -704,12 +707,12 @@ class DashboardMetricsService
      */
     public function getTopAsalSekolah(?int $limit = 5): array
     {
-        $total = CalonSiswa::count();
+        $total = CalonSiswa::tanpaDemo()->count();
 
         $nameExpr = "TRIM(COALESCE(master_sekolah_asal.nama_sekolah, calon_siswa.asal_sekolah_lainnya))";
         $cityExpr = "MAX(COALESCE(master_sekolah_asal.kokab, calon_siswa.kabupaten_nama, 'Garut'))";
 
-        $query = CalonSiswa::query()
+        $query = CalonSiswa::tanpaDemo()
             ->leftJoin('master_sekolah_asal', 'calon_siswa.asal_sekolah_id', '=', 'master_sekolah_asal.id')
             ->where(function ($q) {
                 $q->whereNotNull('calon_siswa.asal_sekolah_id')

@@ -27,7 +27,8 @@ class PembayaranController extends Controller
         $status = $request->query('status');
         $search = $request->query('q');
 
-        $query = PembayaranSeleksi::with(['calonSiswa.jurusan', 'calonSiswa.program', 'verifikator'])
+        $query = PembayaranSeleksi::whereHas('calonSiswa', fn($q) => $q->tanpaDemo())
+            ->with(['calonSiswa.jurusan', 'calonSiswa.program', 'verifikator'])
             ->latest('id');
 
         if (!empty($status) && in_array(strtoupper($status), ['PENDING', 'DIVERIFIKASI', 'DITOLAK'])) {
@@ -38,17 +39,18 @@ class PembayaranController extends Controller
             $query->whereHas('calonSiswa', function ($q) use ($search) {
                 $q->where('nama_lengkap', 'like', "%{$search}%")
                   ->orWhere('nisn', 'like', "%{$search}%")
-                  ->orWhere('nomor_pendaftaran', 'like', "%{$search}%");
+                  ->orWhere('nomor_pendaftaran', 'like', "%{$search}%")
+                  ->orWhere('referensi_nama', 'like', "%{$search}%");
             });
         }
 
         $pembayarans = $query->paginate(20)->withQueryString();
 
         $stats = [
-            'pending' => PembayaranSeleksi::where('status', 'PENDING')->count(),
-            'diverifikasi' => PembayaranSeleksi::where('status', 'DIVERIFIKASI')->count(),
-            'ditolak' => PembayaranSeleksi::where('status', 'DITOLAK')->count(),
-            'total_masuk' => (float) PembayaranSeleksi::where('status', 'DIVERIFIKASI')->sum('nominal_dibayar'),
+            'pending' => PembayaranSeleksi::whereHas('calonSiswa', fn($q) => $q->tanpaDemo())->where('status', 'PENDING')->count(),
+            'diverifikasi' => PembayaranSeleksi::whereHas('calonSiswa', fn($q) => $q->tanpaDemo())->where('status', 'DIVERIFIKASI')->count(),
+            'ditolak' => PembayaranSeleksi::whereHas('calonSiswa', fn($q) => $q->tanpaDemo())->where('status', 'DITOLAK')->count(),
+            'total_masuk' => (float) PembayaranSeleksi::whereHas('calonSiswa', fn($q) => $q->tanpaDemo())->where('status', 'DIVERIFIKASI')->sum('nominal_dibayar'),
         ];
 
         return view('admin.pembayaran.seleksi', compact('pembayarans', 'status', 'search', 'stats'));
@@ -62,7 +64,8 @@ class PembayaranController extends Controller
         $status = $request->query('status');
         $search = $request->query('q');
 
-        $query = PembayaranDaftarUlang::with(['calonSiswa.jurusan', 'tagihan', 'verifikator'])
+        $query = PembayaranDaftarUlang::whereHas('calonSiswa', fn($q) => $q->tanpaDemo())
+            ->with(['calonSiswa.jurusan', 'tagihan', 'verifikator'])
             ->latest('id');
 
         if (!empty($status) && in_array(strtoupper($status), ['PENDING', 'DIVERIFIKASI', 'DITOLAK'])) {
@@ -72,17 +75,18 @@ class PembayaranController extends Controller
         if (!empty($search)) {
             $query->whereHas('calonSiswa', function ($q) use ($search) {
                 $q->where('nama_lengkap', 'like', "%{$search}%")
-                  ->orWhere('nomor_pendaftaran', 'like', "%{$search}%");
+                  ->orWhere('nomor_pendaftaran', 'like', "%{$search}%")
+                  ->orWhere('referensi_nama', 'like', "%{$search}%");
             });
         }
 
         $pembayarans = $query->paginate(20)->withQueryString();
 
         $stats = [
-            'pending' => PembayaranDaftarUlang::where('status', 'PENDING')->count(),
-            'diverifikasi' => PembayaranDaftarUlang::where('status', 'DIVERIFIKASI')->count(),
-            'ditolak' => PembayaranDaftarUlang::where('status', 'DITOLAK')->count(),
-            'total_masuk' => (float) PembayaranDaftarUlang::where('status', 'DIVERIFIKASI')->sum('nominal_dibayar'),
+            'pending' => PembayaranDaftarUlang::whereHas('calonSiswa', fn($q) => $q->tanpaDemo())->where('status', 'PENDING')->count(),
+            'diverifikasi' => PembayaranDaftarUlang::whereHas('calonSiswa', fn($q) => $q->tanpaDemo())->where('status', 'DIVERIFIKASI')->count(),
+            'ditolak' => PembayaranDaftarUlang::whereHas('calonSiswa', fn($q) => $q->tanpaDemo())->where('status', 'DITOLAK')->count(),
+            'total_masuk' => (float) PembayaranDaftarUlang::whereHas('calonSiswa', fn($q) => $q->tanpaDemo())->where('status', 'DIVERIFIKASI')->sum('nominal_dibayar'),
         ];
 
         return view('admin.pembayaran.daftar-ulang', compact('pembayarans', 'status', 'search', 'stats'));

@@ -20,8 +20,7 @@ class TpaHasilController extends Controller
      */
     protected function buildFilteredQuery(Request $request)
     {
-        $query = CalonSiswa::query()
-            ->where('nomor_pendaftaran', 'not like', 'SIM-%')
+        $query = CalonSiswa::tanpaDemo()
             ->with([
                 'jurusan',
                 'gelombang',
@@ -81,10 +80,10 @@ class TpaHasilController extends Controller
         $gelombangList = MasterGelombang::orderBy('nama')->get();
 
         // Statistik singkat
-        $totalPeserta = CalonSiswa::count();
-        $totalSelesai = \App\Models\TpaSesiSiswa::where('status', 'selesai')->count();
-        $totalSedang = \App\Models\TpaSesiSiswa::whereIn('status', ['babak_1', 'transisi', 'babak_2'])->count();
-        $totalDiskualifikasi = \App\Models\TpaSesiSiswa::where('status', 'didiskualifikasi')->count();
+        $totalPeserta = CalonSiswa::tanpaDemo()->count();
+        $totalSelesai = \App\Models\TpaSesiSiswa::whereHas('calonSiswa', fn($q) => $q->tanpaDemo())->where('status', 'selesai')->count();
+        $totalSedang = \App\Models\TpaSesiSiswa::whereHas('calonSiswa', fn($q) => $q->tanpaDemo())->whereIn('status', ['babak_1', 'transisi', 'babak_2'])->count();
+        $totalDiskualifikasi = \App\Models\TpaSesiSiswa::whereHas('calonSiswa', fn($q) => $q->tanpaDemo())->where('status', 'didiskualifikasi')->count();
 
         return view('admin.tpa.hasil.index', compact(
             'calonSiswaList',

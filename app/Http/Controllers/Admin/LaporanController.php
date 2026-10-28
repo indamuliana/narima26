@@ -32,16 +32,16 @@ class LaporanController extends Controller
      */
     public function index(): View
     {
-        $totalPendaftar = CalonSiswa::count();
+        $totalPendaftar = CalonSiswa::tanpaDemo()->count();
 
         // 1. Funnel Konversi Alur SPMB
         $funnel = [
             'total_registrasi' => $totalPendaftar,
-            'seleksi_terbayar' => CalonSiswa::whereNotIn('status_spmb', [
+            'seleksi_terbayar' => CalonSiswa::tanpaDemo()->whereNotIn('status_spmb', [
                 SpmbStatus::REGISTRASI->value,
                 SpmbStatus::MENUNGGU_PEMBAYARAN_SELEKSI->value,
             ])->count(),
-            'biodata_selesai' => CalonSiswa::whereIn('status_spmb', [
+            'biodata_selesai' => CalonSiswa::tanpaDemo()->whereIn('status_spmb', [
                 SpmbStatus::DATA_LENGKAP->value,
                 SpmbStatus::MENUNGGU_WAWANCARA->value,
                 SpmbStatus::SUDAH_DIWAWANCARA->value,
@@ -52,7 +52,7 @@ class LaporanController extends Controller
                 SpmbStatus::DAFTAR_ULANG_DIVERIFIKASI->value,
                 SpmbStatus::RESMI_TERDAFTAR->value,
             ])->count(),
-            'telah_wawancara' => CalonSiswa::whereIn('status_spmb', [
+            'telah_wawancara' => CalonSiswa::tanpaDemo()->whereIn('status_spmb', [
                 SpmbStatus::SUDAH_DIWAWANCARA->value,
                 SpmbStatus::MENUNGGU_KEPUTUSAN->value,
                 SpmbStatus::DITERIMA->value,
@@ -61,29 +61,29 @@ class LaporanController extends Controller
                 SpmbStatus::DAFTAR_ULANG_DIVERIFIKASI->value,
                 SpmbStatus::RESMI_TERDAFTAR->value,
             ])->count(),
-            'diterima' => CalonSiswa::whereIn('status_spmb', [
+            'diterima' => CalonSiswa::tanpaDemo()->whereIn('status_spmb', [
                 SpmbStatus::DITERIMA->value,
                 SpmbStatus::MENUNGGU_DAFTAR_ULANG->value,
                 SpmbStatus::DAFTAR_ULANG_DIVERIFIKASI->value,
                 SpmbStatus::RESMI_TERDAFTAR->value,
             ])->count(),
-            'resmi_terdaftar' => CalonSiswa::where('status_spmb', SpmbStatus::RESMI_TERDAFTAR->value)->count(),
+            'resmi_terdaftar' => CalonSiswa::tanpaDemo()->where('status_spmb', SpmbStatus::RESMI_TERDAFTAR->value)->count(),
         ];
 
         // 2. Rekapitulasi per Kompetensi Keahlian
         $targetQuota = 72;
         $rekapJurusan = MasterJurusan::aktif()->get()->map(function ($j) use ($targetQuota) {
-            $total = CalonSiswa::where('jurusan_id', $j->id)->count();
-            $diterima = CalonSiswa::where('jurusan_id', $j->id)
+            $total = CalonSiswa::tanpaDemo()->where('jurusan_id', $j->id)->count();
+            $diterima = CalonSiswa::tanpaDemo()->where('jurusan_id', $j->id)
                 ->whereIn('status_spmb', [
                     SpmbStatus::DITERIMA->value,
                     SpmbStatus::MENUNGGU_DAFTAR_ULANG->value,
                     SpmbStatus::DAFTAR_ULANG_DIVERIFIKASI->value,
                     SpmbStatus::RESMI_TERDAFTAR->value,
                 ])->count();
-            $ditolak = CalonSiswa::where('jurusan_id', $j->id)->where('status_spmb', SpmbStatus::DITOLAK->value)->count();
-            $mengundurkanDiri = CalonSiswa::where('jurusan_id', $j->id)->where('status_spmb', SpmbStatus::MENGUNDURKAN_DIRI->value)->count();
-            $resmi = CalonSiswa::where('jurusan_id', $j->id)->where('status_spmb', SpmbStatus::RESMI_TERDAFTAR->value)->count();
+            $ditolak = CalonSiswa::tanpaDemo()->where('jurusan_id', $j->id)->where('status_spmb', SpmbStatus::DITOLAK->value)->count();
+            $mengundurkanDiri = CalonSiswa::tanpaDemo()->where('jurusan_id', $j->id)->where('status_spmb', SpmbStatus::MENGUNDURKAN_DIRI->value)->count();
+            $resmi = CalonSiswa::tanpaDemo()->where('jurusan_id', $j->id)->where('status_spmb', SpmbStatus::RESMI_TERDAFTAR->value)->count();
 
             $persen = $targetQuota > 0 ? round(($diterima / $targetQuota) * 100, 1) : 0;
 
@@ -136,7 +136,7 @@ class LaporanController extends Controller
      */
     public function exportRekapPdf(Request $request): Response
     {
-        $query = CalonSiswa::with(['jurusan', 'program', 'gelombang', 'sekolahAsal'])
+        $query = CalonSiswa::tanpaDemo()->with(['jurusan', 'program', 'gelombang', 'sekolahAsal'])
             ->orderBy('jurusan_id')
             ->orderBy('nama_lengkap');
 

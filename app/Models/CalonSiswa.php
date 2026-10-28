@@ -154,6 +154,34 @@ class CalonSiswa extends Model
         return $j2 ? "1. {$j1} | 2. {$j2}" : $j1;
     }
 
+    public function getReferensiDisplayAttribute(): string
+    {
+        if (!empty($this->referensi_nama)) {
+            return $this->referensi_nama;
+        }
+
+        if (!empty($this->referensi_jenis)) {
+            $map = [
+                'GURU_WIKRAMA_GARUT'     => 'Guru Wikrama Garut',
+                'GURU_WIKRAMA_BOGOR'     => 'Guru Wikrama Bogor',
+                'SISWA_WIKRAMA_AKTIF'    => 'Siswa Wikrama Aktif',
+                'ALUMNI_WIKRAMA'         => 'Alumni Wikrama',
+                'CALON_SISWA_WIKRAMA'    => 'Calon Siswa Wikrama',
+                'SOSIAL_MEDIA'           => 'Media Sosial',
+                'GURU_BK_SMP'            => 'Guru BK SMP',
+                'BROSUR_PAMFLET'         => 'Brosur / Pamflet',
+                'KUNJUNGAN_SOSIALISASI'  => 'Sosialisasi SMP',
+                'TEMAN_KELUARGA'         => 'Keluarga / Teman',
+                'WEBSITE_INTERNET'       => 'Website / Internet',
+                'LAINNYA'                => 'Lainnya',
+            ];
+
+            return $map[$this->referensi_jenis] ?? ucwords(strtolower(str_replace('_', ' ', $this->referensi_jenis)));
+        }
+
+        return '-';
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -330,5 +358,23 @@ class CalonSiswa extends Model
     public function tpaSesi(): HasOne
     {
         return $this->hasOne(TpaSesiSiswa::class, 'calon_siswa_id');
+    }
+
+    /**
+     * Scope untuk mengecualikan akun demo / simulasi admin dari metrik & daftar riil.
+     */
+    public function scopeTanpaDemo($query)
+    {
+        return $query->where('calon_siswa.nomor_pendaftaran', 'not like', 'SIM-%')
+                     ->where('calon_siswa.nomor_pendaftaran', 'not like', 'DEMO-%');
+    }
+
+    /**
+     * Periksa apakah record ini merupakan akun demo / simulasi.
+     */
+    public function isDemo(): bool
+    {
+        return str_starts_with($this->nomor_pendaftaran ?? '', 'SIM-')
+            || str_starts_with($this->nomor_pendaftaran ?? '', 'DEMO-');
     }
 }

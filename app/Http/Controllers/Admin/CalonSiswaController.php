@@ -27,8 +27,7 @@ class CalonSiswaController extends Controller
      */
     protected function buildFilteredQuery(Request $request)
     {
-        $query = CalonSiswa::query()
-            ->where('nomor_pendaftaran', 'not like', 'SIM-%')
+        $query = CalonSiswa::tanpaDemo()
             ->with([
                 'jurusan',
                 'jurusan2',

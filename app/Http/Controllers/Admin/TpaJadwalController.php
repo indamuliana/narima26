@@ -20,8 +20,7 @@ class TpaJadwalController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = CalonSiswa::query()
-            ->where('nomor_pendaftaran', 'not like', 'SIM-%')
+        $query = CalonSiswa::tanpaDemo()
             ->with([
                 'user',
                 'jurusan',

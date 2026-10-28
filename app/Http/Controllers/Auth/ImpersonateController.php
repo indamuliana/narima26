@@ -66,8 +66,15 @@ class ImpersonateController extends Controller
         // Kembalikan login ke admin
         Auth::login($admin);
 
+        $isDemo = session('is_demo_student') || ($calonSiswaId && CalonSiswa::withTrashed()->find($calonSiswaId)?->isDemo());
+
         // Hapus session impersonasi
-        session()->forget(['impersonate_admin_id', 'impersonated_calon_siswa_id']);
+        session()->forget(['impersonate_admin_id', 'impersonated_calon_siswa_id', 'is_demo_student', 'is_tpa_simulation']);
+
+        if ($isDemo) {
+            return redirect()->route('admin.dashboard')
+                ->with('success', 'Sesi akun demo siswa selesai. Anda telah kembali ke akun Administrator.');
+        }
 
         if ($calonSiswaId) {
             return redirect()->route('admin.calon-siswa.show', $calonSiswaId)

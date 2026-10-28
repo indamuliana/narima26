@@ -78,6 +78,7 @@ Route::middleware(['auth', 'role:admin,guru,operator,pewawancara'])
     ->name('admin.')
     ->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/demo-siswa', [\App\Http\Controllers\Admin\TpaSimulasiController::class, 'loginDemoPortal'])->name('demo-siswa');
 
         // Manajemen Calon Siswa (DataTables & Export)
         Route::controller(\App\Http\Controllers\Admin\CalonSiswaController::class)
