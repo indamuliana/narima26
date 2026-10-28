@@ -9,9 +9,11 @@ use App\Models\CalonSiswa;
 use App\Models\MasterJurusan;
 use App\Models\MasterKriteriaWawancara;
 use App\Models\Wawancara;
+use App\Services\PdfService;
 use App\Services\WawancaraService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
 
 class WawancaraController extends Controller
@@ -174,6 +176,17 @@ class WawancaraController extends Controller
         $wawancaraOrangTua = $calonSiswa->wawancaraOrangTua;
 
         return view('pewawancara.detail', compact('calonSiswa', 'wawancaraSiswa', 'wawancaraOrangTua'));
+    }
+
+    /**
+     * Cetak PDF Hasil Wawancara Gabungan (Siswa & Orang Tua).
+     */
+    public function cetakPdf(CalonSiswa $calonSiswa, PdfService $pdfService): Response
+    {
+        $pdf = $pdfService->generateHasilWawancara($calonSiswa);
+        $fileName = 'Hasil_Wawancara_' . ($calonSiswa->nomor_pendaftaran ?? 'Siswa') . '_' . str_replace(' ', '_', $calonSiswa->nama_lengkap) . '.pdf';
+
+        return $pdf->stream($fileName);
     }
 
     /**

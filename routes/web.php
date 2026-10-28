@@ -379,6 +379,7 @@ Route::middleware(['auth', 'role:pewawancara,admin,operator'])
             Route::get('/wawancara/{calonSiswa}/orang-tua', 'formOrangTua')->name('wawancara.form-orang-tua');
             Route::post('/wawancara/{calonSiswa}/orang-tua', 'saveOrangTua')->name('wawancara.save-orang-tua');
             Route::get('/wawancara/{calonSiswa}/detail', 'show')->name('wawancara.show');
+            Route::get('/wawancara/{calonSiswa}/cetak-pdf', 'cetakPdf')->name('wawancara.cetak-pdf');
             Route::get('/riwayat', 'riwayat')->name('riwayat');
             Route::get('/instrumen', 'instrumen')->name('instrumen');
         });

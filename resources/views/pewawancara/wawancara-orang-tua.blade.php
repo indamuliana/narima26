@@ -213,12 +213,6 @@
                         <input type="text" name="hobi" value="{{ old('hobi', $wawancara->hobi) }}" placeholder="Contoh: Menggambar, futsal, coding"
                             class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
                     </div>
-
-                    <div class="sm:col-span-2">
-                        <label class="block text-xs font-bold text-slate-700 uppercase">Cita-Cita Siswa</label>
-                        <input type="text" name="cita_cita" value="{{ old('cita_cita', $wawancara->cita_cita) }}" placeholder="Contoh: Software Engineer, Desainer Grafis, Pengusaha"
-                            class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
-                    </div>
                 </div>
             </div>
 

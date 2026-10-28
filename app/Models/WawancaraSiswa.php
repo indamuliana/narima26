@@ -27,6 +27,7 @@ class WawancaraSiswa extends Model
         'alasan_masuk_wikrama',
         'alasan_pilih_program',
         'alasan_pilih_jurusan',
+        'cita_cita',
         'aktivitas_rutin',
         'merokok',
         'penyakit_menahun',

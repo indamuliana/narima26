@@ -308,6 +308,32 @@ class PdfService
             'printedAt' => now(),
         ], $extraData), 'a4', 'portrait');
     }
+
+    /**
+     * Generate Dokumen Hasil Wawancara Gabungan (Siswa & Orang Tua).
+     *
+     * @param CalonSiswa $calonSiswa
+     * @return DomPdfWrapper
+     */
+    public function generateHasilWawancara(CalonSiswa $calonSiswa): DomPdfWrapper
+    {
+        $calonSiswa->loadMissing([
+            'program',
+            'jurusan',
+            'jurusan2',
+            'gelombang',
+            'sekolahAsal',
+            'wawancaraSiswa.pewawancara',
+            'wawancaraOrangTua.pewawancara',
+        ]);
+
+        return $this->renderPdf('pdf.hasil_wawancara', [
+            'calonSiswa' => $calonSiswa,
+            'wawancaraSiswa' => $calonSiswa->wawancaraSiswa,
+            'wawancaraOrangTua' => $calonSiswa->wawancaraOrangTua,
+            'printedAt' => now(),
+        ], 'a4', 'portrait');
+    }
 }
 
 

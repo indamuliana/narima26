@@ -1308,11 +1308,27 @@
 
                 <!-- 10. HASIL EVALUASI WAWANCARA (SISWA & ORTU) -->
                 <div id="sec-wawancara" class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4 scroll-mt-24">
-                    <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-                        <span class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-sm">10</span>
-                        <div>
-                            <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">Hasil Wawancara Seleksi</h2>
-                            <p class="text-[11px] text-slate-400">Data hasil observasi siswa dan komitmen orang tua</p>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-sm">10</span>
+                            <div>
+                                <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">Hasil Wawancara Seleksi</h2>
+                                <p class="text-[11px] text-slate-400">Data hasil observasi siswa dan komitmen orang tua</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ route('pewawancara.wawancara.cetak-pdf', $calonSiswa) }}" target="_blank"
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-xs transition">
+                                <svg class="w-3.5 h-3.5 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <span>Cetak PDF Wawancara</span>
+                            </a>
+                            <a href="{{ route('pewawancara.wawancara.show', $calonSiswa) }}"
+                               class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-xs transition">
+                                <span>Buka Lembar Lengkap</span>
+                                <span>→</span>
+                            </a>
                         </div>
                     </div>
 
@@ -1344,6 +1360,10 @@
                                 <div>
                                     <span class="text-slate-400 block text-[10px]">Kondisi Kesehatan:</span>
                                     <span class="font-bold text-slate-800">{{ $ws->kondisi_kesehatan ?? '-' }}</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-400 block text-[10px]">Cita-Cita Siswa:</span>
+                                    <span class="font-bold text-indigo-700">{{ $ws->cita_cita ?? '-' }}</span>
                                 </div>
                                 <div>
                                     <span class="text-slate-400 block text-[10px]">Baca & Hafalan Qur'an:</span>

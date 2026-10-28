@@ -213,6 +213,12 @@
                         <textarea name="alasan_pilih_jurusan" rows="2" placeholder="Mengapa meminati bidang keahlian ini dan apa cita-cita ke depan..." required
                             class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">{{ old('alasan_pilih_jurusan', $wawancara->alasan_pilih_jurusan) }}</textarea>
                     </div>
+
+                    <div class="sm:col-span-2 md:col-span-3">
+                        <label class="block text-xs font-bold text-slate-700 uppercase">Cita-Cita Siswa</label>
+                        <input type="text" name="cita_cita" value="{{ old('cita_cita', $wawancara->cita_cita) }}" placeholder="Contoh: Software Engineer, Network Engineer, Desainer Grafis, Pengusaha"
+                            class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-200 outline-none">
+                    </div>
                 </div>
             </div>
 
