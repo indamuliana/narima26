@@ -450,6 +450,14 @@ Route::middleware(['auth', 'role:calon_siswa'])
 
         Route::get('/dashboard', function () {
             $calonSiswa = auth()->user()->calonSiswa;
+            $calonSiswa?->loadMissing([
+                'program',
+                'jurusan',
+                'gelombang',
+                'latestWawancara.pewawancara',
+                'kesepahaman',
+                'pembayaranSeleksi',
+            ]);
             return view('calon-siswa.dashboard', compact('calonSiswa'));
         })->name('dashboard');
 
@@ -486,6 +494,14 @@ Route::middleware(['auth', 'role:calon_siswa'])
                 Route::get('/', 'index')->name('index');
                 Route::post('/', 'store')->name('store');
                 Route::get('/cetak', 'cetakPdf')->name('cetak');
+            });
+
+        // Modul Wawancara & TPA Calon Siswa (Fase 10)
+        Route::controller(\App\Http\Controllers\CalonSiswa\WawancaraController::class)
+            ->prefix('wawancara')
+            ->name('wawancara.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
             });
 
         // Hub Dokumen & Cetak PDF (Fase 9)

@@ -3,8 +3,14 @@
     $statusVal = $cs?->status_spmb?->value ?? (is_string($cs?->status_spmb) ? $cs->status_spmb : 'REGISTRASI');
     $pembayaran = $cs?->pembayaranSeleksi;
     $eulaSetuju = $cs ? ($cs->relationLoaded('kesepahaman') ? $cs->kesepahaman->where('setuju', true)->isNotEmpty() : $cs->kesepahaman()->where('setuju', true)->exists()) : false;
-    $isDataComplete = in_array($statusVal, ['DATA_LENGKAP', 'MENUNGGU_WAWANCARA', 'SUDAH_DIWAWANCARA', 'MENUNGGU_KEPUTUSAN', 'DITERIMA', 'MENUNGGU_DAFTAR_ULANG', 'DAFTAR_ULANG_DIVERIFIKASI', 'RESMI_TERDAFTAR']);
+    $isDataComplete = in_array($statusVal, ['DATA_LENGKAP', 'MENUNGGU_WAWANCARA', 'SUDAH_DIWAWANCARA', 'MENUNGGU_KEPUTUSAN', 'DITERIMA', 'MENUNGGU_DAFTAR_ULANG', 'DAFTAR_ULANG_DIVERIFIKASI', 'RESMI_TERDAFTAR']) || ($cs?->status_data === 'LENGKAP');
     $isLulus = in_array($statusVal, ['DITERIMA', 'MENUNGGU_DAFTAR_ULANG', 'DAFTAR_ULANG_DIVERIFIKASI', 'RESMI_TERDAFTAR']);
+
+    // Status Wawancara untuk Badge Sidebar
+    $latestWawancara = $cs?->relationLoaded('latestWawancara') ? $cs->latestWawancara : $cs?->latestWawancara;
+    $isWawancaraScheduled = ($isDataComplete && $eulaSetuju && $latestWawancara && !empty($latestWawancara->pewawancara_id));
+    $isWawancaraSelesai = in_array($statusVal, ['SUDAH_DIWAWANCARA', 'MENUNGGU_KEPUTUSAN', 'DITERIMA', 'MENUNGGU_DAFTAR_ULANG', 'DAFTAR_ULANG_DIVERIFIKASI', 'RESMI_TERDAFTAR']) || ($latestWawancara && $latestWawancara->status === 'SELESAI');
+    $isWawancaraWaiting = ($isDataComplete && $eulaSetuju && !$isWawancaraScheduled && !$isWawancaraSelesai);
 @endphp
 
 <!-- Navigation Links for Calon Siswa -->
@@ -59,7 +65,23 @@
         @endif
     </a>
 
-    <!-- 5. Dokumen & Cetak PDF -->
+    <!-- 5. Wawancara & TPA -->
+    <a href="{{ route('calon-siswa.wawancara.index') }}"
+       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors {{ request()->routeIs('calon-siswa.wawancara.*') ? 'bg-nampi-orange text-white shadow-xs font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+        <svg class="w-5 h-5 {{ request()->routeIs('calon-siswa.wawancara.*') ? 'text-white' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+        </svg>
+        <span class="flex-1">Wawancara</span>
+        @if($isWawancaraSelesai)
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ request()->routeIs('calon-siswa.wawancara.*') ? 'bg-white/20 text-white' : 'bg-emerald-500/20 text-emerald-400' }}">✓ Selesai</span>
+        @elseif($isWawancaraScheduled)
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ request()->routeIs('calon-siswa.wawancara.*') ? 'bg-white/20 text-white' : 'bg-blue-500/20 text-blue-400' }}">Terjadwal</span>
+        @elseif($isWawancaraWaiting)
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ request()->routeIs('calon-siswa.wawancara.*') ? 'bg-white/20 text-white' : 'bg-amber-500/20 text-amber-400' }}">Menunggu</span>
+        @endif
+    </a>
+
+    <!-- 6. Dokumen & Cetak PDF -->
     <a href="{{ route('calon-siswa.dokumen.index') }}"
        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors {{ request()->routeIs('calon-siswa.dokumen.*') ? 'bg-nampi-orange text-white shadow-xs font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
         <svg class="w-5 h-5 {{ request()->routeIs('calon-siswa.dokumen.*') ? 'text-white' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -68,7 +90,7 @@
         <span>Dokumen & Cetak PDF</span>
     </a>
 
-    <!-- 6. Tagihan Daftar Ulang -->
+    <!-- 7. Tagihan Daftar Ulang -->
     <a href="{{ route('calon-siswa.daftar-ulang.index') }}"
        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors {{ request()->routeIs('calon-siswa.daftar-ulang.*') ? 'bg-nampi-orange text-white shadow-xs font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
         <svg class="w-5 h-5 {{ request()->routeIs('calon-siswa.daftar-ulang.*') ? 'text-white' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
