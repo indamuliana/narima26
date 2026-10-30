@@ -5,7 +5,7 @@
     <div class="doc-number">Nomor: <strong>421.5/SPMB-{{ date('Y') }}/{{ $calonSiswa->nomor_pendaftaran }}</strong></div>
 
     <p style="font-size: 10pt; line-height: 1.5; margin-bottom: 12px; text-align: justify;">
-        Berdasarkan hasil verifikasi berkas, tes wawancara, dan observasi kompetensi Calon Peserta Didik Baru SMK Wikrama 1 Garut Tahun Pelajaran {{ date('Y') }}/{{ date('Y') + 1 }}, Kepala Sekolah bersama Panitia SPMB menetapkan bahwa:
+        Berdasarkan hasil verifikasi berkas, tes wawancara, dan observasi kompetensi Calon Murid Baru SMK Wikrama 1 Garut Tahun Pelajaran {{ $tahunPelajaran ?? '2027/2028' }}, Kepala Sekolah bersama Panitia SPMB menetapkan bahwa:
     </p>
 
     <table class="info-table">
@@ -38,8 +38,7 @@
         </span>
         @if($keputusan === 'DITERIMA')
             <p style="margin: 8px 0 0 0; font-size: 11pt; color: #166534;">
-                Sebagai Calon Peserta Didik pada Kompetensi Keahlian:<br>
-                <strong>{{ $calonSiswa->jurusan_pilihan_text }} ({{ $calonSiswa->program?->nama_program ?? 'Reguler' }})</strong>
+                Sebagai Calon Murid Baru SMK Wikrama 1 Garut program {{ $calonSiswa->program?->nama_program ?? 'Reguler' }}
             </p>
         @endif
     </div>
@@ -48,10 +47,10 @@
         <div style="font-size: 9.5pt; line-height: 1.5; margin-bottom: 16px;">
             <strong>Ketentuan Daftar Ulang:</strong>
             <ol style="margin: 4px 0 0 16px; padding: 0;">
-                <li>Calon siswa yang dinyatakan DITERIMA wajib melakukan proses <strong>Daftar Ulang</strong> melalui portal SPMB Nampi.</li>
+                <li>Calon murid yang dinyatakan DITERIMA wajib melakukan proses <strong>Daftar Ulang</strong> melalui portal SPMB Nampi.</li>
                 <li>Menyelesaikan pembayaran biaya daftar ulang atau cicilan tahap pertama sesuai rincian pada Surat Tagihan.</li>
                 <li>Batas akhir proses daftar ulang adalah <strong>7 (tujuh) hari kalender</strong> sejak diterbitkannya surat keputusan ini.</li>
-                <li>Apabila sampai batas waktu yang ditentukan tidak melakukan daftar ulang, maka calon peserta didik dianggap mengundurkan diri.</li>
+                <li>Apabila sampai batas waktu yang ditentukan tidak melakukan daftar ulang, maka calon murid dianggap mengundurkan diri.</li>
             </ol>
         </div>
     @else
@@ -79,7 +78,7 @@
                         @endif
                     </div>
                     <strong style="text-decoration: underline;">( {{ $tte['penandatanganNama'] ?? 'Kunedi, S.Si., Gr.' }} )</strong><br>
-                    <small>NIP / NUPTK. -</small>
+                    <small>NUPTK. {{ $nuptk ?? '5262767668130173' }}</small>
                 </td>
             </tr>
         </table>

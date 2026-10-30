@@ -254,6 +254,7 @@ class PdfService
         $calonSiswa->loadMissing(['program', 'jurusan', 'sekolahAsal', 'keputusanKelulusan']);
 
         $nomorDokumen = "421.5/SPMB-" . date('Y') . "/{$calonSiswa->nomor_pendaftaran}";
+        $tahunPelajaran = \App\Models\PengaturanSpmb::getSettings()->tahun_ajaran ?? '2027/2028';
 
         $tte = $this->signatureService->prepareSignatureData(
             jenisDokumen: DokumenVerifikasi::JENIS_SK_KELULUSAN,
@@ -264,9 +265,8 @@ class PdfService
             penandatanganJabatan: 'Kepala SMK Wikrama 1 Garut',
             metadata: [
                 'keputusan' => strtoupper($keputusan),
-                'jurusan' => $calonSiswa->jurusan?->nama_jurusan,
                 'program' => $calonSiswa->program?->nama_program,
-                'tahun_pelajaran' => date('Y') . '/' . (date('Y') + 1),
+                'tahun_pelajaran' => $tahunPelajaran,
             ],
             signedAt: $calonSiswa->keputusanKelulusan?->ditetapkan_at ?? now()
         );
@@ -275,6 +275,8 @@ class PdfService
             'calonSiswa' => $calonSiswa,
             'keputusan' => strtoupper($keputusan),
             'tte' => $tte,
+            'tahunPelajaran' => $tahunPelajaran,
+            'nuptk' => '5262767668130173',
         ]);
     }
 
