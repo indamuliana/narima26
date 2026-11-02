@@ -20,6 +20,7 @@ class AnalitikController extends Controller
     {
         $gelombangId = $request->input('gelombang_id');
         $programId = $request->input('program_id');
+        $includeEmpty = $request->boolean('include_empty');
 
         $query = CalonSiswa::tanpaDemo();
         if (!empty($gelombangId)) {
@@ -36,8 +37,21 @@ class AnalitikController extends Controller
         $calonSiswaIds = (clone $query)->pluck('calon_siswa.id')->toArray();
 
         // 1. Analisis Asal SMP (Top 10 Asal Sekolah)
-        $sekolahRaw = (clone $query)
-            ->leftJoin('master_sekolah_asal', 'calon_siswa.asal_sekolah_id', '=', 'master_sekolah_asal.id')
+        $sekolahQuery = (clone $query)
+            ->leftJoin('master_sekolah_asal', 'calon_siswa.asal_sekolah_id', '=', 'master_sekolah_asal.id');
+
+        if (!$includeEmpty) {
+            $sekolahQuery->where(function ($q) {
+                $q->whereNotNull('master_sekolah_asal.nama_sekolah')
+                  ->where('master_sekolah_asal.nama_sekolah', '!=', '')
+                  ->orWhere(function ($q2) {
+                      $q2->whereNotNull('calon_siswa.asal_sekolah_lainnya')
+                         ->where('calon_siswa.asal_sekolah_lainnya', '!=', '');
+                  });
+            });
+        }
+
+        $sekolahRaw = $sekolahQuery
             ->selectRaw('COALESCE(NULLIF(master_sekolah_asal.nama_sekolah, ""), NULLIF(calon_siswa.asal_sekolah_lainnya, ""), "Belum Diisi") as nama, count(*) as total')
             ->groupBy('nama')
             ->orderByDesc('total')
@@ -48,7 +62,11 @@ class AnalitikController extends Controller
         $sekolahCounts = $sekolahRaw->pluck('total')->toArray();
 
         // 2. Analisis Wilayah Domisili (Kabupaten & Kecamatan)
-        $kabupatenRaw = (clone $query)
+        $kabupatenQuery = (clone $query);
+        if (!$includeEmpty) {
+            $kabupatenQuery->whereNotNull('kabupaten_nama')->where('kabupaten_nama', '!=', '');
+        }
+        $kabupatenRaw = $kabupatenQuery
             ->selectRaw('COALESCE(NULLIF(kabupaten_nama, ""), "Belum Terdata") as nama, count(*) as total')
             ->groupBy('nama')
             ->orderByDesc('total')
@@ -58,7 +76,11 @@ class AnalitikController extends Controller
         $kabupatenLabels = $kabupatenRaw->pluck('nama')->toArray();
         $kabupatenCounts = $kabupatenRaw->pluck('total')->toArray();
 
-        $kecamatanRaw = (clone $query)
+        $kecamatanQuery = (clone $query);
+        if (!$includeEmpty) {
+            $kecamatanQuery->whereNotNull('kecamatan_nama')->where('kecamatan_nama', '!=', '');
+        }
+        $kecamatanRaw = $kecamatanQuery
             ->selectRaw('COALESCE(NULLIF(kecamatan_nama, ""), "Belum Terdata") as nama, count(*) as total')
             ->groupBy('nama')
             ->orderByDesc('total')
@@ -76,13 +98,17 @@ class AnalitikController extends Controller
             '15 Tahun' => 0,
             '16 Tahun' => 0,
             '> 16 Tahun' => 0,
-            'Belum Diisi' => 0,
         ];
+        if ($includeEmpty) {
+            $usiaMuridBins['Belum Diisi'] = 0;
+        }
 
         $tglLahirList = (clone $query)->pluck('tanggal_lahir')->toArray();
         foreach ($tglLahirList as $tgl) {
             if (empty($tgl)) {
-                $usiaMuridBins['Belum Diisi']++;
+                if ($includeEmpty) {
+                    $usiaMuridBins['Belum Diisi']++;
+                }
                 continue;
             }
             try {
@@ -100,12 +126,18 @@ class AnalitikController extends Controller
                     $usiaMuridBins['> 16 Tahun']++;
                 }
             } catch (\Throwable) {
-                $usiaMuridBins['Belum Diisi']++;
+                if ($includeEmpty) {
+                    $usiaMuridBins['Belum Diisi']++;
+                }
             }
         }
 
         // 4. Tahun Lulus Murid
-        $tahunLulusRaw = (clone $query)
+        $tahunLulusQuery = (clone $query);
+        if (!$includeEmpty) {
+            $tahunLulusQuery->whereNotNull('tahun_lulus')->where('tahun_lulus', '!=', '');
+        }
+        $tahunLulusRaw = $tahunLulusQuery
             ->selectRaw('COALESCE(NULLIF(tahun_lulus, ""), "Belum Diisi") as tahun, count(*) as total')
             ->groupBy('tahun')
             ->orderByDesc('tahun')
@@ -116,8 +148,11 @@ class AnalitikController extends Controller
         $tahunLulusCounts = $tahunLulusRaw->pluck('total')->toArray();
 
         // 5. Kesehatan dan Fisik (data_kesehatan)
-        $goldarRaw = DB::table('data_kesehatan')
-            ->whereIn('calon_siswa_id', $calonSiswaIds)
+        $goldarQuery = DB::table('data_kesehatan')->whereIn('calon_siswa_id', $calonSiswaIds);
+        if (!$includeEmpty) {
+            $goldarQuery->whereNotNull('golongan_darah')->where('golongan_darah', '!=', '')->where('golongan_darah', '!=', 'Tidak Tahu');
+        }
+        $goldarRaw = $goldarQuery
             ->selectRaw('COALESCE(NULLIF(golongan_darah, ""), "Tidak Tahu") as nama, count(*) as total')
             ->groupBy('nama')
             ->orderByDesc('total')
@@ -125,8 +160,11 @@ class AnalitikController extends Controller
         $goldarLabels = $goldarRaw->pluck('nama')->toArray();
         $goldarCounts = $goldarRaw->pluck('total')->toArray();
 
-        $butaWarnaRaw = DB::table('data_kesehatan')
-            ->whereIn('calon_siswa_id', $calonSiswaIds)
+        $butaWarnaQuery = DB::table('data_kesehatan')->whereIn('calon_siswa_id', $calonSiswaIds);
+        if (!$includeEmpty) {
+            $butaWarnaQuery->whereNotNull('buta_warna')->where('buta_warna', '!=', '')->where('buta_warna', '!=', 'Belum Tes');
+        }
+        $butaWarnaRaw = $butaWarnaQuery
             ->selectRaw('COALESCE(NULLIF(buta_warna, ""), "Belum Tes") as status, count(*) as total')
             ->groupBy('status')
             ->get();
@@ -139,8 +177,10 @@ class AnalitikController extends Controller
             'Normal (18.5 - 24.9)' => 0,
             'Kelebihan BB (25 - 29.9)' => 0,
             'Obesitas (>= 30)' => 0,
-            'Belum Lengkap' => 0,
         ];
+        if ($includeEmpty) {
+            $imtBins['Belum Lengkap'] = 0;
+        }
 
         $kesehatanRows = DB::table('data_kesehatan')
             ->whereIn('calon_siswa_id', $calonSiswaIds)
@@ -148,7 +188,9 @@ class AnalitikController extends Controller
             ->get();
 
         $totalKesehatanTerisi = $kesehatanRows->count();
-        $imtBins['Belum Lengkap'] = max(0, $totalMurid - $totalKesehatanTerisi);
+        if ($includeEmpty) {
+            $imtBins['Belum Lengkap'] = max(0, $totalMurid - $totalKesehatanTerisi);
+        }
 
         foreach ($kesehatanRows as $k) {
             $tb = (float) ($k->tinggi_badan ?? 0);
@@ -166,7 +208,9 @@ class AnalitikController extends Controller
                     $imtBins['Obesitas (>= 30)']++;
                 }
             } else {
-                $imtBins['Belum Lengkap']++;
+                if ($includeEmpty) {
+                    $imtBins['Belum Lengkap']++;
+                }
             }
         }
 
@@ -206,8 +250,12 @@ class AnalitikController extends Controller
             ->get();
 
         // Usia Ayah & Ibu
-        $usiaAyahBins = ['< 40 Tahun' => 0, '40 - 49 Tahun' => 0, '50 - 59 Tahun' => 0, '>= 60 Tahun' => 0, 'Belum Diisi' => 0];
-        $usiaIbuBins  = ['< 40 Tahun' => 0, '40 - 49 Tahun' => 0, '50 - 59 Tahun' => 0, '>= 60 Tahun' => 0, 'Belum Diisi' => 0];
+        $usiaAyahBins = ['< 40 Tahun' => 0, '40 - 49 Tahun' => 0, '50 - 59 Tahun' => 0, '>= 60 Tahun' => 0];
+        $usiaIbuBins  = ['< 40 Tahun' => 0, '40 - 49 Tahun' => 0, '50 - 59 Tahun' => 0, '>= 60 Tahun' => 0];
+        if ($includeEmpty) {
+            $usiaAyahBins['Belum Diisi'] = 0;
+            $usiaIbuBins['Belum Diisi'] = 0;
+        }
 
         $pekerjaanAyahCounts = [];
         $pekerjaanIbuCounts  = [];
@@ -224,7 +272,9 @@ class AnalitikController extends Controller
                 elseif ($u < 60) $usiaAyahBins['50 - 59 Tahun']++;
                 else $usiaAyahBins['>= 60 Tahun']++;
             } else {
-                $usiaAyahBins['Belum Diisi']++;
+                if ($includeEmpty) {
+                    $usiaAyahBins['Belum Diisi']++;
+                }
             }
 
             // Usia Ibu
@@ -236,33 +286,49 @@ class AnalitikController extends Controller
                 elseif ($u < 60) $usiaIbuBins['50 - 59 Tahun']++;
                 else $usiaIbuBins['>= 60 Tahun']++;
             } else {
-                $usiaIbuBins['Belum Diisi']++;
+                if ($includeEmpty) {
+                    $usiaIbuBins['Belum Diisi']++;
+                }
             }
 
             // Pekerjaan
-            $pkAyah = !empty($row->pekerjaan_ayah) ? $row->pekerjaan_ayah : 'Belum Diisi';
-            $pekerjaanAyahCounts[$pkAyah] = ($pekerjaanAyahCounts[$pkAyah] ?? 0) + 1;
+            if (!empty($row->pekerjaan_ayah)) {
+                $pekerjaanAyahCounts[$row->pekerjaan_ayah] = ($pekerjaanAyahCounts[$row->pekerjaan_ayah] ?? 0) + 1;
+            } elseif ($includeEmpty) {
+                $pekerjaanAyahCounts['Belum Diisi'] = ($pekerjaanAyahCounts['Belum Diisi'] ?? 0) + 1;
+            }
 
-            $pkIbu = !empty($row->pekerjaan_ibu) ? $row->pekerjaan_ibu : 'Belum Diisi';
-            $pekerjaanIbuCounts[$pkIbu] = ($pekerjaanIbuCounts[$pkIbu] ?? 0) + 1;
+            if (!empty($row->pekerjaan_ibu)) {
+                $pekerjaanIbuCounts[$row->pekerjaan_ibu] = ($pekerjaanIbuCounts[$row->pekerjaan_ibu] ?? 0) + 1;
+            } elseif ($includeEmpty) {
+                $pekerjaanIbuCounts['Belum Diisi'] = ($pekerjaanIbuCounts['Belum Diisi'] ?? 0) + 1;
+            }
 
             // Penghasilan
-            $phAyah = !empty($row->penghasilan_ayah) ? $row->penghasilan_ayah : 'Belum Diisi';
-            $penghasilanAyahCounts[$phAyah] = ($penghasilanAyahCounts[$phAyah] ?? 0) + 1;
+            if (!empty($row->penghasilan_ayah)) {
+                $penghasilanAyahCounts[$row->penghasilan_ayah] = ($penghasilanAyahCounts[$row->penghasilan_ayah] ?? 0) + 1;
+            } elseif ($includeEmpty) {
+                $penghasilanAyahCounts['Belum Diisi'] = ($penghasilanAyahCounts['Belum Diisi'] ?? 0) + 1;
+            }
 
-            $phIbu = !empty($row->penghasilan_ibu) ? $row->penghasilan_ibu : 'Belum Diisi';
-            $penghasilanIbuCounts[$phIbu] = ($penghasilanIbuCounts[$phIbu] ?? 0) + 1;
+            if (!empty($row->penghasilan_ibu)) {
+                $penghasilanIbuCounts[$row->penghasilan_ibu] = ($penghasilanIbuCounts[$row->penghasilan_ibu] ?? 0) + 1;
+            } elseif ($includeEmpty) {
+                $penghasilanIbuCounts['Belum Diisi'] = ($penghasilanIbuCounts['Belum Diisi'] ?? 0) + 1;
+            }
         }
 
         // Tambah selisih jika ortu belum dibuat sama sekali
-        $selisihBelumAdaOrtu = max(0, $totalMurid - $ortuRows->count());
-        $usiaAyahBins['Belum Diisi'] += $selisihBelumAdaOrtu;
-        $usiaIbuBins['Belum Diisi']  += $selisihBelumAdaOrtu;
-        if ($selisihBelumAdaOrtu > 0) {
-            $pekerjaanAyahCounts['Belum Diisi'] = ($pekerjaanAyahCounts['Belum Diisi'] ?? 0) + $selisihBelumAdaOrtu;
-            $pekerjaanIbuCounts['Belum Diisi'] = ($pekerjaanIbuCounts['Belum Diisi'] ?? 0) + $selisihBelumAdaOrtu;
-            $penghasilanAyahCounts['Belum Diisi'] = ($penghasilanAyahCounts['Belum Diisi'] ?? 0) + $selisihBelumAdaOrtu;
-            $penghasilanIbuCounts['Belum Diisi'] = ($penghasilanIbuCounts['Belum Diisi'] ?? 0) + $selisihBelumAdaOrtu;
+        if ($includeEmpty) {
+            $selisihBelumAdaOrtu = max(0, $totalMurid - $ortuRows->count());
+            if ($selisihBelumAdaOrtu > 0) {
+                $usiaAyahBins['Belum Diisi'] += $selisihBelumAdaOrtu;
+                $usiaIbuBins['Belum Diisi']  += $selisihBelumAdaOrtu;
+                $pekerjaanAyahCounts['Belum Diisi'] = ($pekerjaanAyahCounts['Belum Diisi'] ?? 0) + $selisihBelumAdaOrtu;
+                $pekerjaanIbuCounts['Belum Diisi'] = ($pekerjaanIbuCounts['Belum Diisi'] ?? 0) + $selisihBelumAdaOrtu;
+                $penghasilanAyahCounts['Belum Diisi'] = ($penghasilanAyahCounts['Belum Diisi'] ?? 0) + $selisihBelumAdaOrtu;
+                $penghasilanIbuCounts['Belum Diisi'] = ($penghasilanIbuCounts['Belum Diisi'] ?? 0) + $selisihBelumAdaOrtu;
+            }
         }
 
         // Sort descending and take top 6 for job & income
@@ -277,6 +343,7 @@ class AnalitikController extends Controller
             'programList' => $programList,
             'selectedGelombang' => $gelombangId,
             'selectedProgram' => $programId,
+            'includeEmpty' => $includeEmpty,
 
             // Charts data
             'sekolahLabels' => $sekolahLabels,

@@ -69,7 +69,13 @@
                     </select>
                 </div>
 
-                @if($selectedGelombang || $selectedProgram)
+                <!-- Opsi Tampilkan Belum Diisi -->
+                <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold px-3 py-2 rounded-xl border transition-colors {{ $includeEmpty ? 'bg-orange-50 border-orange-300 text-nampi-orange' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100' }}">
+                    <input type="checkbox" name="include_empty" value="1" {{ $includeEmpty ? 'checked' : '' }} onchange="this.form.submit()" class="rounded text-nampi-orange focus:ring-nampi-orange">
+                    <span>Sertakan Data yang Belum Diisi</span>
+                </label>
+
+                @if($selectedGelombang || $selectedProgram || $includeEmpty)
                     <a href="{{ route('admin.analitik.index') }}"
                        class="px-3 py-2 text-xs font-bold text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
                         Reset Filter
