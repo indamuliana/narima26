@@ -620,16 +620,20 @@ class DashboardMetricsService
             ];
         });
 
-        // Referensi / Sumber Informasi
-        $referensiRaw = CalonSiswa::tanpaDemo()->whereNotNull('referensi_jenis')
-            ->select('referensi_jenis', DB::raw('count(*) as count'))
+        // Referensi / Sumber Informasi (termasuk pendaftar yang belum mengisi referensi dimasukkan ke Lainnya)
+        $referensiRaw = CalonSiswa::tanpaDemo()
+            ->selectRaw("COALESCE(NULLIF(referensi_jenis, ''), 'LAINNYA') as referensi_jenis, count(*) as count")
             ->groupBy('referensi_jenis')
             ->orderByDesc('count')
             ->get();
 
         $referensiMap = [
-            'GURU_WIKRAMA_GARUT'     => 'Guru / Karyawan Wikrama',
-            'SISWA_WIKRAMA_GARUT'    => 'Siswa / Alumni Wikrama',
+            'GURU_WIKRAMA_GARUT'     => 'Guru SMK Wikrama 1 Garut',
+            'GURU_WIKRAMA_BOGOR'     => 'Guru SMK Wikrama Bogor',
+            'SISWA_WIKRAMA_AKTIF'    => 'Siswa SMK Wikrama Aktif',
+            'ALUMNI_WIKRAMA'         => 'Alumni SMK Wikrama',
+            'CALON_SISWA_WIKRAMA'    => 'Calon Siswa Wikrama',
+            'LAINNYA'                => 'Lainnya (Medsos/Website/Internet)',
             'SOSIAL_MEDIA'           => 'Media Sosial (IG, TikTok, FB)',
             'GURU_BK_SMP'            => 'Guru BK SMP / MTs',
             'BROSUR_PAMFLET'         => 'Brosur / Spanduk / Baliho',
