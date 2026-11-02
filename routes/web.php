@@ -246,6 +246,19 @@ Route::middleware(['auth', 'role:admin,operator'])
                 Route::patch('/gelombang/{gelombang}/toggle', 'toggleGelombang')->name('gelombang.toggle');
                 Route::delete('/gelombang/{gelombang}', 'destroyGelombang')->name('gelombang.destroy');
             });
+
+        // 7. Mapping Sekolah Asal (Feeder Schools Synchronization)
+        Route::controller(\App\Http\Controllers\Admin\MappingSekolahController::class)
+            ->prefix('mapping-sekolah')
+            ->name('mapping-sekolah.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/preview-auto-match', 'previewAutoMatch')->name('preview-auto-match');
+                Route::post('/apply-auto-match', 'applyAutoMatch')->name('apply-auto-match');
+                Route::post('/link-single', 'linkSingle')->name('link-single');
+                Route::post('/store-master-and-link', 'storeMasterAndLink')->name('store-master-and-link');
+                Route::post('/unlink', 'unlink')->name('unlink');
+            });
     });
 
 // Admin Exclusive Area (Fase 13 - User Management, Audit Trail & Hard Deletion)

@@ -323,11 +323,62 @@
                                 class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none bg-white">
                         </div>
 
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase">Asal Sekolah (SMP/MTs)</label>
-                            <input type="text" name="asal_sekolah_lainnya" value="{{ old('asal_sekolah_lainnya', $calonSiswa->sekolahAsal?->nama_sekolah ?? $calonSiswa->asal_sekolah_lainnya) }}"
-                                placeholder="Nama Sekolah Asal"
-                                class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none">
+                        <div x-data="{
+                            open: false,
+                            q: '{{ addslashes(old('asal_sekolah_lainnya', $calonSiswa->sekolahAsal?->nama_sekolah ?? $calonSiswa->asal_sekolah_lainnya ?? '')) }}',
+                            selectedId: '{{ old('asal_sekolah_id', $calonSiswa->asal_sekolah_id ?? '') }}',
+                            selectedKokab: '{{ addslashes($calonSiswa->sekolahAsal?->kokab ?? '') }}',
+                            results: [],
+                            search() {
+                                if (this.q.length < 2) { this.results = []; return; }
+                                fetch('{{ route('referensi.sekolah') }}?q=' + encodeURIComponent(this.q))
+                                    .then(r => r.json())
+                                    .then(d => { this.results = d || []; this.open = true; });
+                            },
+                            select(sch) {
+                                this.q = sch.nama_sekolah;
+                                this.selectedId = sch.id;
+                                this.selectedKokab = sch.kokab || '';
+                                this.open = false;
+                            },
+                            manualEdit() {
+                                this.selectedId = '';
+                                this.selectedKokab = '';
+                            }
+                        }" class="relative">
+                            <label class="block text-xs font-bold text-slate-700 uppercase">
+                                Asal Sekolah (SMP/MTs)
+                                <template x-if="selectedKokab">
+                                    <span class="ml-1 text-[11px] font-normal text-emerald-600" x-text="'• Master: ' + selectedKokab"></span>
+                                </template>
+                            </label>
+                            <input type="hidden" name="asal_sekolah_id" :value="selectedId">
+                            <div class="relative mt-1">
+                                <input type="text" name="asal_sekolah_lainnya"
+                                    x-model="q"
+                                    @input.debounce.300ms="search(); manualEdit();"
+                                    @focus="if(results.length > 0) open = true"
+                                    @click.away="open = false"
+                                    placeholder="Ketik nama SMP/MTs (otomatis mencari di database master)..."
+                                    class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none">
+                                <template x-if="selectedId">
+                                    <span class="absolute right-3 top-2.5 text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                                        ✓ Master
+                                    </span>
+                                </template>
+                            </div>
+                            <div x-show="open && results.length > 0"
+                                 class="absolute z-20 left-0 right-0 mt-1 max-h-52 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg divide-y divide-slate-100 text-xs">
+                                <template x-for="sch in results" :key="sch.id">
+                                    <div @click="select(sch)" class="p-2.5 hover:bg-indigo-50 cursor-pointer flex items-center justify-between">
+                                        <div>
+                                            <p class="font-bold text-slate-900" x-text="sch.nama_sekolah"></p>
+                                            <p class="text-[11px] text-slate-500" x-text="(sch.kokab || 'Tanpa Kota') + (sch.npsn ? ' • NPSN: ' + sch.npsn : '')"></p>
+                                        </div>
+                                        <span class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-600 font-mono" x-text="'#' + sch.id"></span>
+                                    </div>
+                                </template>
+                            </div>
                         </div>
 
                         <div>

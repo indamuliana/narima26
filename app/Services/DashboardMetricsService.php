@@ -710,7 +710,8 @@ class DashboardMetricsService
         $total = CalonSiswa::tanpaDemo()->count();
 
         $nameExpr = "TRIM(COALESCE(master_sekolah_asal.nama_sekolah, calon_siswa.asal_sekolah_lainnya))";
-        $cityExpr = "MAX(COALESCE(master_sekolah_asal.kokab, calon_siswa.kabupaten_nama, 'Garut'))";
+        // shortcut: fallback '-' jika sekolah belum terhubung ke master_sekolah_asal, upgrade via MappingSekolah
+        $cityExpr = "MAX(COALESCE(master_sekolah_asal.kokab, '-'))";
 
         $query = CalonSiswa::tanpaDemo()
             ->leftJoin('master_sekolah_asal', 'calon_siswa.asal_sekolah_id', '=', 'master_sekolah_asal.id')
@@ -732,7 +733,7 @@ class DashboardMetricsService
         $topSekolah = $query->get()
             ->map(function ($row) use ($total) {
                 $nama = $row->nama ?: 'Sekolah Tidak Terdaftar';
-                $kota = $row->kota ?: 'Garut';
+                $kota = $row->kota ?: '-';
                 $pct  = $total > 0 ? round(($row->total_siswa / $total) * 100, 1) : 0;
 
                 return [
