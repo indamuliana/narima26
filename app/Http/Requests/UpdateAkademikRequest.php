@@ -55,14 +55,17 @@ class UpdateAkademikRequest extends FormRequest
 
     public function rules(): array
     {
+        $isAdminOrOperator = auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isOperator());
+        $reqRule = $isAdminOrOperator ? 'nullable' : 'required';
+
         return [
             'nama_sekolah' => ['nullable', 'string', 'max:150'],
             'npsn' => ['nullable', 'string', 'max:20'],
             'nisn' => ['nullable', 'string', 'max:20'],
-            'nilai_rata_rata' => ['required', 'numeric', 'between:0,100'],
-            'nilai_bahasa_indonesia' => ['required', 'numeric', 'between:0,100'],
-            'nilai_matematika' => ['required', 'numeric', 'between:0,100'],
-            'nilai_bahasa_inggris' => ['required', 'numeric', 'between:0,100'],
+            'nilai_rata_rata' => [$reqRule, 'numeric', 'between:0,100'],
+            'nilai_bahasa_indonesia' => [$reqRule, 'numeric', 'between:0,100'],
+            'nilai_matematika' => [$reqRule, 'numeric', 'between:0,100'],
+            'nilai_bahasa_inggris' => [$reqRule, 'numeric', 'between:0,100'],
             'nilai_ipa' => ['nullable', 'numeric', 'between:0,100'],
             'catatan' => ['nullable', 'string', 'max:500'],
             'prestasi' => ['nullable', 'array'],

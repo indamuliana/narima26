@@ -21,14 +21,17 @@ class UpdateOrangTuaRequest extends FormRequest
 
     public function rules(): array
     {
+        $isAdminOrOperator = auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isOperator());
+        $reqRule = $isAdminOrOperator ? 'nullable' : 'required';
+
         return [
-            'status_ayah' => ['required', 'in:MASIH_HIDUP,WAFAT'],
-            'nama_ayah' => ['required', 'string', 'max:150'],
+            'status_ayah' => [$reqRule, 'in:MASIH_HIDUP,WAFAT'],
+            'nama_ayah' => [$reqRule, 'string', 'max:150'],
             'nik_ayah' => ['nullable', 'string', 'digits:16'],
             'tahun_lahir_ayah' => ['nullable', 'string', 'max:10'],
             'pekerjaan_ayah_id' => [
-                function ($attribute, $value, $fail) {
-                    if ($this->input('status_ayah') === 'MASIH_HIDUP' && empty($value)) {
+                function ($attribute, $value, $fail) use ($isAdminOrOperator) {
+                    if (! $isAdminOrOperator && $this->input('status_ayah') === 'MASIH_HIDUP' && empty($value)) {
                         $fail('Pekerjaan ayah wajib dipilih.');
                     }
                 },
@@ -38,8 +41,8 @@ class UpdateOrangTuaRequest extends FormRequest
             'penghasilan_ayah' => ['nullable', 'string', 'max:50'],
             'pendidikan_ayah' => ['nullable', 'string', 'max:50'],
             'no_hp_ayah' => [
-                function ($attribute, $value, $fail) {
-                    if ($this->input('status_ayah') === 'MASIH_HIDUP' && empty($value)) {
+                function ($attribute, $value, $fail) use ($isAdminOrOperator) {
+                    if (! $isAdminOrOperator && $this->input('status_ayah') === 'MASIH_HIDUP' && empty($value)) {
                         $fail('Nomor HP/WhatsApp ayah wajib diisi.');
                     }
                 },
@@ -49,13 +52,13 @@ class UpdateOrangTuaRequest extends FormRequest
             ],
             'alamat_ayah' => ['nullable', 'string', 'max:500'],
 
-            'status_ibu' => ['required', 'in:MASIH_HIDUP,WAFAT'],
-            'nama_ibu' => ['required', 'string', 'max:150'],
+            'status_ibu' => [$reqRule, 'in:MASIH_HIDUP,WAFAT'],
+            'nama_ibu' => [$reqRule, 'string', 'max:150'],
             'nik_ibu' => ['nullable', 'string', 'digits:16'],
             'tahun_lahir_ibu' => ['nullable', 'string', 'max:10'],
             'pekerjaan_ibu_id' => [
-                function ($attribute, $value, $fail) {
-                    if ($this->input('status_ibu') === 'MASIH_HIDUP' && empty($value)) {
+                function ($attribute, $value, $fail) use ($isAdminOrOperator) {
+                    if (! $isAdminOrOperator && $this->input('status_ibu') === 'MASIH_HIDUP' && empty($value)) {
                         $fail('Pekerjaan ibu wajib dipilih.');
                     }
                 },

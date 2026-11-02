@@ -32,6 +32,14 @@
     <span>Laporan & Rekapitulasi</span>
 </a>
 
+<a href="{{ route('admin.analitik.index') }}"
+   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors {{ request()->routeIs('admin.analitik.*') ? 'bg-nampi-orange text-white shadow-xs font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+    <svg class="w-5 h-5 {{ request()->routeIs('admin.analitik.*') ? 'text-white' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+    </svg>
+    <span>Analitik Calon Murid</span>
+</a>
+
 @if(auth()->user()?->isAdmin() || auth()->user()?->isOperator())
     <div class="pt-4 pb-2">
         <p class="px-3.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">Master & Operasional SPMB</p>

@@ -173,8 +173,8 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase">Program Pendidikan <span class="text-red-500">*</span></label>
-                                <select name="program_id" required
+                                <label class="block text-xs font-bold text-slate-700 uppercase">Program Pendidikan</label>
+                                <select name="program_id"
                                     class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none bg-white">
                                     @foreach($programList as $p)
                                         <option value="{{ $p->id }}" {{ old('program_id', $calonSiswa->program_id) == $p->id ? 'selected' : '' }}>
@@ -185,8 +185,8 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase">Pilihan Jurusan 1 <span class="text-red-500">*</span></label>
-                                <select name="jurusan_id" required
+                                <label class="block text-xs font-bold text-slate-700 uppercase">Pilihan Jurusan 1</label>
+                                <select name="jurusan_id"
                                     class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none bg-white">
                                     <option value="">-- Pilih Jurusan 1 --</option>
                                     @foreach($jurusanList as $j)
@@ -268,8 +268,8 @@
                     <!-- Identitas Dasar Siswa -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                         <div class="sm:col-span-2 md:col-span-1">
-                            <label class="block text-xs font-bold text-slate-700 uppercase">Nama Lengkap <span class="text-red-500">*</span></label>
-                            <input type="text" name="nama_lengkap" value="{{ old('nama_lengkap', $calonSiswa->nama_lengkap) }}" required
+                            <label class="block text-xs font-bold text-slate-700 uppercase">Nama Lengkap</label>
+                            <input type="text" name="nama_lengkap" value="{{ old('nama_lengkap', $calonSiswa->nama_lengkap) }}"
                                 class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none">
                         </div>
 
@@ -280,8 +280,8 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase">Jenis Kelamin <span class="text-red-500">*</span></label>
-                            <select name="jenis_kelamin" required
+                            <label class="block text-xs font-bold text-slate-700 uppercase">Jenis Kelamin</label>
+                            <select name="jenis_kelamin"
                                 class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none bg-white">
                                 <option value="L" {{ old('jenis_kelamin', $calonSiswa->jenis_kelamin) === 'L' || old('jenis_kelamin', $calonSiswa->jenis_kelamin) === 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
                                 <option value="P" {{ old('jenis_kelamin', $calonSiswa->jenis_kelamin) === 'P' || old('jenis_kelamin', $calonSiswa->jenis_kelamin) === 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
@@ -289,21 +289,22 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase">NIK (16 Digit) <span class="text-red-500">*</span></label>
-                            <input type="text" name="nik" value="{{ old('nik', $calonSiswa->nik) }}" maxlength="16" required
+                            <label class="block text-xs font-bold text-slate-700 uppercase">NIK (16 Digit)</label>
+                            <input type="text" name="nik" value="{{ old('nik', $calonSiswa->nik) }}" maxlength="16"
                                 class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none font-mono">
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase">Nomor Kartu Keluarga (16 Digit) <span class="text-red-500">*</span></label>
-                            <input type="text" name="no_kk" value="{{ old('no_kk', $calonSiswa->no_kk) }}" maxlength="16" required
+                            <label class="block text-xs font-bold text-slate-700 uppercase">Nomor Kartu Keluarga (16 Digit)</label>
+                            <input type="text" name="no_kk" value="{{ old('no_kk', $calonSiswa->no_kk) }}" maxlength="16"
                                 class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none font-mono">
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase">Agama <span class="text-red-500">*</span></label>
-                            <select name="agama" required
+                            <label class="block text-xs font-bold text-slate-700 uppercase">Agama</label>
+                            <select name="agama"
                                 class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none bg-white">
+                                <option value="">-- Pilih Agama --</option>
                                 @foreach(['Islam', 'Kristen Protestan', 'Katolik', 'Hindu', 'Buddha', 'Konghucu'] as $agm)
                                     <option value="{{ $agm }}" {{ old('agama', $calonSiswa->agama) === $agm ? 'selected' : '' }}>{{ $agm }}</option>
                                 @endforeach
@@ -311,14 +312,14 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase">Tempat Lahir <span class="text-red-500">*</span></label>
-                            <input type="text" name="tempat_lahir" value="{{ old('tempat_lahir', $calonSiswa->tempat_lahir) }}" required
+                            <label class="block text-xs font-bold text-slate-700 uppercase">Tempat Lahir</label>
+                            <input type="text" name="tempat_lahir" value="{{ old('tempat_lahir', $calonSiswa->tempat_lahir) }}"
                                 class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none">
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase">Tanggal Lahir <span class="text-red-500">*</span></label>
-                            <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', $calonSiswa->tanggal_lahir ? date('Y-m-d', strtotime($calonSiswa->tanggal_lahir)) : '') }}" required
+                            <label class="block text-xs font-bold text-slate-700 uppercase">Tanggal Lahir</label>
+                            <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', $calonSiswa->tanggal_lahir ? date('Y-m-d', strtotime($calonSiswa->tanggal_lahir)) : '') }}"
                                 class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none bg-white">
                         </div>
 
@@ -379,20 +380,20 @@
                         <input type="hidden" name="is_luar_negeri" id="input_is_luar_negeri" value="{{ old('is_luar_negeri', $calonSiswa->is_luar_negeri ? '1' : '0') }}">
 
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase">Alamat Lengkap (Jalan, No. Rumah, Kampung) <span class="text-red-500">*</span></label>
-                            <textarea name="alamat_lengkap" rows="2" required
+                            <label class="block text-xs font-bold text-slate-700 uppercase">Alamat Lengkap (Jalan, No. Rumah, Kampung)</label>
+                            <textarea name="alamat_lengkap" rows="2"
                                 class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none">{{ old('alamat_lengkap', $calonSiswa->alamat_lengkap) }}</textarea>
                         </div>
 
                         <!-- Container Wilayah Dalam Negeri -->
                         <div id="container_wilayah_dalam" class="{{ $calonSiswa->is_luar_negeri ? 'hidden' : '' }} grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase">RT <span class="text-red-500">*</span></label>
+                                <label class="block text-xs font-bold text-slate-700 uppercase">RT</label>
                                 <input type="text" name="rt" id="input_rt" value="{{ old('rt', $calonSiswa->rt) }}" placeholder="001"
                                     class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none font-mono">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase">RW <span class="text-red-500">*</span></label>
+                                <label class="block text-xs font-bold text-slate-700 uppercase">RW</label>
                                 <input type="text" name="rw" id="input_rw" value="{{ old('rw', $calonSiswa->rw) }}" placeholder="005"
                                     class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none font-mono">
                             </div>
@@ -501,8 +502,8 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase">Nama Ayah <span class="text-red-500">*</span></label>
-                                <input type="text" name="nama_ayah" value="{{ old('nama_ayah', $ortu?->nama_ayah) }}" required
+                                <label class="block text-xs font-bold text-slate-700 uppercase">Nama Ayah</label>
+                                <input type="text" name="nama_ayah" value="{{ old('nama_ayah', $ortu?->nama_ayah) }}"
                                     class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none bg-white">
                             </div>
                             <div>
@@ -559,8 +560,8 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase">Nama Ibu <span class="text-red-500">*</span></label>
-                                <input type="text" name="nama_ibu" value="{{ old('nama_ibu', $ortu?->nama_ibu) }}" required
+                                <label class="block text-xs font-bold text-slate-700 uppercase">Nama Ibu</label>
+                                <input type="text" name="nama_ibu" value="{{ old('nama_ibu', $ortu?->nama_ibu) }}"
                                     class="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-200 outline-none bg-white">
                             </div>
                             <div>
@@ -787,7 +788,7 @@
                                     </div>
                                     <div class="sm:col-span-2">
                                         <label class="block text-[11px] font-bold text-slate-600">Nama Lomba / Prestasi</label>
-                                        <input type="text" name="prestasi[{{ $idx }}][nama_prestasi]" value="{{ $pres->nama_prestasi }}" class="mt-1 w-full rounded-lg border border-slate-300 p-2 text-xs" required>
+                                        <input type="text" name="prestasi[{{ $idx }}][nama_prestasi]" value="{{ $pres->nama_prestasi }}" class="mt-1 w-full rounded-lg border border-slate-300 p-2 text-xs">
                                     </div>
                                     <div>
                                         <label class="block text-[11px] font-bold text-slate-600">Tingkat</label>
@@ -1026,13 +1027,6 @@
 
                 if (dalamContainer) dalamContainer.classList.remove('hidden');
                 if (luarContainer) luarContainer.classList.add('hidden');
-
-                if (provInput) provInput.setAttribute('required', 'required');
-                if (kabInput) kabInput.setAttribute('required', 'required');
-                if (kecInput) kecInput.setAttribute('required', 'required');
-                if (desaInput) desaInput.setAttribute('required', 'required');
-                if (rtInput) rtInput.setAttribute('required', 'required');
-                if (rwInput) rwInput.setAttribute('required', 'required');
             }
         }
 
@@ -1056,7 +1050,7 @@
                 </div>
                 <div class="sm:col-span-2">
                     <label class="block text-[11px] font-bold text-slate-600">Nama Lomba / Prestasi</label>
-                    <input type="text" name="prestasi[${idx}][nama_prestasi]" placeholder="Contoh: Juara 1 Bulutangkis O2SN" class="mt-1 w-full rounded-lg border border-slate-300 p-2 text-xs" required>
+                    <input type="text" name="prestasi[${idx}][nama_prestasi]" placeholder="Contoh: Juara 1 Bulutangkis O2SN" class="mt-1 w-full rounded-lg border border-slate-300 p-2 text-xs">
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-600">Tingkat</label>

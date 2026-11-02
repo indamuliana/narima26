@@ -14,6 +14,7 @@ class UpdateBiodataRequest extends FormRequest
 
     public function rules(): array
     {
+        $isAdminOrOperator = auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isOperator());
         $isLuarNegeri = $this->boolean('is_luar_negeri');
 
         $calonSiswaParam = $this->route('calonSiswa');
@@ -25,10 +26,12 @@ class UpdateBiodataRequest extends FormRequest
             ? $calonSiswaParam->user_id
             : ($this->user()?->calonSiswa?->user_id ?? $this->user()?->id);
 
+        $reqRule = $isAdminOrOperator ? 'nullable' : 'required';
+
         $rules = [
-            'nama_lengkap' => ['sometimes', 'required', 'string', 'max:150'],
+            'nama_lengkap' => [$isAdminOrOperator ? 'nullable' : 'required', 'string', 'max:150'],
             'nama_panggilan' => ['nullable', 'string', 'max:50'],
-            'jenis_kelamin' => ['sometimes', 'required', 'in:L,P,Laki-laki,Perempuan'],
+            'jenis_kelamin' => [$isAdminOrOperator ? 'nullable' : 'required', 'in:L,P,Laki-laki,Perempuan'],
             'nisn' => [
                 'nullable',
                 'string',
@@ -46,12 +49,12 @@ class UpdateBiodataRequest extends FormRequest
             'referensi_nama' => ['nullable', 'string', 'max:150'],
             'referensi_rayon' => ['nullable', 'string', 'max:50'],
             'referensi_nomor_seleksi' => ['nullable', 'string', 'max:50'],
-            'nik' => ['required', 'string', 'digits:16'],
-            'no_kk' => ['required', 'string', 'digits:16'],
-            'agama' => ['required', 'string', 'max:30'],
-            'tempat_lahir' => ['required', 'string', 'max:100'],
-            'tanggal_lahir' => ['required', 'date'],
-            'alamat_lengkap' => ['required', 'string', 'max:500'],
+            'nik' => [$isAdminOrOperator ? 'nullable' : 'required', 'string', 'digits:16'],
+            'no_kk' => [$isAdminOrOperator ? 'nullable' : 'required', 'string', 'digits:16'],
+            'agama' => [$isAdminOrOperator ? 'nullable' : 'required', 'string', 'max:30'],
+            'tempat_lahir' => [$isAdminOrOperator ? 'nullable' : 'required', 'string', 'max:100'],
+            'tanggal_lahir' => [$isAdminOrOperator ? 'nullable' : 'required', 'date'],
+            'alamat_lengkap' => [$isAdminOrOperator ? 'nullable' : 'required', 'string', 'max:500'],
             'kode_pos' => ['nullable', 'string', 'max:20'],
             'no_hp_siswa' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'max:150'],
@@ -62,9 +65,9 @@ class UpdateBiodataRequest extends FormRequest
         ];
 
         if ($isLuarNegeri) {
-            $rules['negara'] = ['required', 'string', 'max:100'];
-            $rules['provinsi_luar_negeri'] = ['required', 'string', 'max:100'];
-            $rules['kabupaten_luar_negeri'] = ['required', 'string', 'max:100'];
+            $rules['negara'] = [$reqRule, 'string', 'max:100'];
+            $rules['provinsi_luar_negeri'] = [$reqRule, 'string', 'max:100'];
+            $rules['kabupaten_luar_negeri'] = [$reqRule, 'string', 'max:100'];
             $rules['kecamatan_luar_negeri'] = ['nullable', 'string', 'max:100'];
             $rules['desa_luar_negeri'] = ['nullable', 'string', 'max:100'];
             $rules['rt'] = ['nullable', 'string', 'max:10'];
@@ -83,12 +86,12 @@ class UpdateBiodataRequest extends FormRequest
             $rules['kabupaten_luar_negeri'] = ['nullable', 'string', 'max:100'];
             $rules['kecamatan_luar_negeri'] = ['nullable', 'string', 'max:100'];
             $rules['desa_luar_negeri'] = ['nullable', 'string', 'max:100'];
-            $rules['rt'] = ['required', 'string', 'max:10'];
-            $rules['rw'] = ['required', 'string', 'max:10'];
-            $rules['provinsi_nama'] = ['required_without:provinsi_id', 'nullable', 'string', 'max:100'];
-            $rules['kabupaten_nama'] = ['required_without:kabupaten_id', 'nullable', 'string', 'max:100'];
-            $rules['kecamatan_nama'] = ['required_without:kecamatan_id', 'nullable', 'string', 'max:100'];
-            $rules['desa_nama'] = ['required_without:desa_id', 'nullable', 'string', 'max:100'];
+            $rules['rt'] = [$isAdminOrOperator ? 'nullable' : 'required', 'string', 'max:10'];
+            $rules['rw'] = [$isAdminOrOperator ? 'nullable' : 'required', 'string', 'max:10'];
+            $rules['provinsi_nama'] = [$isAdminOrOperator ? 'nullable' : 'required_without:provinsi_id', 'nullable', 'string', 'max:100'];
+            $rules['kabupaten_nama'] = [$isAdminOrOperator ? 'nullable' : 'required_without:kabupaten_id', 'nullable', 'string', 'max:100'];
+            $rules['kecamatan_nama'] = [$isAdminOrOperator ? 'nullable' : 'required_without:kecamatan_id', 'nullable', 'string', 'max:100'];
+            $rules['desa_nama'] = [$isAdminOrOperator ? 'nullable' : 'required_without:desa_id', 'nullable', 'string', 'max:100'];
             $rules['provinsi_id'] = ['nullable'];
             $rules['kabupaten_id'] = ['nullable'];
             $rules['kecamatan_id'] = ['nullable'];

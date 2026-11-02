@@ -72,8 +72,8 @@ Route::middleware('auth')->get('/dashboard', function () {
     return redirect()->route(auth()->user()->getDashboardRoute());
 })->name('dashboard');
 
-// Admin, Guru, Operator & Pewawancara Shared Area (Executive & Read-Only Directory Access)
-Route::middleware(['auth', 'role:admin,guru,operator,pewawancara'])
+// Admin, Guru, Operator, Pewawancara & Kepala Sekolah Shared Area (Executive & Read-Only Directory Access)
+Route::middleware(['auth', 'role:admin,guru,operator,pewawancara,kepala_sekolah'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
@@ -101,6 +101,9 @@ Route::middleware(['auth', 'role:admin,guru,operator,pewawancara'])
                 Route::get('/', 'index')->name('index');
                 Route::get('/export/pdf', 'exportRekapPdf')->name('rekap.export.pdf');
             });
+
+        // Analitik Calon Murid & Orang Tua
+        Route::get('/analitik', [\App\Http\Controllers\Admin\AnalitikController::class, 'index'])->name('analitik.index');
     });
 
 // Admin & Operator Operational Area (Modul Master & Operasional SPMB)
