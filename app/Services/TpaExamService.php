@@ -90,13 +90,13 @@ class TpaExamService
         if ($sesi->status === 'babak_1' && $sesi->babak_1_mulai) {
             $durasiDetik = $pengaturan->durasi_literasi_menit * 60;
             $selesaiTarget = Carbon::parse($sesi->babak_1_mulai)->addSeconds($durasiDetik);
-            return max(0, $now->diffInSeconds($selesaiTarget, false));
+            return (int) max(0, (int) $now->diffInSeconds($selesaiTarget, false));
         }
 
         if ($sesi->status === 'babak_2' && $sesi->babak_2_mulai) {
             $durasiDetik = $pengaturan->durasi_numerasi_menit * 60;
             $selesaiTarget = Carbon::parse($sesi->babak_2_mulai)->addSeconds($durasiDetik);
-            return max(0, $now->diffInSeconds($selesaiTarget, false));
+            return (int) max(0, (int) $now->diffInSeconds($selesaiTarget, false));
         }
 
         return 0;

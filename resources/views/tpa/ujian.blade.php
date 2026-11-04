@@ -157,6 +157,56 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* ============================================================== */
+        /* RESPONSIVE DRAWER & SIDEBAR LEMBAR JAWABAN                     */
+        /* ============================================================== */
+        @media (max-width: 1023px) {
+            #sidebar-lembar-jawaban {
+                position: fixed !important;
+                top: 0 !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                width: 84vw !important;
+                max-width: 320px !important;
+                z-index: 50 !important;
+                transform: translateX(-100%) !important;
+                transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.35), 0 8px 10px -6px rgba(0, 0, 0, 0.35) !important;
+            }
+            #sidebar-lembar-jawaban.drawer-open {
+                transform: translateX(0) !important;
+            }
+            #lembar-jawaban-backdrop {
+                position: fixed !important;
+                inset: 0 !important;
+                background-color: rgba(15, 23, 42, 0.55) !important;
+                backdrop-filter: blur(2px) !important;
+                z-index: 45 !important;
+                display: none !important;
+            }
+            #lembar-jawaban-backdrop.backdrop-open {
+                display: block !important;
+            }
+            #btn-floating-unhide {
+                display: none !important;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            #sidebar-lembar-jawaban {
+                position: static !important;
+                transform: none !important;
+                transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                width: 18rem !important; /* 288px */
+            }
+            #sidebar-lembar-jawaban.sidebar-collapsed {
+                margin-left: -18rem !important;
+            }
+            #lembar-jawaban-backdrop {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 h-screen w-screen overflow-hidden flex flex-col no-select font-step-2" oncontextmenu="return false;">
@@ -219,9 +269,9 @@
             </div>
 
             <!-- Sisi Kanan: Kontrol Font, Timer, Fullscreen -->
-            <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-                <!-- Toolbar Ukuran Font Soal Bertingkat (A- / A / A+) -->
-                <div class="flex items-center gap-0.5 bg-slate-800 p-0.5 rounded-lg border border-slate-700">
+            <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+                <!-- Toolbar Ukuran Font Soal Bertingkat (A- / A / A+) - Tersembunyi di mobile sempit agar timer lega -->
+                <div class="hidden sm:flex items-center gap-0.5 bg-slate-800 p-0.5 rounded-lg border border-slate-700">
                     <button type="button" onclick="adjustFontSize(-1)" id="btn-font-dec"
                             class="px-2 py-0.5 rounded text-[11px] font-bold text-slate-400 hover:text-white cursor-pointer transition-colors"
                             title="Perkecil Ukuran Teks (A-)">
@@ -268,14 +318,13 @@
     <main class="exam-main-layout flex-1 min-h-0 flex overflow-hidden relative">
 
         <!-- Mobile Backdrop untuk Drawer Lembar Jawaban -->
-        <div id="lembar-jawaban-backdrop" onclick="toggleSidebarLembarJawaban()"
-             class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 lg:hidden hidden"></div>
+        <div id="lembar-jawaban-backdrop" onclick="toggleSidebarLembarJawaban(false)"></div>
 
         <!-- ============================================================== -->
         <!-- PANEL LEMBAR JAWABAN (SISI KIRI) - Kotak-kotak Kecil Minimalis -->
         <!-- ============================================================== -->
         <aside id="sidebar-lembar-jawaban"
-               class="fixed inset-y-0 left-0 z-40 w-64 sm:w-72 bg-white border-r border-slate-200/90 flex flex-col justify-between shadow-2xl transition-all duration-300 -translate-x-full lg:translate-x-0 lg:static lg:inset-auto lg:shadow-none shrink-0">
+               class="bg-white border-r border-slate-200/90 flex flex-col justify-between shrink-0">
 
             <!-- Bagian Atas Lembar Jawaban -->
             <div class="p-3.5 space-y-2.5 overflow-hidden flex flex-col flex-1">
@@ -285,11 +334,11 @@
                         <h2 class="text-xs font-black text-slate-900 uppercase tracking-wider">Lembar Jawaban</h2>
                         <span id="label-progress-stat" class="text-[11px] font-semibold text-slate-500 font-mono">0/{{ count($soalSorted) }} Terjawab (0%)</span>
                     </div>
-                    <button type="button" onclick="toggleSidebarLembarJawaban()"
-                            class="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-                            title="Sembunyikan Lembar Jawaban">
+                    <button type="button" onclick="toggleSidebarLembarJawaban(false)"
+                            class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                            title="Tutup Lembar Jawaban">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                     </button>
                 </div>
@@ -382,7 +431,7 @@
                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                 </svg>
-                <span class="writing-vertical [writing-mode:vertical-lr] rotate-180">LEMBAR SOAL</span>
+                <span class="writing-vertical [writing-mode:vertical-lr] rotate-180">LEMBAR JAWABAN</span>
             </div>
         </button>
 
@@ -412,9 +461,13 @@
                     </span>
 
                     <!-- Tombol Cepat Buka Lembar Jawaban (Untuk Mobile) -->
-                    <button type="button" onclick="toggleSidebarLembarJawaban()"
-                            class="lg:hidden text-xs font-bold text-orange-600 px-2 py-1 rounded-lg bg-orange-50 border border-orange-200">
-                        Nomor Soal &rarr;
+                    <button type="button" onclick="toggleSidebarLembarJawaban(true)"
+                            class="lg:hidden text-xs font-bold text-orange-600 hover:text-orange-700 px-2.5 py-1 rounded-lg bg-orange-50 hover:bg-orange-100 border border-orange-200 flex items-center gap-1 transition-colors cursor-pointer shadow-2xs"
+                            title="Buka Lembar Jawaban">
+                        <svg class="w-3.5 h-3.5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                        </svg>
+                        <span>Daftar Soal ▾</span>
                     </button>
                 </div>
             </div>
@@ -711,33 +764,53 @@
         });
 
         // 3. Toggle Sidebar Lembar Jawaban di Kiri (Hide / Unhide)
-        function toggleSidebarLembarJawaban() {
+        let isSidebarCollapsed = false;
+
+        function toggleSidebarLembarJawaban(forceState = null) {
             const sidebar = document.getElementById('sidebar-lembar-jawaban');
             const floatingBtn = document.getElementById('btn-floating-unhide');
             const backdrop = document.getElementById('lembar-jawaban-backdrop');
+            if (!sidebar) return;
+
             const isMobile = window.innerWidth < 1024;
 
             if (isMobile) {
-                // Di HP: Buka tutup drawer dengan backdrop
-                if (sidebar.classList.contains('-translate-x-full')) {
-                    sidebar.classList.remove('-translate-x-full');
-                    backdrop.classList.remove('hidden');
+                // Di HP: Buka tutup drawer dengan class .drawer-open & .backdrop-open
+                const currentlyOpen = sidebar.classList.contains('drawer-open');
+                const shouldOpen = (forceState !== null) ? forceState : !currentlyOpen;
+
+                if (shouldOpen) {
+                    sidebar.classList.add('drawer-open');
+                    if (backdrop) backdrop.classList.add('backdrop-open');
                 } else {
-                    sidebar.classList.add('-translate-x-full');
-                    backdrop.classList.add('hidden');
+                    sidebar.classList.remove('drawer-open');
+                    if (backdrop) backdrop.classList.remove('backdrop-open');
                 }
             } else {
-                // Di Desktop: Collapse kiri dengan margin minus
-                isSidebarCollapsed = !isSidebarCollapsed;
-                if (isSidebarCollapsed) {
-                    sidebar.classList.add('lg:-ml-72');
-                    floatingBtn.classList.remove('hidden');
+                // Di Desktop: Collapse kiri dengan class .sidebar-collapsed
+                const currentlyCollapsed = sidebar.classList.contains('sidebar-collapsed');
+                const shouldCollapse = (forceState !== null) ? !forceState : !currentlyCollapsed;
+                isSidebarCollapsed = shouldCollapse;
+
+                if (shouldCollapse) {
+                    sidebar.classList.add('sidebar-collapsed');
+                    if (floatingBtn) floatingBtn.classList.remove('hidden');
                 } else {
-                    sidebar.classList.remove('lg:-ml-72');
-                    floatingBtn.classList.add('hidden');
+                    sidebar.classList.remove('sidebar-collapsed');
+                    if (floatingBtn) floatingBtn.classList.add('hidden');
                 }
             }
         }
+
+        // Bersihkan state drawer jika layar diputar/di-resize ke desktop
+        window.addEventListener('resize', function () {
+            if (window.innerWidth >= 1024) {
+                const sidebar = document.getElementById('sidebar-lembar-jawaban');
+                const backdrop = document.getElementById('lembar-jawaban-backdrop');
+                if (sidebar) sidebar.classList.remove('drawer-open');
+                if (backdrop) backdrop.classList.remove('backdrop-open');
+            }
+        });
 
         // 4. Zoom Gambar Soal (+, -, Reset, Lightbox)
         function zoomImage(index, delta) {
@@ -839,12 +912,9 @@
                 scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
-            // Sembunyikan drawer mobile jika di layar HP
+            // Sembunyikan drawer mobile jika di layar HP saat butir soal dipilih
             if (window.innerWidth < 1024) {
-                const sidebar = document.getElementById('sidebar-lembar-jawaban');
-                const backdrop = document.getElementById('lembar-jawaban-backdrop');
-                if (sidebar) sidebar.classList.add('-translate-x-full');
-                if (backdrop) backdrop.classList.add('hidden');
+                toggleSidebarLembarJawaban(false);
             }
         }
 
