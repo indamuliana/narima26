@@ -121,13 +121,13 @@
             background-color: #f97316 !important;
         }
 
-        /* Bilah Navigasi Bawah Selalu Terkunci di Posisi Bawah Layar */
-        .exam-bottom-bar {
+        /* Bilah Navigasi Soal (Dipindahkan ke Atas) */
+        .exam-nav-bar {
             flex-shrink: 0 !important;
             background-color: #ffffff !important;
-            border-top: 1px solid #e2e8f0 !important;
-            z-index: 30 !important;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.04) !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+            z-index: 20 !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03) !important;
         }
 
         /* Gambar Soal: Ukuran Maksimal Terkendali Agar Tidak Menutupi Seluruh Layar */
@@ -169,21 +169,26 @@
                 left: 0 !important;
                 width: 84vw !important;
                 max-width: 320px !important;
-                z-index: 50 !important;
+                z-index: 100 !important;
                 transform: translateX(-100%) !important;
-                transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                visibility: hidden !important;
+                pointer-events: none !important;
+                transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.28s !important;
                 box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.35), 0 8px 10px -6px rgba(0, 0, 0, 0.35) !important;
             }
             #sidebar-lembar-jawaban.drawer-open {
                 transform: translateX(0) !important;
+                visibility: visible !important;
+                pointer-events: auto !important;
             }
             #lembar-jawaban-backdrop {
                 position: fixed !important;
                 inset: 0 !important;
-                background-color: rgba(15, 23, 42, 0.55) !important;
+                background-color: rgba(15, 23, 42, 0.6) !important;
                 backdrop-filter: blur(2px) !important;
-                z-index: 45 !important;
+                z-index: 90 !important;
                 display: none !important;
+                cursor: pointer;
             }
             #lembar-jawaban-backdrop.backdrop-open {
                 display: block !important;
@@ -441,35 +446,63 @@
         <section class="exam-section-layout flex-1 min-h-0 flex flex-col h-full overflow-hidden bg-slate-50/60 relative">
 
             <!-- Subheader Area Soal (Fixed, No Scroll) -->
-            <div class="px-4 sm:px-6 py-2.5 bg-white border-b border-slate-200/80 flex items-center justify-between shrink-0">
-                <div class="flex items-center gap-2">
-                    <span id="current-question-badge" class="px-2.5 py-1 rounded-lg bg-slate-900 text-white font-black text-xs shadow-2xs">
+            <div class="px-3.5 sm:px-6 py-2 bg-white border-b border-slate-200/80 flex items-center justify-between gap-2 shrink-0">
+                <div class="flex items-center gap-2 min-w-0">
+                    <span id="current-question-badge" class="px-2.5 py-1 rounded-lg bg-slate-900 text-white font-black text-xs shadow-2xs shrink-0">
                         Soal No. 1
                     </span>
-                    <span class="text-xs text-slate-400 font-medium">dari {{ count($soalSorted) }} butir</span>
+                    <span class="text-xs text-slate-400 font-medium truncate">dari {{ count($soalSorted) }} butir</span>
                     <span class="text-slate-300 hidden sm:inline">&bull;</span>
                     <span id="current-bobot-text" class="text-xs font-semibold text-slate-500 hidden sm:inline">Bobot: {{ $soalSorted[0]->bobot ?? 1 }} Poin</span>
                 </div>
 
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 shrink-0">
                     <!-- Status Tersimpan AJAX -->
-                    <span id="save-status-indicator" class="text-[11px] font-semibold text-emerald-600 flex items-center gap-1 opacity-0 transition-opacity">
+                    <span id="save-status-indicator" class="text-[11px] font-semibold text-emerald-600 hidden sm:flex items-center gap-1 opacity-0 transition-opacity">
                         <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                         </svg>
-                        <span>Jawaban tersimpan</span>
+                        <span>Tersimpan</span>
                     </span>
 
-                    <!-- Tombol Cepat Buka Lembar Jawaban (Untuk Mobile) -->
+                    <!-- Tombol Cepat Buka Lembar Jawaban (Daftar Soal) -->
                     <button type="button" onclick="toggleSidebarLembarJawaban(true)"
-                            class="lg:hidden text-xs font-bold text-orange-600 hover:text-orange-700 px-2.5 py-1 rounded-lg bg-orange-50 hover:bg-orange-100 border border-orange-200 flex items-center gap-1 transition-colors cursor-pointer shadow-2xs"
+                            class="text-xs font-bold text-orange-600 hover:text-orange-700 px-3 py-1.5 rounded-xl bg-orange-50 hover:bg-orange-100 border border-orange-200 flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
                             title="Buka Lembar Jawaban">
-                        <svg class="w-3.5 h-3.5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="w-4 h-4 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
                         </svg>
                         <span>Daftar Soal ▾</span>
                     </button>
                 </div>
+            </div>
+
+            <!-- Bilah Navigasi Soal (Dipindahkan ke Atas, tepat di bawah Daftar Soal) -->
+            <div class="exam-nav-bar bg-white border-b border-slate-200/90 px-3.5 sm:px-6 py-2 flex items-center justify-between gap-2 shrink-0 shadow-2xs z-20">
+                <button type="button" id="btn-prev" onclick="geserSoal(-1)"
+                        class="inline-flex items-center gap-1 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    <span>Sebelumnya</span>
+                </button>
+
+                <!-- Tombol Simpan Sementara / Ragu-Ragu -->
+                <button type="button" id="btn-ragu" onclick="toggleRaguRagu()"
+                        class="inline-flex items-center gap-1 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl border border-amber-300 bg-amber-50 text-xs font-bold text-amber-800 hover:bg-amber-100 transition-colors shadow-2xs cursor-pointer">
+                    <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span id="label-ragu">Ragu-ragu</span>
+                </button>
+
+                <button type="button" id="btn-next" onclick="geserSoal(1)"
+                        class="inline-flex items-center gap-1 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold transition-all shadow-sm shadow-orange-600/20 cursor-pointer">
+                    <span>Berikutnya</span>
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
             </div>
 
             <!-- Konten Soal & Opsi (Scrollable jika teks sangat panjang, tapi proporsional) -->
@@ -560,33 +593,7 @@
                 @endforeach
             </div>
 
-            <!-- Bilah Navigasi Bawah Tetap (Fixed Bottom Nav Bar) -->
-            <div class="exam-bottom-bar bg-white border-t border-slate-200/90 px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3 shrink-0 shadow-xs z-20">
-                <button type="button" id="btn-prev" onclick="geserSoal(-1)"
-                        class="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
-                    <span>Sebelumnya</span>
-                </button>
 
-                <!-- Tombol Simpan Sementara / Ragu-Ragu -->
-                <button type="button" id="btn-ragu" onclick="toggleRaguRagu()"
-                        class="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl border border-amber-300 bg-amber-50 text-xs font-bold text-amber-800 hover:bg-amber-100 transition-colors shadow-2xs cursor-pointer">
-                    <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <span id="label-ragu">Ragu-ragu</span>
-                </button>
-
-                <button type="button" id="btn-next" onclick="geserSoal(1)"
-                        class="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold transition-all shadow-sm shadow-orange-600/20 cursor-pointer">
-                    <span>Berikutnya</span>
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                    </svg>
-                </button>
-            </div>
         </section>
     </main>
 
@@ -764,8 +771,6 @@
         });
 
         // 3. Toggle Sidebar Lembar Jawaban di Kiri (Hide / Unhide)
-        let isSidebarCollapsed = false;
-
         function toggleSidebarLembarJawaban(forceState = null) {
             const sidebar = document.getElementById('sidebar-lembar-jawaban');
             const floatingBtn = document.getElementById('btn-floating-unhide');
