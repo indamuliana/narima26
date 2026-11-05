@@ -20,13 +20,26 @@ return new class extends Migration
 
         // Salin nilai cita_cita yang pernah diisi di wawancara_orang_tua ke wawancara_siswa jika belum terisi
         if (Schema::hasColumn('wawancara_orang_tua', 'cita_cita')) {
-            DB::statement("
-                UPDATE wawancara_siswa ws
-                JOIN wawancara_orang_tua wo ON ws.calon_siswa_id = wo.calon_siswa_id
-                SET ws.cita_cita = wo.cita_cita
-                WHERE wo.cita_cita IS NOT NULL
-                  AND (ws.cita_cita IS NULL OR ws.cita_cita = '')
-            ");
+            if (DB::getDriverName() === 'mysql') {
+                DB::statement("
+                    UPDATE wawancara_siswa ws
+                    JOIN wawancara_orang_tua wo ON ws.calon_siswa_id = wo.calon_siswa_id
+                    SET ws.cita_cita = wo.cita_cita
+                    WHERE wo.cita_cita IS NOT NULL
+                      AND (ws.cita_cita IS NULL OR ws.cita_cita = '')
+                ");
+            } else {
+                DB::statement("
+                    UPDATE wawancara_siswa
+                    SET cita_cita = (
+                        SELECT cita_cita FROM wawancara_orang_tua
+                        WHERE wawancara_orang_tua.calon_siswa_id = wawancara_siswa.calon_siswa_id
+                          AND wawancara_orang_tua.cita_cita IS NOT NULL
+                        LIMIT 1
+                    )
+                    WHERE cita_cita IS NULL OR cita_cita = ''
+                ");
+            }
         }
     }
 

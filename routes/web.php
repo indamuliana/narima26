@@ -294,19 +294,17 @@ Route::middleware(['auth', 'role:bendahara,admin'])
     ->prefix('bendahara')
     ->name('bendahara.')
     ->group(function () {
-        Route::get('/dashboard', function () {
-            $stats = [
-                'seleksi_masuk' => (float) \App\Models\PembayaranSeleksi::where('status', 'DIVERIFIKASI')->sum('nominal_dibayar'),
-                'seleksi_pending' => \App\Models\PembayaranSeleksi::where('status', 'PENDING')->count(),
-                'daftar_ulang_masuk' => (float) \App\Models\PembayaranDaftarUlang::where('status', 'DIVERIFIKASI')->sum('nominal_dibayar'),
-                'daftar_ulang_pending' => \App\Models\PembayaranDaftarUlang::where('status', 'PENDING')->count(),
-                'total_tagihan' => \App\Models\Tagihan::count(),
-            ];
-            $recentSeleksi = \App\Models\PembayaranSeleksi::with('calonSiswa')->latest('id')->take(5)->get();
-            $recentDaftarUlang = \App\Models\PembayaranDaftarUlang::with(['calonSiswa', 'tagihan'])->latest('id')->take(5)->get();
-            $programStats = app(\App\Services\DashboardMetricsService::class)->getProgramGenderStats();
-            return view('bendahara.dashboard', compact('stats', 'recentSeleksi', 'recentDaftarUlang', 'programStats'));
-        })->name('dashboard');
+        Route::get('/dashboard', [\App\Http\Controllers\Bendahara\DashboardController::class, 'index'])->name('dashboard');
+
+        // Laporan Keuangan Terpadu
+        Route::controller(\App\Http\Controllers\Bendahara\LaporanKeuanganController::class)
+            ->prefix('laporan')
+            ->name('laporan.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/export/pdf', 'exportPdf')->name('export.pdf');
+                Route::get('/export/xls', 'exportXls')->name('export.xls');
+            });
 
         // Pembayaran Seleksi (Fase 7)
         Route::controller(\App\Http\Controllers\Bendahara\PembayaranSeleksiController::class)
