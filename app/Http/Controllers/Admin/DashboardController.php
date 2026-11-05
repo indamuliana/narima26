@@ -23,71 +23,72 @@ class DashboardController extends Controller
     public function index(DashboardMetricsService $metricsService): View
     {
         // Baris 1: Ringkasan Total & Breakdown Program / Gender (Eksklusif data riil / tanpa demo)
+        $programStats = $metricsService->getProgramGenderStats();
         $totalPendaftar = CalonSiswa::tanpaDemo()->count();
-        $unggulanAll = CalonSiswa::tanpaDemo()->whereHas('program', fn($q) => $q->where('kode', 'UGG')->orWhere('nama', 'like', '%Unggulan%'))->count();
-        $regulerAll = CalonSiswa::tanpaDemo()->whereHas('program', fn($q) => $q->where('kode', 'REG')->orWhere('nama', 'like', '%Reguler%'))->count();
-        $unggulanLaki = CalonSiswa::tanpaDemo()->whereHas('program', fn($q) => $q->where('kode', 'UGG')->orWhere('nama', 'like', '%Unggulan%'))->where('jenis_kelamin', 'L')->count();
-        $unggulanPerempuan = CalonSiswa::tanpaDemo()->whereHas('program', fn($q) => $q->where('kode', 'UGG')->orWhere('nama', 'like', '%Unggulan%'))->where('jenis_kelamin', 'P')->count();
-        $regulerLaki = CalonSiswa::tanpaDemo()->whereHas('program', fn($q) => $q->where('kode', 'REG')->orWhere('nama', 'like', '%Reguler%'))->where('jenis_kelamin', 'L')->count();
-        $regulerPerempuan = CalonSiswa::tanpaDemo()->whereHas('program', fn($q) => $q->where('kode', 'REG')->orWhere('nama', 'like', '%Reguler%'))->where('jenis_kelamin', 'P')->count();
 
         $baris1 = [
             'total_pendaftar' => $totalPendaftar,
-            'total_unggulan' => $unggulanAll,
-            'total_reguler' => $regulerAll,
-            'unggulan_laki' => $unggulanLaki,
-            'unggulan_perempuan' => $unggulanPerempuan,
-            'reguler_laki' => $regulerLaki,
-            'reguler_perempuan' => $regulerPerempuan,
+            'total_unggulan' => $programStats['unggulan_all'],
+            'total_reguler' => $programStats['reguler_all'],
+            'unggulan_laki' => $programStats['unggulan_laki'],
+            'unggulan_perempuan' => $programStats['unggulan_perempuan'],
+            'reguler_laki' => $programStats['reguler_laki'],
+            'reguler_perempuan' => $programStats['reguler_perempuan'],
         ];
 
-        // Baris 2: 8 Status Kunci Alur SPMB
+        // Baris 2: 8 Status Kunci Alur SPMB (1 single grouped query)
+        $rawStatusCounts = CalonSiswa::tanpaDemo()
+            ->selectRaw('status_spmb, count(*) as count')
+            ->groupBy('status_spmb')
+            ->pluck('count', 'status_spmb')
+            ->toArray();
+
         $statusCounts = [
             'menunggu_bayar' => [
                 'label' => 'Menunggu Bayar Seleksi',
-                'count' => CalonSiswa::tanpaDemo()->whereIn('status_spmb', [SpmbStatus::REGISTRASI->value, SpmbStatus::MENUNGGU_PEMBAYARAN_SELEKSI->value])->count(),
+                'count' => ($rawStatusCounts[SpmbStatus::REGISTRASI->value] ?? 0) + ($rawStatusCounts[SpmbStatus::MENUNGGU_PEMBAYARAN_SELEKSI->value] ?? 0),
                 'color' => 'amber',
                 'status_key' => SpmbStatus::MENUNGGU_PEMBAYARAN_SELEKSI->value,
             ],
             'melengkapi_data' => [
                 'label' => 'Melengkapi Data & Dokumen',
-                'count' => CalonSiswa::tanpaDemo()->whereIn('status_spmb', [SpmbStatus::PEMBAYARAN_SELEKSI_DIVERIFIKASI->value, SpmbStatus::MELENGKAPI_DATA->value, SpmbStatus::DATA_LENGKAP->value])->count(),
+                'count' => ($rawStatusCounts[SpmbStatus::PEMBAYARAN_SELEKSI_DIVERIFIKASI->value] ?? 0) + ($rawStatusCounts[SpmbStatus::MELENGKAPI_DATA->value] ?? 0) + ($rawStatusCounts[SpmbStatus::DATA_LENGKAP->value] ?? 0),
                 'color' => 'orange',
                 'status_key' => SpmbStatus::MELENGKAPI_DATA->value,
             ],
             'menunggu_wawancara' => [
                 'label' => 'Menunggu Wawancara',
-                'count' => CalonSiswa::tanpaDemo()->where('status_spmb', SpmbStatus::MENUNGGU_WAWANCARA->value)->count(),
+                'count' => $rawStatusCounts[SpmbStatus::MENUNGGU_WAWANCARA->value] ?? 0,
                 'color' => 'cyan',
                 'status_key' => SpmbStatus::MENUNGGU_WAWANCARA->value,
             ],
             'menunggu_keputusan' => [
                 'label' => 'Menunggu Sidang / Keputusan',
-                'count' => CalonSiswa::tanpaDemo()->whereIn('status_spmb', [SpmbStatus::SUDAH_DIWAWANCARA->value, SpmbStatus::MENUNGGU_KEPUTUSAN->value])->count(),
+                'count' => ($rawStatusCounts[SpmbStatus::SUDAH_DIWAWANCARA->value] ?? 0) + ($rawStatusCounts[SpmbStatus::MENUNGGU_KEPUTUSAN->value] ?? 0),
                 'color' => 'indigo',
                 'status_key' => SpmbStatus::MENUNGGU_KEPUTUSAN->value,
             ],
             'diterima' => [
                 'label' => 'Lulus / Menunggu Daftar Ulang',
-                'count' => CalonSiswa::tanpaDemo()->whereIn('status_spmb', [SpmbStatus::DITERIMA->value, SpmbStatus::MENUNGGU_DAFTAR_ULANG->value, SpmbStatus::DAFTAR_ULANG_DIVERIFIKASI->value])->count(),
+                'count' => ($rawStatusCounts[SpmbStatus::DITERIMA->value] ?? 0) + ($rawStatusCounts[SpmbStatus::MENUNGGU_DAFTAR_ULANG->value] ?? 0) + ($rawStatusCounts[SpmbStatus::DAFTAR_ULANG_DIVERIFIKASI->value] ?? 0),
                 'color' => 'emerald',
                 'status_key' => SpmbStatus::DITERIMA->value,
             ],
             'resmi_terdaftar' => [
                 'label' => 'Resmi Terdaftar',
-                'count' => CalonSiswa::tanpaDemo()->where('status_spmb', SpmbStatus::RESMI_TERDAFTAR->value)->count(),
+                'count' => $rawStatusCounts[SpmbStatus::RESMI_TERDAFTAR->value] ?? 0,
                 'color' => 'teal',
                 'status_key' => SpmbStatus::RESMI_TERDAFTAR->value,
             ],
             'ditolak' => [
                 'label' => 'Ditolak',
-                'count' => CalonSiswa::tanpaDemo()->where('status_spmb', SpmbStatus::DITOLAK->value)->count(),
+                'count' => $rawStatusCounts[SpmbStatus::DITOLAK->value] ?? 0,
                 'color' => 'rose',
                 'status_key' => SpmbStatus::DITOLAK->value,
             ],
             'mengundurkan_diri' => [
                 'label' => 'Mengundurkan Diri',
-                'count' => CalonSiswa::tanpaDemo()->where('status_spmb', SpmbStatus::MENGUNDURKAN_DIRI->value)->count(),
+                'count' => $rawStatusCounts[SpmbStatus::MENGUNDURKAN_DIRI->value] ?? 0,
                 'color' => 'slate',
                 'status_key' => SpmbStatus::MENGUNDURKAN_DIRI->value,
             ],

@@ -545,6 +545,82 @@
                 </div>
             </div>
 
+            <!-- Formulir Aktivasi Sisa Seragam (Pesan Nanti) Jika Ada -->
+            @if ($pendingSeragamList->isNotEmpty())
+                <div class="p-6 rounded-3xl bg-amber-50/60 border border-amber-200/90 shadow-xs space-y-4"
+                     x-data="{
+                        selected: [],
+                        priceMap: {
+                            @foreach($pendingSeragamList as $ps)
+                                @php
+                                    $namaS = $ps->jenisSeragam?->nama_jenis;
+                                    $mBiaya = $biayaSeragamList->first(fn($b) => stripos($b->nama_biaya, $namaS) !== false || stripos($namaS, $b->nama_biaya) !== false);
+                                    $pNom = $mBiaya ? (float)$mBiaya->nominal : 0;
+                                @endphp
+                                '{{ $ps->id }}': {{ $pNom }},
+                            @endforeach
+                        },
+                        totalSelected() {
+                            return this.selected.reduce((sum, id) => sum + (this.priceMap[id] || 0), 0);
+                        },
+                        formatRupiah(num) {
+                            return 'Rp ' + Number(num).toLocaleString('id-ID');
+                        }
+                     }">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl">👔</span>
+                            <h3 class="text-base font-black text-amber-950">Sisa Seragam Sekolah (Pesan Nanti)</h3>
+                        </div>
+                        <p class="text-xs text-amber-800 mt-1">
+                            Anda memiliki item seragam yang sebelumnya disimpan dengan opsi "Pesan Nanti". Pilih seragam yang ingin Anda aktifkan untuk menerbitkan tagihan pembayaran susulan:
+                        </p>
+                    </div>
+
+                    <form action="{{ route('calon-siswa.daftar-ulang.aktivasi-seragam') }}" method="POST" class="space-y-4">
+                        @csrf
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                            @foreach($pendingSeragamList as $ps)
+                                @php
+                                    $namaS = $ps->jenisSeragam?->nama_jenis;
+                                    $mBiaya = $biayaSeragamList->first(fn($b) => stripos($b->nama_biaya, $namaS) !== false || stripos($namaS, $b->nama_biaya) !== false);
+                                    $pNom = $mBiaya ? (float)$mBiaya->nominal : 0;
+                                @endphp
+                                <label class="p-3.5 rounded-2xl bg-white border border-amber-200/90 shadow-2xs flex items-center justify-between gap-3 cursor-pointer hover:border-amber-400 transition"
+                                       :class="selected.includes('{{ $ps->id }}') ? 'ring-2 ring-amber-500 bg-amber-50/50' : ''">
+                                    <div class="flex items-center gap-3">
+                                        <input type="checkbox" name="ukuran_seragam_ids[]" value="{{ $ps->id }}" x-model="selected" class="w-4 h-4 rounded text-orange-500 focus:ring-orange-400 border-slate-300">
+                                        <div>
+                                            <span class="text-xs font-bold text-slate-800 block">{{ $namaS }}</span>
+                                            <span class="text-[11px] text-slate-500">Ukuran: <strong class="text-slate-800 font-mono">{{ $ps->ukuran }}</strong></span>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-mono font-bold text-amber-900 shrink-0">
+                                        Rp {{ number_format($pNom, 0, ',', '.') }}
+                                    </span>
+                                </label>
+                            @endforeach
+                        </div>
+
+                        <div class="pt-3 border-t border-amber-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="text-xs text-amber-900">
+                                <span>Total Seragam Terpilih: </span>
+                                <strong class="text-sm font-black text-slate-900 font-mono" x-text="formatRupiah(totalSelected())">Rp 0</strong>
+                                <span class="text-[11px] text-slate-500" x-text="'(' + selected.length + ' item)'"></span>
+                            </div>
+
+                            <button type="submit" 
+                                    :disabled="selected.length === 0"
+                                    :class="selected.length === 0 ? 'opacity-50 cursor-not-allowed bg-slate-300 text-slate-600' : 'bg-teal-600 hover:bg-teal-700 text-white shadow-sm cursor-pointer'"
+                                    class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition">
+                                <span>💳 Aktifkan Pemesanan & Terbitkan Tagihan Susulan</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            @endif
 
             <!-- Riwayat Seluruh Pembayaran Terpadu (Single Unified History) -->
             @php

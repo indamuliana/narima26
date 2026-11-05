@@ -109,9 +109,18 @@ class RegistrationController extends Controller
 
     /**
      * Login instan calon siswa setelah registrasi langsung menuju dashboard.
+     * Dilindungi: Hanya dapat diakses dengan sesi registrasi aktif atau tanda tangan URL valid.
      */
-    public function loginDirect(string $nomorPendaftaran): RedirectResponse
+    public function loginDirect(Request $request, string $nomorPendaftaran): RedirectResponse
     {
+        $sessionNomor = session('registration_result.nomor_pendaftaran');
+        $hasActiveSession = $sessionNomor && $sessionNomor === $nomorPendaftaran;
+        $isAlreadyAuthenticated = Auth::check() && (Auth::user()->username === $nomorPendaftaran || Auth::user()->calonSiswa?->nomor_pendaftaran === $nomorPendaftaran);
+
+        if (!$hasActiveSession && !$request->hasValidSignature() && !$isAlreadyAuthenticated) {
+            return redirect()->route('login')->with('warning', 'Sesi registrasi telah berakhir. Silakan login dengan username dan password Anda.');
+        }
+
         $calonSiswa = CalonSiswa::where('nomor_pendaftaran', $nomorPendaftaran)->firstOrFail();
 
         if ($calonSiswa->user && $calonSiswa->user->is_active) {

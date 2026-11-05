@@ -73,7 +73,7 @@ class AdminDashboardTest extends TestCase
         $response->assertOk();
         $response->assertSee('Panel Administrator');
         $response->assertSee('Total Pendaftar');
-        $response->assertSee('Keterisian Kuota Kompetensi Keahlian');
+        $response->assertSee('Status Periode', false);
         $response->assertSee($this->calonSiswa->nama_lengkap);
     }
 
@@ -429,15 +429,9 @@ class AdminDashboardTest extends TestCase
         // 4. View renders timeline and milestones
         $response = $this->actingAs($this->adminUser)->get(route('admin.dashboard'));
         $response->assertOk();
-        $response->assertSee('Timeline Tren Mingguan');
-        $response->assertSee('Siklus 10 Bulan (49 Minggu)');
-        $response->assertSee('Pembukaan');
-        $response->assertSee('Gelombang 1');
-        $response->assertSee('Gelombang 2');
-        $response->assertSee('Gelombang 3');
-        $response->assertSee('31 Des 2026');
-        $response->assertSee('28 Feb 2027');
-        $response->assertSee('30 Jun 2027');
+        $response->assertSee('Timeline Pendaftar (All Time Mingguan)');
+        $response->assertSee('All Time Mingguan');
+        $response->assertSee('All Time Bulanan');
     }
 
     public function test_dashboard_displays_unggulan_and_reguler_gender_statistics(): void
@@ -456,9 +450,8 @@ class AdminDashboardTest extends TestCase
         // 2. Admin & Guru Dashboard
         $responseAdmin = $this->actingAs($this->adminUser)->get(route('admin.dashboard'));
         $responseAdmin->assertOk();
-        $responseAdmin->assertSee('Statistik Peminatan Program');
-        $responseAdmin->assertSee('Total Pendaftar Unggulan All');
-        $responseAdmin->assertSee('Total Pendaftar Reguler All');
+        $responseAdmin->assertSee('Program Unggulan');
+        $responseAdmin->assertSee('Program Reguler');
 
         // 3. Kepala Sekolah Dashboard
         $kepsekUser = \App\Models\User::factory()->create(['role' => 'kepala_sekolah']);

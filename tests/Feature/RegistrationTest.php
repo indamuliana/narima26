@@ -224,7 +224,13 @@ class RegistrationTest extends TestCase
             'nomor_pendaftaran' => 'A16260088',
         ]);
 
-        $response = $this->get(route('pendaftaran.login-direct', $calonSiswa->nomor_pendaftaran));
+        // 1. Tanpa sesi atau signature valid, diarahkan ke login (IDOR Protection)
+        $unauthorizedResponse = $this->get(route('pendaftaran.login-direct', $calonSiswa->nomor_pendaftaran));
+        $unauthorizedResponse->assertRedirect(route('login'));
+
+        // 2. Dengan sesi registrasi aktif (alur normal pendaftar)
+        $response = $this->withSession(['registration_result' => ['nomor_pendaftaran' => $calonSiswa->nomor_pendaftaran]])
+            ->get(route('pendaftaran.login-direct', $calonSiswa->nomor_pendaftaran));
         $response->assertRedirect(route('calon-siswa.dashboard'));
         $this->assertAuthenticatedAs($user);
     }

@@ -204,7 +204,7 @@ class KeuanganDaftarUlangTest extends TestCase
 
         $response->assertOk();
         $response->assertSee($tagihan->nomor_tagihan);
-        $response->assertSee('Rincian Komponen Biaya Baku');
+        $response->assertSee('Rincian Biaya Pendidikan (Tagihan 1)');
         $response->assertSee('Konfirmasi Transfer');
     }
 

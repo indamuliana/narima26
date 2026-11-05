@@ -637,7 +637,6 @@ class CalonSiswaController extends Controller
             ]);
         }
 
-        $candidates = $query->get();
         $filePrefix = $mode === 'simple' ? 'Rekap_Ringkas_Calon_Siswa_' : 'Master_Lengkap_Calon_Siswa_';
         $filename = $filePrefix . date('Ymd_His') . '.csv';
 
@@ -652,16 +651,23 @@ class CalonSiswaController extends Controller
         $invoiceSnapshotService = app(\App\Services\InvoiceSnapshotService::class);
         $columnHeaders = $this->getExportHeaders($mode);
 
-        $callback = function () use ($candidates, $mode, $invoiceSnapshotService, $columnHeaders) {
+        $callback = function () use ($query, $mode, $invoiceSnapshotService, $columnHeaders) {
             $handle = fopen('php://output', 'w');
             // Write UTF-8 BOM so Excel opens it with proper encoding
             fputs($handle, "\xEF\xBB\xBF");
 
             fputcsv($handle, $columnHeaders);
 
-            foreach ($candidates as $index => $cs) {
-                fputcsv($handle, $this->formatExportRow($cs, $index, $mode, $invoiceSnapshotService, true));
-            }
+            $index = 0;
+            $query->chunk(200, function ($batch) use (&$index, $handle, $mode, $invoiceSnapshotService) {
+                foreach ($batch as $cs) {
+                    fputcsv($handle, $this->formatExportRow($cs, $index++, $mode, $invoiceSnapshotService, true));
+                }
+                if (ob_get_level() > 0) {
+                    ob_flush();
+                }
+                flush();
+            });
 
             fclose($handle);
         };
@@ -704,7 +710,6 @@ class CalonSiswaController extends Controller
             ]);
         }
 
-        $candidates = $query->get();
         $filePrefix = $mode === 'simple' ? 'Rekap_Ringkas_Calon_Siswa_' : 'Master_Lengkap_Calon_Siswa_';
         $filename = $filePrefix . date('Ymd_His') . '.xls';
 
@@ -719,7 +724,7 @@ class CalonSiswaController extends Controller
         $invoiceSnapshotService = app(\App\Services\InvoiceSnapshotService::class);
         $columnHeaders = $this->getExportHeaders($mode);
 
-        $callback = function () use ($candidates, $mode, $invoiceSnapshotService, $columnHeaders) {
+        $callback = function () use ($query, $mode, $invoiceSnapshotService, $columnHeaders) {
             $output = fopen('php://output', 'w');
 
             // Excel HTML / XML Table wrapper
@@ -745,14 +750,21 @@ class CalonSiswaController extends Controller
             fwrite($output, "</tr></thead>\r\n");
             fwrite($output, "<tbody>\r\n");
 
-            foreach ($candidates as $index => $cs) {
-                $row = $this->formatExportRow($cs, $index, $mode, $invoiceSnapshotService, false);
-                fwrite($output, "<tr>\r\n");
-                foreach ($row as $cell) {
-                    fwrite($output, '<td>' . htmlspecialchars((string) $cell, ENT_QUOTES, 'UTF-8') . "</td>\r\n");
+            $index = 0;
+            $query->chunk(200, function ($batch) use (&$index, $output, $mode, $invoiceSnapshotService) {
+                foreach ($batch as $cs) {
+                    $row = $this->formatExportRow($cs, $index++, $mode, $invoiceSnapshotService, false);
+                    fwrite($output, "<tr>\r\n");
+                    foreach ($row as $cell) {
+                        fwrite($output, '<td>' . htmlspecialchars((string) $cell, ENT_QUOTES, 'UTF-8') . "</td>\r\n");
+                    }
+                    fwrite($output, "</tr>\r\n");
                 }
-                fwrite($output, "</tr>\r\n");
-            }
+                if (ob_get_level() > 0) {
+                    ob_flush();
+                }
+                flush();
+            });
 
             fwrite($output, "</tbody>\r\n");
             fwrite($output, "</table>\r\n");

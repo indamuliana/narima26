@@ -10,7 +10,14 @@
         <!-- Header Dashboard Minimalis -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80">
             <div>
-                <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Dashboard SPMB</h1>
+                <div class="flex items-center gap-2.5">
+                    <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Dashboard SPMB</h1>
+                    @if(auth()->user()->isGuru())
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">Panel Guru</span>
+                    @elseif(auth()->user()->isAdmin())
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">Panel Administrator</span>
+                    @endif
+                </div>
                 <p class="text-xs font-semibold text-slate-600 mt-1 flex flex-wrap items-center gap-1.5 sm:gap-2">
                     <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-100 text-slate-800 font-bold border border-slate-200/80">
                         <svg class="w-3.5 h-3.5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">

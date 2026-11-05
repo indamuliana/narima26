@@ -72,8 +72,8 @@ Route::middleware('auth')->get('/dashboard', function () {
     return redirect()->route(auth()->user()->getDashboardRoute());
 })->name('dashboard');
 
-// Admin, Guru, Operator, Pewawancara & Kepala Sekolah Shared Area (Executive & Read-Only Directory Access)
-Route::middleware(['auth', 'role:admin,guru,operator,pewawancara,kepala_sekolah'])
+// Admin, Guru, Operator Shared Area (Executive & Read-Only Directory Access)
+Route::middleware(['auth', 'role:admin,guru,operator'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
@@ -558,23 +558,4 @@ Route::prefix('api/wilayah')->group(function () {
     Route::get('/desa/{id}', [\App\Http\Controllers\Api\WilayahController::class, 'desa']);
 });
 
-// ROUTE SEMENTARA UNTUK MIGRASI DI CPANEL (Tanpa Terminal)
-// Hapus atau comment route ini setelah selesai digunakan di hosting!
-Route::get('/migrate-wawancara-2026', function () {
-    try {
-        \Illuminate\Support\Facades\Artisan::call('migrate', [
-            '--force' => true,
-        ]);
-        $output = "Migrasi berhasil dijalankan! Output: <br><pre>" . \Illuminate\Support\Facades\Artisan::output() . "</pre><br>";
-        
-        \Illuminate\Support\Facades\Artisan::call('db:seed', [
-            '--class' => 'KesepahamanSeeder',
-            '--force' => true,
-        ]);
-        $output .= "Seeder berhasil dijalankan! Output: <br><pre>" . \Illuminate\Support\Facades\Artisan::output() . "</pre>";
-        
-        return $output;
-    } catch (\Exception $e) {
-        return "Terjadi kesalahan: " . $e->getMessage();
-    }
-});
+
