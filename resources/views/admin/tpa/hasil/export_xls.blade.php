@@ -3,14 +3,14 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!--[if gte mso 9]>
     <xml>
-        <x:ExcelWorkbook>
-            <x:ExcelWorksheets>
-                <x:ExcelWorksheet>
-                    <x:Name>Rekap Nilai TPA</x:Name>
-                    <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
-                </x:ExcelWorksheet>
-            </x:ExcelWorksheets>
-        </x:ExcelWorkbook>
+        {!! '<' . 'x:ExcelWorkbook>' !!}
+            {!! '<' . 'x:ExcelWorksheets>' !!}
+                {!! '<' . 'x:ExcelWorksheet>' !!}
+                    {!! '<' . 'x:Name>Rekap Nilai TPA<' . '/x:Name>' !!}
+                    {!! '<' . 'x:WorksheetOptions><' . 'x:DisplayGridlines/><' . '/x:WorksheetOptions>' !!}
+                {!! '<' . '/x:ExcelWorksheet>' !!}
+            {!! '<' . '/x:ExcelWorksheets>' !!}
+        {!! '<' . '/x:ExcelWorkbook>' !!}
     </xml>
     <![endif]-->
     <style>
