@@ -25,12 +25,36 @@ class BendaharaLaporanKeuanganTest extends TestCase
         $this->calonSiswa = User::where('role', User::ROLE_CALON_SISWA)->first();
     }
 
-    public function test_bendahara_can_access_laporan_keuangan_index(): void
+    public function test_bendahara_can_access_laporan_keuangan_tab_piutang(): void
     {
-        $response = $this->actingAs($this->bendahara)->get(route('bendahara.laporan.index'));
+        $response = $this->actingAs($this->bendahara)->get(route('bendahara.laporan.index', ['tab' => 'piutang_siswa']));
 
         $response->assertStatus(200);
-        $response->assertSee('Laporan Keuangan Terpadu');
+        $response->assertSee('Rekapitulasi Piutang');
+    }
+
+    public function test_bendahara_can_access_laporan_keuangan_tab_buku_kas(): void
+    {
+        $response = $this->actingAs($this->bendahara)->get(route('bendahara.laporan.index', ['tab' => 'buku_kas']));
+
+        $response->assertStatus(200);
+        $response->assertSee('Jurnal Buku Kas Penerimaan');
+    }
+
+    public function test_bendahara_can_access_laporan_keuangan_tab_matrix_jurusan(): void
+    {
+        $response = $this->actingAs($this->bendahara)->get(route('bendahara.laporan.index', ['tab' => 'matrix_jurusan']));
+
+        $response->assertStatus(200);
+        $response->assertSee('Rekapitulasi Target');
+    }
+
+    public function test_bendahara_can_access_laporan_keuangan_tab_diskon(): void
+    {
+        $response = $this->actingAs($this->bendahara)->get(route('bendahara.laporan.index', ['tab' => 'diskon']));
+
+        $response->assertStatus(200);
+        $response->assertSee('Rekapitulasi Pemberian Diskon');
     }
 
     public function test_admin_can_access_laporan_keuangan_index(): void
@@ -49,19 +73,21 @@ class BendaharaLaporanKeuanganTest extends TestCase
         $response->assertSessionHas('error');
     }
 
-    public function test_bendahara_can_export_pdf_laporan_keuangan(): void
+    public function test_bendahara_can_export_pdf_all_tabs(): void
     {
-        $response = $this->actingAs($this->bendahara)->get(route('bendahara.laporan.export.pdf'));
-
-        $response->assertStatus(200);
-        $this->assertTrue(str_contains($response->headers->get('content-disposition', ''), '.pdf'));
+        foreach (['piutang_siswa', 'buku_kas', 'matrix_jurusan', 'diskon'] as $tab) {
+            $response = $this->actingAs($this->bendahara)->get(route('bendahara.laporan.export.pdf', ['tab' => $tab]));
+            $response->assertStatus(200);
+            $this->assertTrue(str_contains($response->headers->get('content-disposition', ''), '.pdf'));
+        }
     }
 
-    public function test_bendahara_can_export_xls_laporan_keuangan(): void
+    public function test_bendahara_can_export_xls_all_tabs(): void
     {
-        $response = $this->actingAs($this->bendahara)->get(route('bendahara.laporan.export.xls'));
-
-        $response->assertStatus(200);
-        $this->assertTrue(str_contains($response->headers->get('content-disposition', ''), '.xls'));
+        foreach (['piutang_siswa', 'buku_kas', 'matrix_jurusan', 'diskon'] as $tab) {
+            $response = $this->actingAs($this->bendahara)->get(route('bendahara.laporan.export.xls', ['tab' => $tab]));
+            $response->assertStatus(200);
+            $this->assertTrue(str_contains($response->headers->get('content-disposition', ''), '.xls'));
+        }
     }
 }
