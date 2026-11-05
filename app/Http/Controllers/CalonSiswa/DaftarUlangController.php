@@ -42,7 +42,10 @@ class DaftarUlangController extends Controller
             ?? $calonSiswa->tagihan->first();
         
         $tagihanSRGList = $calonSiswa->tagihan->where('jenis_tagihan', Tagihan::JENIS_SERAGAM)->sortBy('tahap_seragam')->values();
-        $tagihanSRG = $tagihanSRGList->last();
+        $selectedTagihanId = request('tagihan_id');
+        $tagihanSRG = $selectedTagihanId
+            ? ($tagihanSRGList->firstWhere('id', $selectedTagihanId) ?? $tagihanSRGList->last())
+            : $tagihanSRGList->last();
 
         $totalPaidDU  = $tagihanDU ? $this->invoiceService->getTotalPaidVerified($tagihanDU) : 0;
         $remainingDU  = $tagihanDU ? $this->invoiceService->getRemainingBalance($tagihanDU) : 0;

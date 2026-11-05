@@ -5,7 +5,7 @@
         @include('calon-siswa.partials.sidebar')
     </x-slot>
 
-    <div class="space-y-6" x-data="{ activeTab: 'pendidikan' }">
+    <div class="space-y-6" x-data="{ activeTab: '{{ request('tab', request('tagihan_id') ? 'seragam' : 'pendidikan') }}' }">
         <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -134,6 +134,234 @@
                     </div>
                 </div>
             @endif
+
+            <!-- =============================================================== -->
+            <!-- TABEL RINCIAN BIAYA KONSOLIDASI (TAGIHAN 1 & TAGIHAN 2)         -->
+            <!-- =============================================================== -->
+            @php
+                $seragamDetails = $tagihanSRGList->isNotEmpty() ? $tagihanSRGList->flatMap->details : ($tagihanSRG ? $tagihanSRG->details : collect());
+                $totalBrutoSRG = $tagihanSRGList->isNotEmpty() ? $tagihanSRGList->sum('total_bruto') : ($tagihanSRG?->total_bruto ?? 0);
+                $totalDiskonSRG = $tagihanSRGList->isNotEmpty() ? $tagihanSRGList->sum('total_diskon') : ($tagihanSRG?->total_diskon ?? 0);
+                $totalNettoSRG = $tagihanSRGList->isNotEmpty() ? $tagihanSRGList->sum('total_netto') : ($tagihanSRG?->total_netto ?? 0);
+
+                $totalBrutoDU = $tagihanDU?->total_bruto ?? 0;
+                $totalDiskonDU = $tagihanDU?->total_diskon ?? 0;
+                $totalNettoDU = $tagihanDU?->total_netto ?? 0;
+
+                $grandTotal = $totalNettoDU + $totalNettoSRG;
+            @endphp
+
+            <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
+                <div class="p-5 sm:p-6 bg-slate-50/70 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-base sm:text-lg font-black text-slate-900">Rincian Seluruh Tagihan Daftar Ulang</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            Kompilasi resmi Tagihan 1 (Biaya Pendidikan) dan Tagihan 2 (Paket Seragam & Atribut).
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                            {{ $calonSiswa->program?->nama_program ?? 'Reguler' }} &bull; {{ $calonSiswa->gelombang?->nama_gelombang ?? 'Gelombang 1' }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-600">
+                        <thead class="bg-slate-100/70 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                            <tr>
+                                <th class="px-4 py-3 w-12 text-center">No</th>
+                                <th class="px-4 py-3">Komponen Biaya</th>
+                                <th class="px-4 py-3">Kategori</th>
+                                <th class="px-5 py-3 text-right">Nominal</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            {{-- SECTION 1: TAGIHAN 1 (PENDIDIKAN) --}}
+                            <tr class="bg-orange-50/60 border-t border-b border-orange-200/80">
+                                <td colspan="4" class="px-4 py-2.5 font-black text-slate-800 text-xs sm:text-sm uppercase tracking-wide">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-2.5 h-2.5 rounded-full bg-nampi-orange"></span>
+                                            <span>Rincian Biaya Pendidikan (Tagihan 1)</span>
+                                        </div>
+                                        @if ($tagihanDU)
+                                            <span class="font-mono text-[11px] text-slate-500 font-semibold normal-case">#{{ $tagihanDU->nomor_tagihan }}</span>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+
+                            @if ($tagihanDU && $tagihanDU->details->isNotEmpty())
+                                @foreach ($tagihanDU->details as $idx => $item)
+                                    <tr class="hover:bg-slate-50/50 transition-colors">
+                                        <td class="px-4 py-2.5 text-center text-slate-400 font-mono">{{ $idx + 1 }}</td>
+                                        <td class="px-4 py-2.5 font-semibold text-slate-800">
+                                            {{ $item->nama_biaya }}
+                                        </td>
+                                        <td class="px-4 py-2.5">
+                                            @php
+                                                $kategoriNama = strtoupper($item->kategori_snapshot ?? $item->kategori);
+                                                $badgeClass = match($kategoriNama) {
+                                                    'DSP' => 'bg-blue-50 text-blue-700 border-blue-200',
+                                                    'SPP' => 'bg-purple-50 text-purple-700 border-purple-200',
+                                                    'ASRAMA' => 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                                                    'SERAGAM' => 'bg-teal-50 text-teal-700 border-teal-200',
+                                                    default => 'bg-slate-100 text-slate-600 border-slate-200',
+                                                };
+                                            @endphp
+                                            <span class="px-2 py-0.5 rounded border text-[10px] font-bold {{ $badgeClass }}">
+                                                {{ $item->kategori_snapshot ?? $item->kategori }}
+                                            </span>
+                                        </td>
+                                        <td class="px-5 py-2.5 text-right font-mono font-bold text-slate-900">
+                                            Rp {{ number_format($item->nominal, 0, ',', '.') }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td colspan="4" class="px-4 py-3 text-center text-slate-400 italic">
+                                        Belum ada rincian komponen biaya pendidikan yang diterbitkan.
+                                    </td>
+                                </tr>
+                            @endif
+
+                            {{-- SUB TOTAL TAGIHAN 1 --}}
+                            <tr class="bg-slate-50/80 font-bold border-t border-slate-200">
+                                <td colspan="3" class="px-4 py-2.5 text-right text-slate-700 text-xs">
+                                    Sub total (tagihan 1):
+                                </td>
+                                <td class="px-5 py-2.5 text-right font-mono font-bold text-slate-900 text-xs">
+                                    Rp {{ number_format($totalBrutoDU, 0, ',', '.') }}
+                                </td>
+                            </tr>
+                            @if ($totalDiskonDU > 0)
+                                <tr class="bg-emerald-50/70 text-emerald-900 border-t border-emerald-100 text-xs">
+                                    <td colspan="3" class="px-4 py-2 text-right">
+                                        <span class="inline-flex items-center gap-1 font-semibold text-emerald-800 text-[11px]">
+                                            <span>🏷️</span>
+                                            <span>Potongan Diskon / Beasiswa:</span>
+                                            <span class="font-normal italic">({{ $tagihanDU->diskon?->jenis_diskon ?? 'Keringanan Biaya' }})</span>
+                                        </span>
+                                    </td>
+                                    <td class="px-5 py-2 text-right font-mono font-bold text-emerald-700 text-xs">
+                                        - Rp {{ number_format($totalDiskonDU, 0, ',', '.') }}
+                                    </td>
+                                </tr>
+                                <tr class="bg-slate-50 font-black border-t border-slate-200 text-xs">
+                                    <td colspan="3" class="px-4 py-2 text-right text-slate-800">
+                                        Sub total Netto (tagihan 1):
+                                    </td>
+                                    <td class="px-5 py-2 text-right font-mono font-bold text-nampi-orange text-xs">
+                                        Rp {{ number_format($totalNettoDU, 0, ',', '.') }}
+                                    </td>
+                                </tr>
+                            @endif
+
+                            {{-- SECTION 2: TAGIHAN 2 (SERAGAM & ATRIBUT) --}}
+                            <tr class="bg-teal-50/60 border-t-2 border-b border-teal-200/80">
+                                <td colspan="4" class="px-4 py-2.5 font-black text-slate-800 text-xs sm:text-sm uppercase tracking-wide">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-2.5 h-2.5 rounded-full bg-teal-500"></span>
+                                            <span>Rincian Biaya Seragam & Atribut (Tagihan 2)</span>
+                                        </div>
+                                        @if ($tagihanSRG)
+                                            <span class="font-mono text-[11px] text-slate-500 font-semibold normal-case">#{{ $tagihanSRG->nomor_tagihan }}</span>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+
+                            @if ($seragamDetails->isNotEmpty())
+                                @foreach ($seragamDetails as $idx => $item)
+                                    <tr class="hover:bg-slate-50/50 transition-colors">
+                                        <td class="px-4 py-2.5 text-center text-slate-400 font-mono">{{ $idx + 1 }}</td>
+                                        <td class="px-4 py-2.5 font-semibold text-slate-800">
+                                            {{ $item->nama_biaya }}
+                                        </td>
+                                        <td class="px-4 py-2.5">
+                                            <span class="px-2 py-0.5 rounded border text-[10px] font-bold bg-teal-50 text-teal-700 border-teal-200">
+                                                SERAGAM
+                                            </span>
+                                        </td>
+                                        <td class="px-5 py-2.5 text-right font-mono font-bold text-slate-900">
+                                            Rp {{ number_format($item->nominal, 0, ',', '.') }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td colspan="4" class="px-4 py-3 text-center text-slate-500 italic bg-amber-50/30 text-xs">
+                                        Belum ada paket seragam yang dipesan (Calon siswa memilih opsi "Pesan Nanti").
+                                    </td>
+                                </tr>
+                            @endif
+
+                            {{-- SUB TOTAL TAGIHAN 2 --}}
+                            <tr class="bg-slate-50/80 font-bold border-t border-slate-200">
+                                <td colspan="3" class="px-4 py-2.5 text-right text-slate-700 text-xs">
+                                    Sub Total (tagihan 2):
+                                </td>
+                                <td class="px-5 py-2.5 text-right font-mono font-bold text-slate-900 text-xs">
+                                    Rp {{ number_format($totalBrutoSRG, 0, ',', '.') }}
+                                </td>
+                            </tr>
+                            @if ($totalDiskonSRG > 0)
+                                <tr class="bg-emerald-50/70 text-emerald-900 border-t border-emerald-100 text-xs">
+                                    <td colspan="3" class="px-4 py-2 text-right">
+                                        <span class="inline-flex items-center gap-1 font-semibold text-emerald-800 text-[11px]">
+                                            <span>🏷️</span>
+                                            <span>Potongan Diskon Seragam:</span>
+                                        </span>
+                                    </td>
+                                    <td class="px-5 py-2 text-right font-mono font-bold text-emerald-700 text-xs">
+                                        - Rp {{ number_format($totalDiskonSRG, 0, ',', '.') }}
+                                    </td>
+                                </tr>
+                                <tr class="bg-slate-50 font-black border-t border-slate-200 text-xs">
+                                    <td colspan="3" class="px-4 py-2 text-right text-slate-800">
+                                        Sub Total Netto (tagihan 2):
+                                    </td>
+                                    <td class="px-5 py-2 text-right font-mono font-bold text-teal-600 text-xs">
+                                        Rp {{ number_format($totalNettoSRG, 0, ',', '.') }}
+                                    </td>
+                                </tr>
+                            @endif
+                        </tbody>
+
+                        {{-- FOOTER / TOTAL BIAYA --}}
+                        <tfoot class="border-t-2 border-slate-300">
+                            <tr class="bg-slate-100/90">
+                                <td colspan="3" class="px-5 py-3.5 text-right font-black text-slate-900 text-xs sm:text-sm">
+                                    Total Biaya ( Sub total (tagihan 1)+Sub Total (tagihan 2) ) :
+                                </td>
+                                <td class="px-5 py-3.5 text-right font-black text-slate-900 text-sm sm:text-base font-mono">
+                                    Rp {{ number_format($grandTotal, 0, ',', '.') }}
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                {{-- FOOTNOTE CATATAN --}}
+                <div class="px-5 py-4 bg-slate-50/90 border-t border-slate-200 text-xs text-slate-600 space-y-1">
+                    <p class="font-bold text-slate-700 text-[11px] uppercase tracking-wider">Catatan:</p>
+                    <ul class="list-disc list-inside space-y-1 text-xs text-slate-600 pl-0.5">
+                        <li>Pembayaran DSP (Dana Sumbangan Pendidikan) dapat diangsur di tahun pertama</li>
+                        <li>Dana yang telah dibayarkan tidak dapat dikembalikan (non-refundable) apabila calon murid mengundurkan diri (kecuali tidak lulus dari SMP/MTs/Sederajat).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bagian Pembayaran & Riwayat -->
+            <div class="pt-2">
+                <h2 class="text-lg font-black text-slate-800">Menu Pembayaran & Konfirmasi Transfer</h2>
+                <p class="text-xs text-slate-500 mt-0.5">
+                    Pilih salah satu tab tagihan di bawah ini untuk melihat nomor rekening resmi, melakukan konfirmasi transfer, atau mengunduh invoice dan kwitansi.
+                </p>
+            </div>
 
             <!-- Invoice Tabs Switcher -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -283,94 +511,15 @@
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                        <!-- Breakdown Table -->
-                        <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-                            <div class="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                                <div>
-                                    <h3 class="text-sm font-black text-slate-800">Rincian Komponen Biaya Baku</h3>
-                                    <p class="text-[11px] text-slate-400">Snapshot resmi invoice #{{ $tagihanDU->nomor_tagihan }}</p>
-                                </div>
-                                <span class="px-2.5 py-0.5 rounded text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                                    {{ $tagihanDU->program_snapshot }} &bull; {{ $tagihanDU->gelombang_snapshot }}
-                                </span>
-                            </div>
-
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left text-xs text-slate-600">
-                                    <thead class="bg-slate-50/50 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase">
-                                        <tr>
-                                            <th class="px-4 py-3">Komponen Biaya</th>
-                                            <th class="px-3 py-3">Kategori</th>
-                                            <th class="px-4 py-3 text-right">Nominal</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-slate-100">
-                                        @foreach ($tagihanDU->details as $item)
-                                            <tr>
-                                                <td class="px-4 py-3 font-semibold text-slate-800">
-                                                    {{ $item->nama_biaya }}
-                                                </td>
-                                                <td class="px-3 py-3">
-                                                    @php
-                                                        $kategoriNama = strtoupper($item->kategori_snapshot ?? $item->kategori);
-                                                        $badgeClass = match($kategoriNama) {
-                                                            'DSP' => 'bg-blue-50 text-blue-700 border-blue-200',
-                                                            'SPP' => 'bg-purple-50 text-purple-700 border-purple-200',
-                                                            'ASRAMA' => 'bg-indigo-50 text-indigo-700 border-indigo-200',
-                                                            'SERAGAM' => 'bg-teal-50 text-teal-700 border-teal-200',
-                                                            default => 'bg-slate-100 text-slate-600 border-slate-200',
-                                                        };
-                                                    @endphp
-                                                    <span class="px-2 py-0.5 rounded border text-[10px] font-bold {{ $badgeClass }}">
-                                                        {{ $item->kategori_snapshot ?? $item->kategori }}
-                                                    </span>
-                                                </td>
-                                                <td class="px-4 py-3 text-right font-bold text-slate-900">
-                                                    Rp {{ number_format($item->nominal, 0, ',', '.') }}
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                    <tfoot class="bg-slate-50/70 border-t border-slate-200">
-                                        <tr>
-                                            <td colspan="2" class="px-4 py-2.5 font-bold text-slate-700 text-right">Total Biaya Awal (Bruto):</td>
-                                            <td class="px-4 py-2.5 font-bold text-slate-900 text-right">Rp {{ number_format($tagihanDU->total_bruto, 0, ',', '.') }}</td>
-                                        </tr>
-                                        @if ($tagihanDU->total_diskon > 0)
-                                            <tr class="bg-emerald-50/80 border-y border-emerald-200/80 text-emerald-900">
-                                                <td colspan="2" class="px-4 py-2.5 font-bold text-emerald-800 text-right">
-                                                    <div class="inline-flex items-center gap-1.5">
-                                                        <span>🏷️</span>
-                                                        <span>Potongan Diskon ({{ $tagihanDU->diskon?->jenis_diskon ?? 'Keringanan Biaya' }}):</span>
-                                                    </div>
-                                                    @if ($tagihanDU->diskon?->alasan)
-                                                        <span class="block text-[10px] text-emerald-700 font-normal italic">{{ $tagihanDU->diskon->alasan }}</span>
-                                                    @endif
-                                                </td>
-                                                <td class="px-4 py-2.5 font-black text-emerald-700 text-right text-sm">
-                                                    - Rp {{ number_format($tagihanDU->total_diskon, 0, ',', '.') }}
-                                                </td>
-                                            </tr>
-                                        @endif
-                                        <tr class="border-t-2 border-slate-200">
-                                            <td colspan="2" class="px-4 py-3 font-black text-slate-900 text-right text-sm">Total Yang Harus Dibayar (Netto):</td>
-                                            <td class="px-4 py-3 font-black text-nampi-orange text-right text-base">Rp {{ number_format($tagihanDU->total_netto, 0, ',', '.') }}</td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- Bank & Payment History -->
-                        <div class="lg:col-span-5 space-y-6">
-                            <!-- Rekening Bank -->
+                        <!-- Rekening Bank (lg:col-span-5) -->
+                        <div class="lg:col-span-5 space-y-4">
                             <div class="p-5 rounded-2xl bg-amber-50/70 border border-amber-200/80 text-amber-900 space-y-3">
                                 <div class="flex items-center gap-2">
                                     <span class="text-xl">🏦</span>
                                     <h4 class="text-sm font-bold text-amber-900">Rekening Resmi Pembayaran SPMB</h4>
                                 </div>
                                 <div class="p-3 bg-white rounded-xl border border-amber-200/60 text-xs space-y-1">
-                                    <p class="font-bold text-slate-800">Bank BNI </p>
+                                    <p class="font-bold text-slate-800">Bank BNI</p>
                                     <p class="font-mono text-base font-black text-slate-900">082 0083 086</p>
                                     <p class="text-slate-500">Atas Nama: <strong>SMK WIKRAMA 1 GARUT</strong></p>
                                 </div>
@@ -378,8 +527,10 @@
                                     Biaya pendidikan dapat dibayar <strong>lunas sekaligus</strong> atau <strong>dicicil/bertahap</strong>. Cantumkan no pendaftaran <strong>{{ $calonSiswa->nomor_pendaftaran }}</strong> pada berita transfer.
                                 </p>
                             </div>
+                        </div>
 
-                            <!-- Riwayat Pembayaran DSP & SPP -->
+                        <!-- Riwayat Pembayaran DSP & SPP (lg:col-span-7) -->
+                        <div class="lg:col-span-7 space-y-4">
                             <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
                                 <div class="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
                                     <h4 class="text-sm font-black text-slate-800">Riwayat Pembayaran DSP & SPP</h4>
@@ -541,72 +692,8 @@
                         </div>
 
                         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                            <!-- Breakdown Table -->
-                            <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-                                <div class="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                                    <div>
-                                        <h3 class="text-sm font-black text-slate-800">Rincian Paket Seragam {{ $tagihanSRG->tahap_seragam > 1 ? '(Tahap ' . $tagihanSRG->tahap_seragam . ')' : '' }}</h3>
-                                        <p class="text-[11px] text-slate-400">Komponen seragam yang dipesan pada tahap ini</p>
-                                    </div>
-                                    <span class="px-2.5 py-0.5 rounded text-[11px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
-                                        {{ $tagihanSRG->details->count() }} Komponen
-                                    </span>
-                                </div>
-
-                                <div class="overflow-x-auto">
-                                    <table class="w-full text-left text-xs text-slate-600">
-                                        <thead class="bg-slate-50/50 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase">
-                                            <tr>
-                                                <th class="px-4 py-3">Nama Seragam</th>
-                                                <th class="px-4 py-3 text-right">Harga</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="divide-y divide-slate-100">
-                                            @foreach ($tagihanSRG->details as $item)
-                                                <tr>
-                                                    <td class="px-4 py-3 font-semibold text-slate-800 flex items-center gap-2">
-                                                        <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
-                                                        {{ $item->nama_biaya }}
-                                                    </td>
-                                                    <td class="px-4 py-3 text-right font-bold text-slate-900">
-                                                        Rp {{ number_format($item->nominal, 0, ',', '.') }}
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                        <tfoot class="bg-slate-50/70 border-t border-slate-200">
-                                            @if ($tagihanSRG->total_diskon > 0)
-                                                <tr>
-                                                    <td class="px-4 py-2.5 font-bold text-slate-700 text-right">Total Biaya Awal (Bruto):</td>
-                                                    <td class="px-4 py-2.5 font-bold text-slate-900 text-right">Rp {{ number_format($tagihanSRG->total_bruto, 0, ',', '.') }}</td>
-                                                </tr>
-                                                <tr class="bg-emerald-50/80 border-y border-emerald-200/80 text-emerald-900">
-                                                    <td class="px-4 py-2.5 font-bold text-emerald-800 text-right">
-                                                        <div class="inline-flex items-center gap-1.5">
-                                                          <span>🏷️</span>
-                                                          <span>Potongan Diskon ({{ $tagihanSRG->diskon?->jenis_diskon ?? 'Keringanan Biaya' }}):</span>
-                                                        </div>
-                                                        @if ($tagihanSRG->diskon?->alasan)
-                                                          <span class="block text-[10px] text-emerald-700 font-normal italic">{{ $tagihanSRG->diskon->alasan }}</span>
-                                                        @endif
-                                                    </td>
-                                                    <td class="px-4 py-2.5 font-black text-emerald-700 text-right text-sm">
-                                                        - Rp {{ number_format($tagihanSRG->total_diskon, 0, ',', '.') }}
-                                                    </td>
-                                                </tr>
-                                            @endif
-                                            <tr class="border-t {{ $tagihanSRG->total_diskon > 0 ? 'border-t-2' : '' }} border-slate-200">
-                                                <td class="px-4 py-3 font-black text-slate-900 text-right text-sm">{{ $tagihanSRG->total_diskon > 0 ? 'Total Yang Harus Dibayar (Netto):' : 'Total Seragam:' }}</td>
-                                                <td class="px-4 py-3 font-black text-teal-600 text-right {{ $tagihanSRG->total_diskon > 0 ? 'text-base' : 'text-sm' }}">Rp {{ number_format($tagihanSRG->total_netto, 0, ',', '.') }}</td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <!-- Bank & Payment History -->
-                            <div class="lg:col-span-5 space-y-6">
-                                <!-- Rekening Bank -->
+                            <!-- Rekening Bank (lg:col-span-5) -->
+                            <div class="lg:col-span-5 space-y-4">
                                 <div class="p-5 rounded-2xl bg-teal-50/60 border border-teal-200/80 text-teal-900 space-y-3">
                                     <div class="flex items-center gap-2">
                                         <span class="text-xl">👔</span>
@@ -621,8 +708,10 @@
                                         Transfer pembayaran seragam dilakukan terpisah dari DSP/SPP. Tuliskan keterangan: <strong>SERAGAM - {{ $calonSiswa->nomor_pendaftaran }}</strong>.
                                     </p>
                                 </div>
+                            </div>
 
-                                <!-- Riwayat Pembayaran Seragam -->
+                            <!-- Riwayat Pembayaran Seragam (lg:col-span-7) -->
+                            <div class="lg:col-span-7 space-y-4">
                                 <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
                                     <div class="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
                                         <h4 class="text-sm font-black text-slate-800">Riwayat Pembayaran Seragam</h4>
