@@ -55,7 +55,7 @@ class AnalitikController extends Controller
             ->selectRaw('COALESCE(NULLIF(master_sekolah_asal.nama_sekolah, ""), NULLIF(calon_siswa.asal_sekolah_lainnya, ""), "Belum Diisi") as nama, count(*) as total')
             ->groupBy('nama')
             ->orderByDesc('total')
-            ->limit(10)
+            ->limit(15)
             ->get();
 
         $sekolahLabels = $sekolahRaw->pluck('nama')->toArray();
@@ -70,7 +70,7 @@ class AnalitikController extends Controller
             ->selectRaw('COALESCE(NULLIF(kabupaten_nama, ""), "Belum Terdata") as nama, count(*) as total')
             ->groupBy('nama')
             ->orderByDesc('total')
-            ->limit(8)
+            ->limit(15)
             ->get();
 
         $kabupatenLabels = $kabupatenRaw->pluck('nama')->toArray();
@@ -84,7 +84,7 @@ class AnalitikController extends Controller
             ->selectRaw('COALESCE(NULLIF(kecamatan_nama, ""), "Belum Terdata") as nama, count(*) as total')
             ->groupBy('nama')
             ->orderByDesc('total')
-            ->limit(8)
+            ->limit(15)
             ->get();
 
         $kecamatanLabels = $kecamatanRaw->pluck('nama')->toArray();
@@ -378,17 +378,17 @@ class AnalitikController extends Controller
             'usiaIbuLabels' => array_keys($usiaIbuBins),
             'usiaIbuCounts' => array_values($usiaIbuBins),
 
-            'pekerjaanAyahLabels' => array_keys(array_slice($pekerjaanAyahCounts, 0, 8)),
-            'pekerjaanAyahCounts' => array_values(array_slice($pekerjaanAyahCounts, 0, 8)),
+            'pekerjaanAyahLabels' => array_keys(array_slice($pekerjaanAyahCounts, 0, 15)),
+            'pekerjaanAyahCounts' => array_values(array_slice($pekerjaanAyahCounts, 0, 15)),
 
-            'pekerjaanIbuLabels' => array_keys(array_slice($pekerjaanIbuCounts, 0, 8)),
-            'pekerjaanIbuCounts' => array_values(array_slice($pekerjaanIbuCounts, 0, 8)),
+            'pekerjaanIbuLabels' => array_keys(array_slice($pekerjaanIbuCounts, 0, 15)),
+            'pekerjaanIbuCounts' => array_values(array_slice($pekerjaanIbuCounts, 0, 15)),
 
-            'penghasilanAyahLabels' => array_keys(array_slice($penghasilanAyahCounts, 0, 8)),
-            'penghasilanAyahCounts' => array_values(array_slice($penghasilanAyahCounts, 0, 8)),
+            'penghasilanAyahLabels' => array_keys(array_slice($penghasilanAyahCounts, 0, 15)),
+            'penghasilanAyahCounts' => array_values(array_slice($penghasilanAyahCounts, 0, 15)),
 
-            'penghasilanIbuLabels' => array_keys(array_slice($penghasilanIbuCounts, 0, 8)),
-            'penghasilanIbuCounts' => array_values(array_slice($penghasilanIbuCounts, 0, 8)),
+            'penghasilanIbuLabels' => array_keys(array_slice($penghasilanIbuCounts, 0, 15)),
+            'penghasilanIbuCounts' => array_values(array_slice($penghasilanIbuCounts, 0, 15)),
         ]);
     }
 }
