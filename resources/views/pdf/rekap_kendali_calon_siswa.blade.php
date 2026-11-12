@@ -47,9 +47,10 @@
     <div class="doc-title">REKAPITULASI KENDALI CALON MURID BARU</div>
     <div class="doc-number">Tahun Ajaran 2027/2028 &bull; Dicetak pada: {{ $printedAt->translatedFormat('d F Y H:i') }} WIB</div>
 
-    @if (!empty($filters['jurusan_nama']) || !empty($filters['status_nama']) || !empty($filters['gelombang_nama']) || !empty($filters['program_nama']) || !empty($filters['gender_nama']))
+    @if (!empty($filters['jurusan_nama']) || !empty($filters['status_nama']) || !empty($filters['gelombang_nama']) || !empty($filters['program_nama']) || !empty($filters['gender_nama']) || !empty($filters['bulan_nama']))
         <div style="font-size: 7.5pt; color: #475569; margin-bottom: 8px; background-color: #f8fafc; padding: 5px 8px; border-radius: 4px; border: 1px solid #e2e8f0;">
             <strong>Filter Laporan:</strong>
+            @if (!empty($filters['bulan_nama'])) Bulan Daftar: <strong>{{ $filters['bulan_nama'] }}</strong> &bull; @endif
             @if (!empty($filters['program_nama'])) Program: <strong>{{ $filters['program_nama'] }}</strong> &bull; @endif
             @if (!empty($filters['jurusan_nama'])) Jurusan: <strong>{{ $filters['jurusan_nama'] }}</strong> &bull; @endif
             @if (!empty($filters['gelombang_nama'])) Gelombang: <strong>{{ $filters['gelombang_nama'] }}</strong> &bull; @endif
@@ -83,7 +84,8 @@
                     <td style="text-align: center; font-weight: bold; color: #64748b;">{{ $index + 1 }}</td>
                     <td style="font-family: monospace;">
                         <strong style="color: #ea580c;">{{ $cs->nomor_pendaftaran }}</strong><br>
-                        <span style="color: #64748b;">{{ $cs->nisn }}</span>
+                        <span style="color: #64748b;">{{ $cs->nisn }}</span><br>
+                        <span style="color: #475569; font-size: 5.5pt;">Tgl: {{ $cs->created_at ? $cs->created_at->format('d/m/Y') : '-' }}</span>
                     </td>
                     <td>
                         <strong>{{ strtoupper($cs->nama_lengkap) }}</strong><br>

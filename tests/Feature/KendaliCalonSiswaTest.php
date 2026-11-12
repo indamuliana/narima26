@@ -87,6 +87,8 @@ class KendaliCalonSiswaTest extends TestCase
         $response->assertSee('Kendali Calon Murid');
         $response->assertSee('Khusus Admin');
         $response->assertSee('Nama Calon Murid');
+        $response->assertSee('Tanggal Daftar');
+        $response->assertSee('Bulan Daftar');
         $response->assertSee('Biaya Seleksi');
         $response->assertSee('Pemberi Rekomendasi');
         $response->assertSee('Catatan Khusus CS');
@@ -206,5 +208,44 @@ class KendaliCalonSiswaTest extends TestCase
             ->get(route('admin.kendali-calon-siswa.export.xls'));
         $responseXls->assertStatus(200);
         $this->assertStringContainsString('Catatan CS panjang', $responseXls->streamedContent());
+    }
+
+    public function test_admin_can_filter_kendali_by_bulan_daftar(): void
+    {
+        $jurusan = MasterJurusan::first();
+        $gelombang = MasterGelombang::first();
+        $program = MasterProgram::first();
+
+        // 1. Buat calon siswa di bulan Oktober 2026 dan November 2026
+        $siswaOktober = CalonSiswa::factory()->create([
+            'nama_lengkap' => 'Siswa Bulan Oktober',
+            'jurusan_id' => $jurusan->id,
+            'gelombang_id' => $gelombang->id,
+            'program_id' => $program->id,
+            'created_at' => '2026-10-15 10:00:00',
+        ]);
+        $siswaNovember = CalonSiswa::factory()->create([
+            'nama_lengkap' => 'Siswa Bulan November',
+            'jurusan_id' => $jurusan->id,
+            'gelombang_id' => $gelombang->id,
+            'program_id' => $program->id,
+            'created_at' => '2026-11-05 14:00:00',
+        ]);
+
+        // Filter November 2026
+        $responseNov = $this->actingAs($this->adminUser)
+            ->get(route('admin.kendali-calon-siswa.index', ['bulan_daftar' => '2026-11']));
+
+        $responseNov->assertOk();
+        $responseNov->assertSee('Siswa Bulan November');
+        $responseNov->assertDontSee('Siswa Bulan Oktober');
+
+        // Filter Oktober 2026
+        $responseOkt = $this->actingAs($this->adminUser)
+            ->get(route('admin.kendali-calon-siswa.index', ['bulan_daftar' => '2026-10']));
+
+        $responseOkt->assertOk();
+        $responseOkt->assertSee('Siswa Bulan Oktober');
+        $responseOkt->assertDontSee('Siswa Bulan November');
     }
 }

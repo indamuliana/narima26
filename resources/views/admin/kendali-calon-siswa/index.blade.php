@@ -118,13 +118,26 @@
 
         <!-- Filter & Search Toolbar -->
         <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-            <form method="GET" action="{{ route('admin.kendali-calon-siswa.index') }}" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-3">
+            <form method="GET" action="{{ route('admin.kendali-calon-siswa.index') }}" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-9 gap-3">
                 <!-- Search Keyword -->
                 <div class="sm:col-span-2 md:col-span-2 lg:col-span-2 xl:col-span-2">
                     <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Cari Peserta</label>
                     <input type="text" name="q" value="{{ request('q') }}"
                            placeholder="Nama, NISN, No. Pendaftaran, Promotor..."
                            class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30">
+                </div>
+
+                <!-- Bulan Daftar Filter -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Bulan Daftar</label>
+                    <select name="bulan_daftar" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-nampi-orange/30">
+                        <option value="">Semua Bulan</option>
+                        @foreach ($bulanList as $ym => $labelBulan)
+                            <option value="{{ $ym }}" {{ request('bulan_daftar') === (string) $ym ? 'selected' : '' }}>
+                                {{ $labelBulan }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <!-- Status Filter -->
@@ -194,7 +207,7 @@
                     <button type="submit" class="flex-1 py-2 px-3 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-colors cursor-pointer">
                         Filter
                     </button>
-                    @if (request()->hasAny(['q', 'status_spmb', 'jurusan_id', 'gelombang_id', 'program_id', 'jenis_kelamin']))
+                    @if (request()->hasAny(['q', 'status_spmb', 'jurusan_id', 'gelombang_id', 'program_id', 'jenis_kelamin', 'bulan_daftar']))
                         <a href="{{ route('admin.kendali-calon-siswa.index') }}" class="py-2 px-3 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition-colors">
                             Reset
                         </a>
@@ -226,6 +239,7 @@
                         <tr>
                             <th class="px-3 py-3.5 text-center">No</th>
                             <th class="px-4 py-3.5 min-w-[190px]">Nama Calon Murid</th>
+                            <th class="px-3 py-3.5 min-w-[120px]">Tanggal Daftar</th>
                             <th class="px-3 py-3.5 min-w-[130px]">Jurusan</th>
                             <th class="px-3 py-3.5">Gelombang</th>
                             <th class="px-3 py-3.5 text-center">Biaya Seleksi</th>
@@ -271,6 +285,16 @@
                                     <p class="text-[11px] text-slate-500 mt-0.5">
                                         {{ $cs->sekolah_asal_text }}
                                     </p>
+                                </td>
+
+                                <!-- Tanggal Daftar -->
+                                <td class="px-3 py-4 whitespace-nowrap">
+                                    <span class="font-bold text-slate-800 block text-xs">
+                                        {{ $cs->created_at ? $cs->created_at->translatedFormat('d M Y') : '-' }}
+                                    </span>
+                                    <span class="text-[10px] text-slate-400 block font-mono mt-0.5">
+                                        {{ $cs->created_at ? $cs->created_at->format('H:i') . ' WIB' : '' }}
+                                    </span>
                                 </td>
 
                                 <!-- Jurusan -->
@@ -419,7 +443,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="11" class="px-6 py-12 text-center text-slate-400">
+                                <td colspan="12" class="px-6 py-12 text-center text-slate-400">
                                     <div class="flex flex-col items-center justify-center">
                                         <svg class="w-12 h-12 text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>

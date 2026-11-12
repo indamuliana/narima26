@@ -74,6 +74,18 @@ class KendaliCalonSiswaController extends Controller
             }
         }
 
+        if ($bulan = $request->input('bulan_daftar')) {
+            if ($bulan !== 'SEMUA' && !empty($bulan)) {
+                if (preg_match('/^\d{4}-\d{2}$/', (string) $bulan)) {
+                    [$year, $month] = explode('-', (string) $bulan);
+                    $query->whereYear('created_at', (int) $year)
+                          ->whereMonth('created_at', (int) $month);
+                } elseif (is_numeric($bulan) && (int) $bulan >= 1 && (int) $bulan <= 12) {
+                    $query->whereMonth('created_at', (int) $bulan);
+                }
+            }
+        }
+
         return $query;
     }
 
@@ -94,12 +106,51 @@ class KendaliCalonSiswaController extends Controller
         $statusList = SpmbStatus::cases();
         $totalCount = $calonSiswaList->total();
 
+        // Daftar Opsi Bulan Pendaftaran (Kombinasi kalender SPMB 2026/2027 & data riil database)
+        $defaultMonths = [
+            '2026-09' => 'September 2026',
+            '2026-10' => 'Oktober 2026',
+            '2026-11' => 'November 2026',
+            '2026-12' => 'Desember 2026',
+            '2027-01' => 'Januari 2027',
+            '2027-02' => 'Februari 2027',
+            '2027-03' => 'Maret 2027',
+            '2027-04' => 'April 2027',
+            '2027-05' => 'Mei 2027',
+            '2027-06' => 'Juni 2027',
+        ];
+
+        $dbMonths = [];
+        try {
+            $formatSql = \Illuminate\Support\Facades\DB::getDriverName() === 'sqlite'
+                ? "strftime('%Y-%m', created_at)"
+                : "DATE_FORMAT(created_at, '%Y-%m')";
+
+            $rawYm = CalonSiswa::query()
+                ->selectRaw("DISTINCT {$formatSql} as ym")
+                ->whereNotNull('created_at')
+                ->orderByDesc('ym')
+                ->pluck('ym')
+                ->filter();
+
+            foreach ($rawYm as $ym) {
+                if (!isset($defaultMonths[$ym]) && preg_match('/^\d{4}-\d{2}$/', (string)$ym)) {
+                    $dbMonths[$ym] = \Carbon\Carbon::createFromFormat('Y-m', $ym)->translatedFormat('F Y');
+                }
+            }
+        } catch (\Throwable $e) {
+            // fallback to defaultMonths
+        }
+
+        $bulanList = $dbMonths + $defaultMonths;
+
         return view('admin.kendali-calon-siswa.index', compact(
             'calonSiswaList',
             'jurusanList',
             'gelombangList',
             'programList',
             'statusList',
+            'bulanList',
             'totalCount'
         ));
     }
@@ -180,6 +231,7 @@ class KendaliCalonSiswaController extends Controller
             'No. Pendaftaran',
             'NISN',
             'Nama Lengkap',
+            'Tanggal Daftar',
             'L/P',
             'Program',
             'Jurusan Pilihan 1',
@@ -235,6 +287,7 @@ class KendaliCalonSiswaController extends Controller
                     $cs->nomor_pendaftaran,
                     $cs->nisn,
                     $cs->nama_lengkap,
+                    $cs->created_at ? $cs->created_at->translatedFormat('d/m/Y H:i') : '-',
                     $cs->jenis_kelamin === 'PEREMPUAN' || $cs->jenis_kelamin === 'P' ? 'P' : 'L',
                     $cs->program?->nama ?? $cs->program?->nama_program ?? 'Reguler',
                     $cs->jurusan?->nama_jurusan ?? '-',
@@ -303,6 +356,15 @@ class KendaliCalonSiswaController extends Controller
         if ($gender = $request->input('jenis_kelamin')) {
             if ($gender !== 'SEMUA') {
                 $filters['gender_nama'] = $gender === 'L' ? 'Laki-laki' : 'Perempuan';
+            }
+        }
+        if ($bulan = $request->input('bulan_daftar')) {
+            if ($bulan !== 'SEMUA' && !empty($bulan)) {
+                if (preg_match('/^\d{4}-\d{2}$/', (string) $bulan)) {
+                    $filters['bulan_nama'] = \Carbon\Carbon::createFromFormat('Y-m', $bulan)->translatedFormat('F Y');
+                } else {
+                    $filters['bulan_nama'] = 'Bulan ' . $bulan;
+                }
             }
         }
 
