@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
                 'name' => 'Inda Muliana',
                 'email' => 'admin@wikrama.sch.id',
                 'username' => 'admin',
-                'password' => Hash::make('admin123'),
+                'password' => Hash::make('Jb88fWt2q3'),
                 'role' => User::ROLE_ADMIN,
                 'phone' => '081200000001',
                 'is_active' => true,
