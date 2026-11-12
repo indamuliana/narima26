@@ -71,6 +71,29 @@ enum SpmbStatus: string
     }
 
     /**
+     * Get table row background color for admin kendali views.
+     */
+    public function rowBgColor(): string
+    {
+        return match ($this) {
+            self::REGISTRASI => '#F7E5BB',
+            self::MENUNGGU_PEMBAYARAN_SELEKSI => '#F7D1BB',
+            self::PEMBAYARAN_SELEKSI_DIVERIFIKASI => '#F7F2BB',
+            self::MELENGKAPI_DATA => '#E3F7BB',
+            self::DATA_LENGKAP => '#C0F7BB',
+            self::MENUNGGU_WAWANCARA => '#BBF7EB',
+            self::SUDAH_DIWAWANCARA => '#BAF2F5',
+            self::MENUNGGU_KEPUTUSAN => '#BBE3F7',
+            self::DITERIMA => '#BBF7D4',
+            self::DITOLAK => '#F7BBBB',
+            self::MENUNGGU_DAFTAR_ULANG => '#BBCFF7',
+            self::DAFTAR_ULANG_DIVERIFIKASI => '#C5BBF7',
+            self::RESMI_TERDAFTAR => '#E8BBF7',
+            self::MENGUNDURKAN_DIRI => '#F7BBDE',
+        };
+    }
+
+    /**
      * List of allowed next statuses in normal SPMB state progression.
      * Note: MENGUNDURKAN_DIRI can be set from any active state by Admin/Kepsek.
      *

@@ -6,6 +6,9 @@
     </x-slot>
 
     <div class="space-y-6" x-data="{
+        // State Legenda Warna Status
+        showLegend: false,
+
         // State Modal Pop-up Edit Catatan
         modalOpen: false,
         modalTitle: '',
@@ -216,9 +219,20 @@
             </form>
         </div>
 
-        <!-- Table Summary Badge -->
-        <div class="flex items-center justify-between text-xs text-slate-500 px-1">
-            <span>Menampilkan <strong>{{ $calonSiswaList->count() }}</strong> dari total <strong>{{ $totalCount }}</strong> calon murid</span>
+        <!-- Table Summary Badge & Controls -->
+        <div class="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500 px-1">
+            <div class="flex items-center gap-3">
+                <span>Menampilkan <strong>{{ $calonSiswaList->count() }}</strong> dari total <strong>{{ $totalCount }}</strong> calon murid</span>
+                <button type="button" 
+                        @click="showLegend = !showLegend" 
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-2xs transition-all cursor-pointer select-none">
+                    <span class="text-sm leading-none">🎨</span>
+                    <span>Legenda Warna Status</span>
+                    <svg class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200" :class="showLegend ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+            </div>
             <div class="flex items-center gap-2">
                 <span>Tampilkan:</span>
                 <select onchange="window.location.href = this.value" class="px-2 py-1 text-xs rounded-lg border border-slate-200">
@@ -228,6 +242,36 @@
                         </option>
                     @endforeach
                 </select>
+            </div>
+        </div>
+
+        <!-- Collapsible Legend Panel -->
+        <div x-show="showLegend"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 -translate-y-2"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 -translate-y-2"
+             style="display: none;"
+             class="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
+            <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-nampi-orange"></span>
+                    <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                        Panduan Warna Baris Status SPMB
+                    </h4>
+                </div>
+                <span class="text-[11px] text-slate-400 font-medium">14 Status Pendaftaran</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2">
+                @foreach(\App\Enums\SpmbStatus::cases() as $st)
+                    <div class="flex items-center gap-2 px-2.5 py-2 rounded-xl border border-black/[0.08] text-slate-900 text-[11px] font-semibold transition-all hover:scale-[1.02] shadow-2xs"
+                         style="background-color: {{ $st->rowBgColor() }};">
+                        <span class="w-3.5 h-3.5 rounded-full border border-black/25 shrink-0 shadow-2xs" style="background-color: {{ $st->rowBgColor() }};"></span>
+                        <span class="truncate" title="{{ $st->label() }}">{{ $st->label() }}</span>
+                    </div>
+                @endforeach
             </div>
         </div>
 
@@ -251,13 +295,18 @@
                             <th class="px-3 py-3.5 text-center min-w-[100px]">WhatsApp</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-black/[0.04]">
                         @forelse ($calonSiswaList as $index => $cs)
                             @php
                                 $bayarSeleksi = $cs->pembayaranSeleksi;
                                 $statusStr = is_string($cs->status_spmb) ? $cs->status_spmb : ($cs->status_spmb?->value ?? '-');
+                                $statusEnum = $cs->status_spmb instanceof \App\Enums\SpmbStatus
+                                    ? $cs->status_spmb
+                                    : \App\Enums\SpmbStatus::tryFrom((string) $cs->status_spmb);
+                                $rowBgColor = $statusEnum ? $statusEnum->rowBgColor() : '#ffffff';
                             @endphp
-                            <tr class="hover:bg-slate-50/60 transition-colors align-top">
+                            <tr class="align-top border-b border-black/[0.04] transition-all hover:brightness-[0.96]"
+                                style="background-color: {{ $rowBgColor }};">
                                 <!-- No -->
                                 <td class="px-3 py-4 text-center font-bold text-slate-400">
                                     {{ $calonSiswaList->firstItem() + $index }}
@@ -329,7 +378,7 @@
 
                                 <!-- Status SPMB -->
                                 <td class="px-3 py-4 text-center">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-white/85 text-slate-800 border border-black/10 shadow-2xs backdrop-blur-xs">
                                         {{ str_replace('_', ' ', $statusStr) }}
                                     </span>
                                 </td>

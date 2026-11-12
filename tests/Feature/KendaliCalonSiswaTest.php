@@ -89,6 +89,8 @@ class KendaliCalonSiswaTest extends TestCase
         $response->assertSee('Nama Calon Murid');
         $response->assertSee('Tanggal Daftar');
         $response->assertSee('Bulan Daftar');
+        $response->assertSee('Legenda Warna Status');
+        $response->assertSee('Panduan Warna Baris Status SPMB');
         $response->assertSee('Biaya Seleksi');
         $response->assertSee('Pemberi Rekomendasi');
         $response->assertSee('Catatan Khusus CS');
@@ -247,5 +249,41 @@ class KendaliCalonSiswaTest extends TestCase
         $responseOkt->assertOk();
         $responseOkt->assertSee('Siswa Bulan Oktober');
         $responseOkt->assertDontSee('Siswa Bulan November');
+    }
+
+    public function test_all_spmb_statuses_have_configured_row_background_colors(): void
+    {
+        $cases = SpmbStatus::cases();
+        $this->assertCount(14, $cases);
+
+        $colors = array_map(fn($st) => $st->rowBgColor(), $cases);
+
+        // Pastikan setiap status memiliki hex color yang valid (#RRGGBB)
+        foreach ($colors as $color) {
+            $this->assertMatchesRegularExpression('/^#[0-9A-Fa-f]{6}$/', $color);
+        }
+
+        // Pastikan ke-14 status memiliki warna unik (14 warna berbeda)
+        $this->assertCount(14, array_unique($colors));
+
+        // Cek pemetaan semantik kunci
+        $this->assertEquals('#F7BBBB', SpmbStatus::DITOLAK->rowBgColor());
+        $this->assertEquals('#F7BBDE', SpmbStatus::MENGUNDURKAN_DIRI->rowBgColor());
+        $this->assertEquals('#BBF7D4', SpmbStatus::DITERIMA->rowBgColor());
+        $this->assertEquals('#E8BBF7', SpmbStatus::RESMI_TERDAFTAR->rowBgColor());
+    }
+
+    public function test_kendali_table_rows_render_background_color_inline_style(): void
+    {
+        $this->calonSiswa->update([
+            'status_spmb' => SpmbStatus::MENUNGGU_WAWANCARA,
+        ]);
+
+        $response = $this->actingAs($this->adminUser)
+            ->get(route('admin.kendali-calon-siswa.index'));
+
+        $response->assertOk();
+        $expectedColor = SpmbStatus::MENUNGGU_WAWANCARA->rowBgColor();
+        $response->assertSee('style="background-color: ' . $expectedColor . ';"', false);
     }
 }
