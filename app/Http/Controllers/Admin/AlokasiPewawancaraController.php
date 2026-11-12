@@ -23,6 +23,10 @@ class AlokasiPewawancaraController extends Controller
         $jurusanId = $request->input('jurusan_id');
         $pewawancaraId = $request->input('pewawancara_id');
         $statusAlokasi = $request->input('status_alokasi');
+        $statusWawancara = $request->input('status_wawancara', 'BELUM');
+        if (!in_array($statusWawancara, ['BELUM', 'SELESAI', 'SEMUA'], true)) {
+            $statusWawancara = 'BELUM';
+        }
 
         // Calon siswa yang sudah menyelesaikan berkas & masuk tahapan wawancara
         $query = CalonSiswa::with([
@@ -30,6 +34,8 @@ class AlokasiPewawancaraController extends Controller
             'program',
             'latestWawancara.pewawancara',
             'latestWawancara.details',
+            'wawancaraSiswa.pewawancara',
+            'wawancaraOrangTua.pewawancara',
         ])->whereIn('status_spmb', [
             SpmbStatus::DATA_LENGKAP->value,
             SpmbStatus::MENUNGGU_WAWANCARA->value,
@@ -63,6 +69,36 @@ class AlokasiPewawancaraController extends Controller
             $query->whereHas('wawancara');
         }
 
+        // Kriteria kedua wawancara telah selesai (Siswa & Ortu)
+        $selesaiClosure = function ($q) {
+            $q->where(function ($sub) {
+                $sub->whereHas('wawancaraSiswa', function ($sq) {
+                    $sq->where('status', 'SELESAI');
+                })->whereHas('wawancaraOrangTua', function ($oq) {
+                    $oq->where('status', 'SELESAI');
+                });
+            })->orWhere(function ($sub) {
+                $sub->whereDoesntHave('wawancaraSiswa')
+                    ->whereDoesntHave('wawancaraOrangTua')
+                    ->whereHas('wawancara', function ($wq) {
+                        $wq->where('status', 'SELESAI')->orWhereHas('details');
+                    });
+            });
+        };
+
+        // Hitung counter untuk segmented tabs
+        $baseQuery = clone $query;
+        $countBelumSelesai = (clone $baseQuery)->whereNot($selesaiClosure)->count();
+        $countSudahSelesai = (clone $baseQuery)->where($selesaiClosure)->count();
+        $countSemua = (clone $baseQuery)->count();
+
+        // Terapkan filter status wawancara (Default: BELUM)
+        if ($statusWawancara === 'BELUM') {
+            $query->whereNot($selesaiClosure);
+        } elseif ($statusWawancara === 'SELESAI') {
+            $query->where($selesaiClosure);
+        }
+
         $calonSiswaList = $query->paginate(20)->withQueryString();
 
         $pewawancaraList = User::whereIn('role', [User::ROLE_PEWAWANCARA, User::ROLE_ADMIN, User::ROLE_OPERATOR])
@@ -80,7 +116,11 @@ class AlokasiPewawancaraController extends Controller
             'search',
             'jurusanId',
             'pewawancaraId',
-            'statusAlokasi'
+            'statusAlokasi',
+            'statusWawancara',
+            'countBelumSelesai',
+            'countSudahSelesai',
+            'countSemua'
         ));
     }
 

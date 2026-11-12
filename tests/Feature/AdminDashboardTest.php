@@ -10,6 +10,8 @@ use App\Models\MasterProgram;
 use App\Models\MasterSekolahAsal;
 use App\Models\PembayaranSeleksi;
 use App\Models\User;
+use App\Models\WawancaraOrangTua;
+use App\Models\WawancaraSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Activitylog\Models\Activity;
 use Tests\TestCase;
@@ -280,6 +282,85 @@ class AdminDashboardTest extends TestCase
             'calon_siswa_id' => $this->calonSiswa->id,
             'pewawancara_id' => $pewawancaraUser->id,
         ]);
+    }
+
+    public function test_admin_alokasi_pewawancara_filters_by_status_wawancara_and_shows_indicators(): void
+    {
+        $pewawancara = User::where('role', User::ROLE_PEWAWANCARA)->first() ?? $this->adminUser;
+
+        // Siswa 1: Keduanya selesai
+        $siswaSelesai = CalonSiswa::factory()->create([
+            'nama_lengkap' => 'Siswa Lengkap Selesai',
+            'status_spmb' => SpmbStatus::MENUNGGU_WAWANCARA,
+            'jurusan_id' => $this->jurusan->id,
+        ]);
+        WawancaraSiswa::create([
+            'calon_siswa_id' => $siswaSelesai->id,
+            'pewawancara_id' => $pewawancara->id,
+            'status' => 'SELESAI',
+            'tanggal_wawancara' => now(),
+        ]);
+        WawancaraOrangTua::create([
+            'calon_siswa_id' => $siswaSelesai->id,
+            'pewawancara_id' => $pewawancara->id,
+            'status' => 'SELESAI',
+            'tanggal_wawancara' => now(),
+        ]);
+
+        // Siswa 2: Baru siswa yang selesai, ortu belum
+        $siswaParsial = CalonSiswa::factory()->create([
+            'nama_lengkap' => 'Siswa Parsial Belum Ortu',
+            'status_spmb' => SpmbStatus::MENUNGGU_WAWANCARA,
+            'jurusan_id' => $this->jurusan->id,
+        ]);
+        WawancaraSiswa::create([
+            'calon_siswa_id' => $siswaParsial->id,
+            'pewawancara_id' => $pewawancara->id,
+            'status' => 'SELESAI',
+            'tanggal_wawancara' => now(),
+        ]);
+
+        // Siswa 3: Belum diwawancara sama sekali
+        $siswaBelum = CalonSiswa::factory()->create([
+            'nama_lengkap' => 'Siswa Belum Wawancara',
+            'status_spmb' => SpmbStatus::MENUNGGU_WAWANCARA,
+            'jurusan_id' => $this->jurusan->id,
+        ]);
+
+        // 1. Default view (status_wawancara = BELUM)
+        $responseDefault = $this->actingAs($this->adminUser)
+            ->get(route('admin.alokasi-pewawancara.index'));
+
+        $responseDefault->assertOk();
+        $responseDefault->assertSee('Belum Selesai');
+        $responseDefault->assertSee('Sudah Selesai');
+        $responseDefault->assertSee('Semua Calon Murid');
+        $responseDefault->assertSee('Siswa Parsial Belum Ortu');
+        $responseDefault->assertSee('Siswa Belum Wawancara');
+        $responseDefault->assertDontSee('Siswa Lengkap Selesai');
+
+        // Indikator ringkas di response default
+        $responseDefault->assertSee('Murid ✓', false);
+        $responseDefault->assertSee('Ortu ⏳', false);
+
+        // 2. Tab Sudah Selesai (status_wawancara = SELESAI)
+        $responseSelesai = $this->actingAs($this->adminUser)
+            ->get(route('admin.alokasi-pewawancara.index', ['status_wawancara' => 'SELESAI']));
+
+        $responseSelesai->assertOk();
+        $responseSelesai->assertSee('Siswa Lengkap Selesai');
+        $responseSelesai->assertSee('✓ Keduanya Selesai', false);
+        $responseSelesai->assertDontSee('Siswa Parsial Belum Ortu');
+        $responseSelesai->assertDontSee('Siswa Belum Wawancara');
+
+        // 3. Tab Semua Data (status_wawancara = SEMUA)
+        $responseSemua = $this->actingAs($this->adminUser)
+            ->get(route('admin.alokasi-pewawancara.index', ['status_wawancara' => 'SEMUA']));
+
+        $responseSemua->assertOk();
+        $responseSemua->assertSee('Siswa Lengkap Selesai');
+        $responseSemua->assertSee('Siswa Parsial Belum Ortu');
+        $responseSemua->assertSee('Siswa Belum Wawancara');
     }
 
     public function test_feeder_schools_aggregates_master_and_manual_input(): void

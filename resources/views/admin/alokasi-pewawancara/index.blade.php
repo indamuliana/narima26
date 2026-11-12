@@ -52,6 +52,7 @@
         <!-- Filter & Search Toolbar -->
         <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
             <form method="GET" action="{{ route('admin.alokasi-pewawancara.index') }}" class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+                <input type="hidden" name="status_wawancara" value="{{ $statusWawancara }}">
                 <div>
                     <label class="block font-bold text-slate-500 uppercase mb-1">Cari Peserta</label>
                     <input type="text" name="q" value="{{ request('q') }}" placeholder="Nama, NISN, No. Daftar..."
@@ -83,6 +84,57 @@
                     </a>
                 </div>
             </form>
+        </div>
+
+        <!-- Segmented Tabs: Status Pelaksanaan Wawancara -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="inline-flex p-1 bg-slate-200/80 rounded-2xl gap-1 text-xs font-bold self-start">
+                <!-- Tab Belum Selesai (Default) -->
+                <a href="{{ request()->fullUrlWithQuery(['status_wawancara' => 'BELUM']) }}"
+                   class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl transition-all {{ $statusWawancara === 'BELUM' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-white/50' }}">
+                    <span class="w-2 h-2 rounded-full {{ $statusWawancara === 'BELUM' ? 'bg-amber-500' : 'bg-slate-400' }}"></span>
+                    <span>Belum Selesai</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] {{ $statusWawancara === 'BELUM' ? 'bg-amber-100 text-amber-900' : 'bg-slate-300 text-slate-700' }}">
+                        {{ $countBelumSelesai }}
+                    </span>
+                </a>
+
+                <!-- Tab Sudah Selesai -->
+                <a href="{{ request()->fullUrlWithQuery(['status_wawancara' => 'SELESAI']) }}"
+                   class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl transition-all {{ $statusWawancara === 'SELESAI' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-white/50' }}">
+                    <span class="w-2 h-2 rounded-full {{ $statusWawancara === 'SELESAI' ? 'bg-emerald-500' : 'bg-slate-400' }}"></span>
+                    <span>Sudah Selesai</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] {{ $statusWawancara === 'SELESAI' ? 'bg-emerald-100 text-emerald-900' : 'bg-slate-300 text-slate-700' }}">
+                        {{ $countSudahSelesai }}
+                    </span>
+                </a>
+
+                <!-- Tab Semua Data -->
+                <a href="{{ request()->fullUrlWithQuery(['status_wawancara' => 'SEMUA']) }}"
+                   class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl transition-all {{ $statusWawancara === 'SEMUA' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-white/50' }}">
+                    <span>Semua Calon Murid</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] {{ $statusWawancara === 'SEMUA' ? 'bg-slate-900 text-white' : 'bg-slate-300 text-slate-700' }}">
+                        {{ $countSemua }}
+                    </span>
+                </a>
+            </div>
+
+            <!-- Keterangan Status Aktif -->
+            <div class="text-xs text-slate-500">
+                @if ($statusWawancara === 'BELUM')
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 font-medium">
+                        <span>⏳</span> Menampilkan calon yang wawancaranya belum lengkap (Siswa atau Ortu)
+                    </span>
+                @elseif ($statusWawancara === 'SELESAI')
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 font-medium">
+                        <span>✓</span> Menampilkan calon yang kedua wawancara telah selesai
+                    </span>
+                @else
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 border border-slate-200 font-medium">
+                        <span>📋</span> Menampilkan seluruh riwayat calon murid pada tahapan wawancara
+                    </span>
+                @endif
+            </div>
         </div>
 
         <!-- Batch Action Form -->
@@ -125,14 +177,32 @@
                             @forelse ($calonSiswaList as $cs)
                                 @php
                                     $w = $cs->latestWawancara;
-                                    $pewawancaraAssigned = $w?->pewawancara;
+                                    $pewawancaraAssigned = $w?->pewawancara ?? $cs->wawancaraSiswa?->pewawancara ?? $cs->wawancaraOrangTua?->pewawancara;
+
+                                    $isSiswaSelesai = $cs->wawancaraSiswa?->status === 'SELESAI';
+                                    $isOrtuSelesai = $cs->wawancaraOrangTua?->status === 'SELESAI';
+
+                                    // Fallback bila data wawancara disimpan pada model Wawancara legacy
+                                    if (!$cs->wawancaraSiswa && !$cs->wawancaraOrangTua && $w && ($w->status === 'SELESAI' || $w->details?->count() > 0)) {
+                                        $isSiswaSelesai = true;
+                                        $isOrtuSelesai = true;
+                                    }
+
+                                    $isKeduanyaSelesai = $isSiswaSelesai && $isOrtuSelesai;
                                 @endphp
-                                <tr class="hover:bg-slate-50/70 transition-colors">
+                                <tr class="transition-colors {{ $isKeduanyaSelesai ? 'bg-emerald-50/50 hover:bg-emerald-100/40 border-b border-emerald-100' : 'hover:bg-slate-50/70' }}">
                                     <td class="px-4 py-4 text-center">
                                         <input type="checkbox" name="calon_siswa_ids[]" value="{{ $cs->id }}" class="candidate-checkbox rounded text-nampi-orange">
                                     </td>
                                     <td class="px-5 py-4">
-                                        <span class="font-bold text-slate-900 block text-sm">{{ $cs->nama_lengkap }}</span>
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-bold text-slate-900 block text-sm">{{ $cs->nama_lengkap }}</span>
+                                            @if ($isKeduanyaSelesai)
+                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800" title="Wawancara Siswa & Ortu Selesai">
+                                                    ✓ Selesai
+                                                </span>
+                                            @endif
+                                        </div>
                                         <span class="text-slate-400 font-mono text-[11px]">{{ $cs->nomor_pendaftaran }} &bull; NISN: {{ $cs->nisn }}</span>
                                     </td>
                                     <td class="px-4 py-4 font-semibold text-slate-700">
@@ -151,17 +221,34 @@
                                         @endif
                                     </td>
                                     <td class="px-4 py-4 text-center">
-                                        @if ($w && $w->details->count() > 0)
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                                Selesai (Skor: {{ round($w->details->avg('skor')) }})
+                                        @if ($isKeduanyaSelesai)
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                                ✓ Keduanya Selesai
                                             </span>
-                                        @elseif ($w)
+                                        @elseif ($isSiswaSelesai || $isOrtuSelesai || ($cs->wawancaraSiswa?->status === 'DRAFT' || $cs->wawancaraOrangTua?->status === 'DRAFT'))
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                                                ⏳ Belum Lengkap
+                                            </span>
+                                        @elseif ($pewawancaraAssigned)
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
                                                 Menunggu Uji
                                             </span>
                                         @else
-                                            <span class="text-slate-400 italic text-[11px]">-</span>
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-500 border border-slate-200">
+                                                Belum Wawancara
+                                            </span>
                                         @endif
+
+                                        <!-- Indikator Ikon Ringkas Murid & Ortu -->
+                                        <div class="flex items-center justify-center gap-2 mt-1.5 text-[11px] font-medium">
+                                            <span class="{{ $isSiswaSelesai ? 'text-emerald-700 font-bold' : 'text-slate-400' }}" title="{{ $isSiswaSelesai ? 'Wawancara Murid: Selesai' : 'Wawancara Murid: Belum Selesai' }}">
+                                                Murid {!! $isSiswaSelesai ? '✓' : '⏳' !!}
+                                            </span>
+                                            <span class="text-slate-300">&bull;</span>
+                                            <span class="{{ $isOrtuSelesai ? 'text-emerald-700 font-bold' : 'text-slate-400' }}" title="{{ $isOrtuSelesai ? 'Wawancara Ortu: Selesai' : 'Wawancara Ortu: Belum Selesai' }}">
+                                                Ortu {!! $isOrtuSelesai ? '✓' : '⏳' !!}
+                                            </span>
+                                        </div>
                                     </td>
                                     <td class="px-5 py-4 text-right">
                                         <button type="button"
