@@ -286,7 +286,6 @@
                             <th class="px-3 py-3.5 min-w-[150px]">Tanggal Daftar</th>
                             <th class="px-3 py-3.5 min-w-[130px]">Jurusan</th>
                             <th class="px-3 py-3.5 text-center min-w-[120px]">Program & Gelombang</th>
-                            <th class="px-3 py-3.5 text-center">Biaya Seleksi</th>
                             <th class="px-3 py-3.5 text-center min-w-[130px]">Status SPMB</th>
                             <th class="px-3 py-3.5 min-w-[140px]">Pemberi Rekomendasi</th>
                             <th class="px-3 py-3.5 w-[180px] min-w-[180px] max-w-[180px]">Catatan Khusus CS</th>
@@ -365,23 +364,6 @@
                                     <span class="block text-[11px] font-semibold text-slate-700 mt-1">
                                         {{ $cs->gelombang?->nama_gelombang ?? '-' }}
                                     </span>
-                                </td>
-
-                                <!-- Biaya Seleksi (Lunas/Belum Lunas) -->
-                                <td class="px-3 py-4 text-center">
-                                    @if ($bayarSeleksi && $bayarSeleksi->status === 'DIVERIFIKASI')
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                            ✓ Lunas
-                                        </span>
-                                    @elseif ($bayarSeleksi && $bayarSeleksi->status === 'PENDING')
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                            ⏳ Menunggu
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500">
-                                            Belum Lunas
-                                        </span>
-                                    @endif
                                 </td>
 
                                 <!-- Status SPMB -->
@@ -493,7 +475,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="11" class="px-6 py-12 text-center text-slate-400">
+                                <td colspan="10" class="px-6 py-12 text-center text-slate-400">
                                     <div class="flex flex-col items-center justify-center">
                                         <svg class="w-12 h-12 text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
