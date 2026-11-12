@@ -218,6 +218,14 @@
         <span>Audit Trail Sistem</span>
     </a>
 
+    <a href="{{ route('admin.backup.index') }}"
+       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors {{ request()->routeIs('admin.backup.*') ? 'bg-nampi-orange text-white shadow-xs font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+        <svg class="w-5 h-5 {{ request()->routeIs('admin.backup.*') ? 'text-white' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/>
+        </svg>
+        <span>Backup & Restore</span>
+    </a>
+
     <div class="pt-4 pb-2">
         <p class="px-3.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">Pintasan Antar Role</p>
     </div>

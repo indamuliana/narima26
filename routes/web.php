@@ -286,6 +286,19 @@ Route::middleware(['auth', 'role:admin'])
 
         // Log Audit Trail
         Route::get('/audit-trail', [\App\Http\Controllers\Admin\AuditTrailController::class, 'index'])->name('audit-trail.index');
+
+        // Backup & Restore Data (Admin Exclusive)
+        Route::controller(\App\Http\Controllers\Admin\BackupController::class)
+            ->prefix('backup')
+            ->name('backup.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::post('/database', 'createDatabase')->name('database');
+                Route::post('/storage', 'createStorage')->name('storage');
+                Route::get('/download/{filename}', 'download')->name('download');
+                Route::delete('/{filename}', 'destroy')->name('destroy');
+                Route::post('/restore', 'restore')->name('restore');
+            });
     });
 
 // Bendahara Area
