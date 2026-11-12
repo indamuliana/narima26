@@ -91,6 +91,7 @@ class KendaliCalonSiswaTest extends TestCase
         $response->assertSee('Bulan Daftar');
         $response->assertSee('Legenda Warna Status');
         $response->assertSee('Panduan Warna Baris Status SPMB');
+        $response->assertSee('Program & Gelombang', false);
         $response->assertSee('Biaya Seleksi');
         $response->assertSee('Pemberi Rekomendasi');
         $response->assertSee('Catatan Khusus CS');

@@ -282,13 +282,12 @@
                     <thead class="bg-slate-50/80 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                         <tr>
                             <th class="px-3 py-3.5 text-center">No</th>
-                            <th class="px-4 py-3.5 min-w-[190px]">Nama Calon Murid</th>
-                            <th class="px-3 py-3.5 min-w-[120px]">Tanggal Daftar</th>
+                            <th class="px-4 py-3.5 min-w-[180px]">Nama Calon Murid</th>
+                            <th class="px-3 py-3.5 min-w-[150px]">Tanggal Daftar</th>
                             <th class="px-3 py-3.5 min-w-[130px]">Jurusan</th>
-                            <th class="px-3 py-3.5">Gelombang</th>
+                            <th class="px-3 py-3.5 text-center min-w-[120px]">Program & Gelombang</th>
                             <th class="px-3 py-3.5 text-center">Biaya Seleksi</th>
-                            <th class="px-3 py-3.5 text-center">Status SPMB</th>
-                            <th class="px-3 py-3.5 text-center">Program</th>
+                            <th class="px-3 py-3.5 text-center min-w-[130px]">Status SPMB</th>
                             <th class="px-3 py-3.5 min-w-[140px]">Pemberi Rekomendasi</th>
                             <th class="px-3 py-3.5 w-[180px] min-w-[180px] max-w-[180px]">Catatan Khusus CS</th>
                             <th class="px-3 py-3.5 w-[180px] min-w-[180px] max-w-[180px]">Catatan Pewawancara</th>
@@ -328,22 +327,24 @@
                                             </span>
                                         @endif
                                     </div>
-                                    <p class="text-[11px] text-slate-400 font-mono mt-0.5">
+                                    <p class="text-[11px] text-slate-500 font-mono mt-0.5">
                                         {{ $cs->nomor_pendaftaran }} &bull; NISN: {{ $cs->nisn }}
-                                    </p>
-                                    <p class="text-[11px] text-slate-500 mt-0.5">
-                                        {{ $cs->sekolah_asal_text }}
                                     </p>
                                 </td>
 
-                                <!-- Tanggal Daftar -->
-                                <td class="px-3 py-4 whitespace-nowrap">
-                                    <span class="font-bold text-slate-800 block text-xs">
+                                <!-- Tanggal Daftar & Asal SMP -->
+                                <td class="px-3 py-4">
+                                    <span class="font-bold text-slate-800 block text-xs whitespace-nowrap">
                                         {{ $cs->created_at ? $cs->created_at->translatedFormat('d M Y') : '-' }}
                                     </span>
-                                    <span class="text-[10px] text-slate-400 block font-mono mt-0.5">
+                                    <span class="text-[10px] text-slate-400 block font-mono mt-0.5 whitespace-nowrap">
                                         {{ $cs->created_at ? $cs->created_at->format('H:i') . ' WIB' : '' }}
                                     </span>
+                                    @if($cs->sekolah_asal_text)
+                                        <span class="text-[11px] text-slate-700 font-medium block mt-1 leading-snug" title="{{ $cs->sekolah_asal_text }}">
+                                            {{ $cs->sekolah_asal_text }}
+                                        </span>
+                                    @endif
                                 </td>
 
                                 <!-- Jurusan -->
@@ -354,9 +355,16 @@
                                     @endif
                                 </td>
 
-                                <!-- Gelombang -->
-                                <td class="px-3 py-4 text-slate-700">
-                                    <span class="font-medium">{{ $cs->gelombang?->nama_gelombang ?? '-' }}</span>
+                                <!-- Program & Gelombang (Program diatas, Gelombang dibawah) -->
+                                <td class="px-3 py-4 text-center">
+                                    <div>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold {{ str_contains(strtolower($cs->program?->nama ?? $cs->program?->nama_program ?? ''), 'unggul') ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-blue-50 text-blue-800 border border-blue-200' }}">
+                                            {{ $cs->program?->nama ?? $cs->program?->nama_program ?? 'Reguler' }}
+                                        </span>
+                                    </div>
+                                    <span class="block text-[11px] font-semibold text-slate-700 mt-1">
+                                        {{ $cs->gelombang?->nama_gelombang ?? '-' }}
+                                    </span>
                                 </td>
 
                                 <!-- Biaya Seleksi (Lunas/Belum Lunas) -->
@@ -380,13 +388,6 @@
                                 <td class="px-3 py-4 text-center">
                                     <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-white/85 text-slate-800 border border-black/10 shadow-2xs backdrop-blur-xs">
                                         {{ str_replace('_', ' ', $statusStr) }}
-                                    </span>
-                                </td>
-
-                                <!-- Program -->
-                                <td class="px-3 py-4 text-center">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold {{ str_contains(strtolower($cs->program?->nama_program ?? ''), 'unggul') ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-blue-50 text-blue-700 border border-blue-200' }}">
-                                        {{ $cs->program?->nama_program ?? 'Reguler' }}
                                     </span>
                                 </td>
 
@@ -492,7 +493,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="12" class="px-6 py-12 text-center text-slate-400">
+                                <td colspan="11" class="px-6 py-12 text-center text-slate-400">
                                     <div class="flex flex-col items-center justify-center">
                                         <svg class="w-12 h-12 text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
