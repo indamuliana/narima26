@@ -27,7 +27,7 @@ class AuditTrailTest extends TestCase
 
         $this->post('/login', [
             'login' => 'admin@wikrama.sch.id',
-            'password' => 'Jb88fWt2q3',
+            'password' => 'password',
         ]);
 
         $this->assertDatabaseHas('activity_log', [
