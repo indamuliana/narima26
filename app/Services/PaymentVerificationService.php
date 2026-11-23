@@ -178,4 +178,66 @@ class PaymentVerificationService
             return $pembayaran->fresh();
         });
     }
+
+    /**
+     * Membatalkan verifikasi pembayaran seleksi yang telah diverifikasi (DIVERIFIKASI -> PENDING).
+     *
+     * @param PembayaranSeleksi $pembayaran
+     * @param User $actor
+     * @param string|null $catatan
+     * @return PembayaranSeleksi
+     */
+    public function cancelSelectionPaymentVerification(
+        PembayaranSeleksi $pembayaran,
+        User $actor,
+        ?string $catatan = null
+    ): PembayaranSeleksi {
+        return DB::transaction(function () use ($pembayaran, $actor, $catatan) {
+            if ($pembayaran->status !== PaymentStatus::DIVERIFIKASI->value) {
+                throw new RuntimeException("Hanya pembayaran dengan status DIVERIFIKASI yang dapat dibatalkan verifikasinya.");
+            }
+
+            $calonSiswa = $pembayaran->calonSiswa;
+            $oldVerifiedBy = $pembayaran->verifikator?->name ?? 'Petugas';
+
+            // 1. Kembalikan status pembayaran seleksi ke PENDING
+            $pembayaran->update([
+                'status' => PaymentStatus::PENDING->value,
+                'verified_by' => null,
+                'verified_at' => null,
+                'catatan_bendahara' => $catatan ?? "Verifikasi dibatalkan oleh {$actor->name}.",
+            ]);
+
+            // 2. Kembalikan status SPMB jika masih di tahap awal seleksi
+            $currentStatus = is_string($calonSiswa->status_spmb)
+                ? SpmbStatus::from($calonSiswa->status_spmb)
+                : $calonSiswa->status_spmb;
+
+            if (in_array($currentStatus, [SpmbStatus::PEMBAYARAN_SELEKSI_DIVERIFIKASI, SpmbStatus::MELENGKAPI_DATA], true)) {
+                $this->statusService->changeStatus(
+                    calonSiswa: $calonSiswa,
+                    targetStatus: SpmbStatus::MENUNGGU_PEMBAYARAN_SELEKSI,
+                    alasan: "Verifikasi pembayaran seleksi dibatalkan oleh {$actor->name}.",
+                    catatan: $catatan ?? "Verifikasi sebelumnya oleh {$oldVerifiedBy} telah dibatalkan.",
+                    changedBy: $actor,
+                    force: true
+                );
+            }
+
+            // 3. Catat ke Audit Trail
+            activity('finance')
+                ->performedOn($pembayaran)
+                ->causedBy($actor)
+                ->withProperties([
+                    'calon_siswa_id' => $calonSiswa->id,
+                    'nomor_pendaftaran' => $calonSiswa->nomor_pendaftaran,
+                    'status_sebelumnya' => PaymentStatus::DIVERIFIKASI->value,
+                    'status_baru' => PaymentStatus::PENDING->value,
+                    'cancelled_by' => $actor->name,
+                ])
+                ->log("{$actor->name} membatalkan verifikasi pembayaran seleksi calon siswa #{$calonSiswa->nomor_pendaftaran}");
+
+            return $pembayaran->fresh();
+        });
+    }
 }

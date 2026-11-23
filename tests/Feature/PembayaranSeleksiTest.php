@@ -272,4 +272,93 @@ class PembayaranSeleksiTest extends TestCase
 
         $responseJson->assertStatus(403);
     }
+
+    /**
+     * Test 10: Admin dapat membatalkan verifikasi pembayaran seleksi.
+     */
+    public function test_admin_can_cancel_selection_payment_verification(): void
+    {
+        $admin = User::where('role', 'admin')->first();
+        $pembayaran = PembayaranSeleksi::where('calon_siswa_id', $this->calonSiswa->id)->first();
+        $pembayaran->update([
+            'status' => PaymentStatus::DIVERIFIKASI->value,
+            'verified_by' => $this->bendahara->id,
+            'verified_at' => now(),
+        ]);
+        $this->calonSiswa->update([
+            'status_spmb' => SpmbStatus::PEMBAYARAN_SELEKSI_DIVERIFIKASI,
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->post(route('admin.pembayaran.seleksi.cancel-verification', $pembayaran));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $pembayaranFresh = $pembayaran->fresh();
+        $this->assertEquals(PaymentStatus::PENDING->value, $pembayaranFresh->status);
+        $this->assertNull($pembayaranFresh->verified_by);
+        $this->assertNull($pembayaranFresh->verified_at);
+
+        // Status calon siswa kembali ke MENUNGGU_PEMBAYARAN_SELEKSI
+        $this->assertEquals(SpmbStatus::MENUNGGU_PEMBAYARAN_SELEKSI, $this->calonSiswa->fresh()->status_spmb);
+    }
+
+    /**
+     * Test 11: Bendahara dapat membatalkan verifikasi pembayaran seleksi.
+     */
+    public function test_bendahara_can_cancel_selection_payment_verification(): void
+    {
+        $pembayaran = PembayaranSeleksi::where('calon_siswa_id', $this->calonSiswa->id)->first();
+        $pembayaran->update([
+            'status' => PaymentStatus::DIVERIFIKASI->value,
+            'verified_by' => $this->bendahara->id,
+            'verified_at' => now(),
+        ]);
+        $this->calonSiswa->update([
+            'status_spmb' => SpmbStatus::MELENGKAPI_DATA,
+        ]);
+
+        $response = $this->actingAs($this->bendahara)
+            ->post(route('bendahara.pembayaran-seleksi.cancel-verification', $pembayaran));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $pembayaranFresh = $pembayaran->fresh();
+        $this->assertEquals(PaymentStatus::PENDING->value, $pembayaranFresh->status);
+        $this->assertNull($pembayaranFresh->verified_by);
+
+        // Status calon siswa kembali ke MENUNGGU_PEMBAYARAN_SELEKSI
+        $this->assertEquals(SpmbStatus::MENUNGGU_PEMBAYARAN_SELEKSI, $this->calonSiswa->fresh()->status_spmb);
+    }
+
+    /**
+     * Test 12: Pembatalan verifikasi tidak menarik mundur status calon yang sudah lanjut wawancara/diterima.
+     */
+    public function test_cancel_verification_preserves_spmb_status_if_candidate_already_progressed(): void
+    {
+        $admin = User::where('role', 'admin')->first();
+        $pembayaran = PembayaranSeleksi::where('calon_siswa_id', $this->calonSiswa->id)->first();
+        $pembayaran->update([
+            'status' => PaymentStatus::DIVERIFIKASI->value,
+            'verified_by' => $this->bendahara->id,
+            'verified_at' => now(),
+        ]);
+        $this->calonSiswa->update([
+            'status_spmb' => SpmbStatus::SUDAH_DIWAWANCARA,
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->post(route('admin.pembayaran.seleksi.cancel-verification', $pembayaran));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $pembayaranFresh = $pembayaran->fresh();
+        $this->assertEquals(PaymentStatus::PENDING->value, $pembayaranFresh->status);
+
+        // Status SPMB calon siswa tetap SUDAH_DIWAWANCARA
+        $this->assertEquals(SpmbStatus::SUDAH_DIWAWANCARA, $this->calonSiswa->fresh()->status_spmb);
+    }
 }

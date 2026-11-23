@@ -180,6 +180,7 @@ Route::middleware(['auth', 'role:admin,operator'])
                 Route::get('/seleksi', 'seleksi')->name('seleksi');
                 Route::post('/seleksi/{pembayaranSeleksi}/verify', 'verifySeleksi')->name('seleksi.verify');
                 Route::post('/seleksi/{pembayaranSeleksi}/reject', 'rejectSeleksi')->name('seleksi.reject');
+                Route::post('/seleksi/{pembayaranSeleksi}/cancel-verification', 'cancelVerifySeleksi')->name('seleksi.cancel-verification');
                 Route::get('/daftar-ulang', 'daftarUlang')->name('daftar-ulang');
             });
 
@@ -328,6 +329,7 @@ Route::middleware(['auth', 'role:bendahara,admin'])
                 Route::get('/{pembayaranSeleksi}', 'show')->name('show');
                 Route::post('/{pembayaranSeleksi}/verify', 'verify')->name('verify');
                 Route::post('/{pembayaranSeleksi}/reject', 'reject')->name('reject');
+                Route::post('/{pembayaranSeleksi}/cancel-verification', 'cancelVerification')->name('cancel-verification');
                 Route::get('/{pembayaranSeleksi}/cetak', 'cetakKwitansi')->name('cetak');
             });
 

@@ -203,6 +203,13 @@
                                                 class="inline-flex items-center p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                             </a>
+                                            <form action="{{ route('bendahara.pembayaran-seleksi.cancel-verification', $pembayaran->id) }}" method="POST" class="inline"
+                                                  onsubmit="return confirm('Apakah Anda yakin ingin membatalkan verifikasi pembayaran seleksi ini? Status pembayaran akan kembali menjadi PENDING.')">
+                                                @csrf
+                                                <button type="submit" title="Batalkan Verifikasi" class="inline-flex items-center px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold text-xs transition cursor-pointer">
+                                                    Batal
+                                                </button>
+                                            </form>
                                         @endif
                                     </div>
                                 </td>

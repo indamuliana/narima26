@@ -103,6 +103,19 @@ class PembayaranSeleksiController extends Controller
     }
 
     /**
+     * Membatalkan verifikasi pembayaran seleksi (DIVERIFIKASI -> PENDING).
+     */
+    public function cancelVerification(Request $request, PembayaranSeleksi $pembayaranSeleksi): RedirectResponse
+    {
+        $this->paymentService->cancelSelectionPaymentVerification(
+            pembayaran: $pembayaranSeleksi,
+            actor: auth()->user()
+        );
+
+        return back()->with('success', "Verifikasi pembayaran seleksi calon siswa {$pembayaranSeleksi->calonSiswa->nama_lengkap} berhasil dibatalkan.");
+    }
+
+    /**
      * Cetak Kwitansi Resmi Pembayaran Seleksi PDF (ber-KOP resmi).
      */
     public function cetakKwitansi(PembayaranSeleksi $pembayaranSeleksi, PdfService $pdfService): Response

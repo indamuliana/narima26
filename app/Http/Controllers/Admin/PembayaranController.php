@@ -123,4 +123,17 @@ class PembayaranController extends Controller
 
         return back()->with('success', "Pembayaran seleksi ditolak.");
     }
+
+    /**
+     * Cancel verification of selection payment.
+     */
+    public function cancelVerifySeleksi(Request $request, PembayaranSeleksi $pembayaranSeleksi): RedirectResponse
+    {
+        $this->paymentService->cancelSelectionPaymentVerification(
+            $pembayaranSeleksi,
+            auth()->user()
+        );
+
+        return back()->with('success', "Verifikasi pembayaran seleksi calon siswa {$pembayaranSeleksi->calonSiswa?->nama_lengkap} berhasil dibatalkan.");
+    }
 }
