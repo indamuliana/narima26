@@ -145,14 +145,16 @@
                                             <span class="text-[11px] text-slate-400 font-mono">
                                                 Oleh: {{ $p->verifikator?->name ?? 'Admin' }}
                                             </span>
-                                            <form method="POST" action="{{ route('admin.pembayaran.seleksi.cancel-verification', $p) }}" class="inline"
-                                                  onsubmit="return confirm('Apakah Anda yakin ingin membatalkan verifikasi pembayaran seleksi ini? Status pembayaran akan kembali menjadi PENDING.')">
-                                                @csrf
-                                                <button type="submit" class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 font-bold text-xs transition-colors cursor-pointer"
-                                                        title="Batalkan verifikasi pembayaran ini">
-                                                    Batalkan
-                                                </button>
-                                            </form>
+                                            @if(\Illuminate\Support\Facades\Route::has('admin.pembayaran.seleksi.cancel-verification'))
+                                                <form method="POST" action="{{ route('admin.pembayaran.seleksi.cancel-verification', $p) }}" class="inline"
+                                                      onsubmit="return confirm('Apakah Anda yakin ingin membatalkan verifikasi pembayaran seleksi ini? Status pembayaran akan kembali menjadi PENDING.')">
+                                                    @csrf
+                                                    <button type="submit" class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 font-bold text-xs transition-colors cursor-pointer"
+                                                            title="Batalkan verifikasi pembayaran ini">
+                                                        Batalkan
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </div>
                                     @else
                                         <span class="text-xs text-rose-500 font-medium">Ditolak</span>
